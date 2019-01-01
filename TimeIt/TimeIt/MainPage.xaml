@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="TimeIt.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:TimeIt.Helpers"
+    xmlns:local="clr-namespace:TimeIt"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+    Title="TimeIt"
+    BindingContext="{Binding Main, Source={StaticResource Locator}}"
+    SizeChanged="ContentPage_SizeChanged"
+    Style="{StaticResource PageStyle}"
+    mc:Ignorable="d">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Name="AddMenuItem"
+            Command="{Binding AddTimerCommand}"
+            Order="Default"
+            Priority="0"
+            Text="Add Timer" />
+        <ToolbarItem
+            Name="SettingsMenuItem"
+            Order="Secondary"
+            Priority="1"
+            Text="Settings" />
+    </ContentPage.ToolbarItems>
+
+    <!--<OnPlatform x:TypeArguments="View">
+        <OnPlatform.Platforms>
+            <On Platform="Android">
+                <On.Value>
+                    <Button Text="I'm an Android Button" />
+                </On.Value>
+            </On>
+            <On Platform="iOS">
+                <On.Value>
+                    <Button Text="I'm an iOS Button" />
+                </On.Value>
+            </On>
+            <On Platform="UWP">
+                <On.Value>
+                    <Button Text="I'm a UWP Button" />
+                </On.Value>
+            </On>
+        </OnPlatform.Platforms>
+    </OnPlatform>-->
+
+    <ContentPage.Content>
+        <ScrollView Orientation="Both" VerticalOptions="FillAndExpand">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <!--  Timer name and repetitions  -->
+                <Grid
+                    Grid.Row="0"
+                    Padding="10"
+                    BackgroundColor="Coral"
+                    HorizontalOptions="Fill">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        HorizontalOptions="StartAndExpand"
+                        Text="Timer " />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='22',
+                                              UWP='18'}"
+                        HorizontalOptions="StartAndExpand"
+                        Text="{Binding Timer.Name, Mode=OneWay}" />
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        HorizontalOptions="EndAndExpand"
+                        Text="Repetitions " />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='22',
+                                              UWP='18'}"
+                        HorizontalOptions="EndAndExpand"
+                        Text="{Binding Timer.Repetitions, Mode=OneWay}" />
+                </Grid>
+                <!--  Canvas  -->
+                <skia:SKCanvasView
+                    x:Name="canvasView"
+                    Grid.Row="1"
+                    HeightRequest="400"
+                    PaintSurface="OnCanvasViewPaintSurface" />
+                <!--  Buttons  -->
+                <Grid Grid.Row="2" HorizontalOptions="Fill">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        Grid.Column="0"
+                        Command="{Binding StartTimerCommand}"
+                        Text="Start"
+                        TextColor="White" />
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding PauseTimerCommand}"
+                        Text="Pause"
+                        TextColor="White" />
+                    <Button
+                        Grid.Column="2"
+                        Command="{Binding StopTimerCommand}"
+                        Text="Stop"
+                        TextColor="White" />
+                </Grid>
+                <!--  Total time and elapsed  -->
+                <Grid
+                    Grid.Row="3"
+                    Padding="10"
+                    BackgroundColor="Coral"
+                    HorizontalOptions="Fill">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='22',
+                                              UWP='18'}"
+                        HorizontalOptions="StartAndExpand"
+                        Text="{Binding TotalTimeText, Mode=OneWay}" />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        HorizontalOptions="StartAndExpand"
+                        Text="Total" />
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='22',
+                                              UWP='18'}"
+                        HorizontalOptions="EndAndExpand"
+                        Text="{Binding ElapsedTimeText, Mode=OneWay}" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        HorizontalOptions="EndAndExpand"
+                        Text="Elapsed" />
+                </Grid>
+            </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

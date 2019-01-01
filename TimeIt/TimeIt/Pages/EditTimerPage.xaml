@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="TimeIt.Pages.EditTimerPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
+    xmlns:models="clr-namespace:TimeIt.Models"
+    Title="Add / Edit Timer"
+    BindingContext="{Binding EditTimer, Source={StaticResource Locator}}"
+    NavigationPage.BackButtonTitle="Go back hdp">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Order="Primary"
+            Priority="0"
+            Text="Save" />
+
+        <ToolbarItem
+            Order="Primary"
+            Priority="1"
+            Text="Discard" />
+
+        <ToolbarItem
+            Order="Secondary"
+            Priority="2"
+            Text="Delete" />
+    </ContentPage.ToolbarItems>
+
+
+    <ContentPage.Content>
+        <!--<ScrollView>-->
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Entry
+                Grid.Row="0"
+                Placeholder="Timer name"
+                Text="{Binding TimerName, Mode=TwoWay}" />
+            <StackLayout Grid.Row="1" Orientation="Horizontal">
+                <Label
+                    FontAttributes="Bold"
+                    Text="Repetitions"
+                    VerticalOptions="Center" />
+                <Stepper
+                    BackgroundColor="Transparent"
+                    Increment="1"
+                    Maximum="99"
+                    Minimum="0"
+                    MinimumWidthRequest="100"
+                    Value="{Binding Repetitions, Mode=TwoWay}" />
+                <Entry
+                    FontAttributes="Bold"
+                    IsEnabled="False"
+                    Keyboard="Numeric"
+                    MinimumWidthRequest="100"
+                    Placeholder="0"
+                    Text="{Binding Repetitions, Mode=TwoWay}" />
+            </StackLayout>
+            <StackLayout
+                Grid.Row="2"
+                HorizontalOptions="FillAndExpand"
+                Orientation="Vertical">
+                <BoxView
+                    BackgroundColor="Black"
+                    HeightRequest="1"
+                    HorizontalOptions="FillAndExpand" />
+                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label
+                        FontAttributes="Bold"
+                        HorizontalOptions="StartAndExpand"
+                        Text="Intervals:"
+                        VerticalOptions="Center" />
+                    <Button
+                        BackgroundColor="Transparent"
+                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                        FontSize="Medium"
+                        HorizontalOptions="EndAndExpand"
+                        Text="&#xf067;"
+                        VerticalOptions="End" />
+                </StackLayout>
+            </StackLayout>
+            <ListView Grid.Row="3" ItemsSource="{Binding Intervals, Mode=OneWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Interval">
+                        <ViewCell>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Column="0"
+                                    HorizontalOptions="StartAndExpand"
+                                    HorizontalTextAlignment="Start"
+                                    Text="{Binding Name, Mode=OneWay}"
+                                    VerticalOptions="Center" />
+                                <FlexLayout
+                                    Grid.Column="1"
+                                    Direction="Row"
+                                    JustifyContent="End">
+                                    <Button
+                                        BackgroundColor="Transparent"
+                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="&#xf0b2;"
+                                        TextColor="Black" />
+                                    <Button
+                                        BackgroundColor="Transparent"
+                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="&#xf304;"
+                                        TextColor="Black" />
+                                    <Button
+                                        BackgroundColor="Transparent"
+                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="&#xf2ed;"
+                                        TextColor="Black" />
+                                </FlexLayout>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Footer>
+                    <StackLayout Orientation="Horizontal">
+                        <Label HorizontalOptions="End" Text="{Binding IntervalToTalTime, Mode=OneWay}" />
+                    </StackLayout>
+                </ListView.Footer>
+            </ListView>
+        </Grid>
+        <!--</ScrollView>-->
+    </ContentPage.Content>
+</ContentPage>
