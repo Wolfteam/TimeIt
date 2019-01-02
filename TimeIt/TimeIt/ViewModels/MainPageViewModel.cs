@@ -25,6 +25,7 @@ namespace TimeIt.ViewModels
 
         public CustomTimer customTimer;
         public bool requestReDraw;
+        public bool navigated;
         #endregion
 
         #region Properties
@@ -82,35 +83,35 @@ namespace TimeIt.ViewModels
                 {
                     new IntervalItemViewModel
                     {
-                        Duration = 13,
+                        Duration = 6,
                         Color = "#58ff00",
                         Name = "Workout",
                         Position = 1
                     },
                     new IntervalItemViewModel
                     {
-                        Duration = 6,
+                        Duration = 3,
                         Color = "#0c00ff",
                         Name = "Rest you motherfucker",
                         Position = 3
                     },
                     new IntervalItemViewModel
                     {
-                        Duration = 15,
+                        Duration = 7,
                         Color = "#ff0000",
                         Name = "Excercise",
                         Position = 2
                     },
                     new IntervalItemViewModel
                     {
-                        Duration = 10,
+                        Duration = 5,
                         Color = "#feff00",
                         Name = "Intervalo con un nombre muy largo",
                         Position = 4
                     }
                 },
                 Name = "Tibia",
-                Repetitions = 10
+                Repetitions = 5
             };
 
             foreach (var interval in Timer.Intervals)
@@ -118,7 +119,7 @@ namespace TimeIt.ViewModels
                 interval.TimeLeft = interval.Duration;
             }
 
-            TotalTimeText = TimeSpan.FromSeconds(GetTimerTotalTime()).ToString(_timeSpanFormat);
+            TotalTimeText = TimeSpan.FromSeconds(Timer.TotalTime).ToString(_timeSpanFormat);
             ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
 
             AddTimerCommand = new RelayCommand(() =>
@@ -126,6 +127,7 @@ namespace TimeIt.ViewModels
                 System.Diagnostics.Debug.WriteLine("Navigating to x page");
                 _navigationService.NavigateTo($"{AppPages.ADD_TIMER}");
                 requestReDraw = true;
+                navigated = true;
             });
 
             OpenSettingsCommand = new RelayCommand
@@ -141,10 +143,13 @@ namespace TimeIt.ViewModels
 
         public void StartTimer()
         {
+            //just a sanity check
+            if (customTimer?.IsRunning == true || customTimer?.IsPaused == true)
+                return;
             foreach (var interval in Timer.Intervals)
             {
                 if (interval.TimeLeft <= 0)
-                    interval.TimeLeft = interval.TimeLeft;
+                    interval.TimeLeft = interval.Duration;
                 if (interval.Position == 1)
                     interval.IsRunning = true;
             }
@@ -175,7 +180,6 @@ namespace TimeIt.ViewModels
 
         public void StopTimer()
         {
-            IsTimerRunning = true;
             customTimer.Stop();
             customTimer.IsPaused = false;
 
@@ -184,8 +188,9 @@ namespace TimeIt.ViewModels
                 interval.IsRunning = false;
                 interval.TimeLeft = interval.Duration;
             }
-
             InvalidateSurfaceEvent.Invoke();
+            IsTimerRunning = true;
+            Timer.ElapsedRepetitions = 0;
             ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
         }
 
@@ -203,28 +208,44 @@ namespace TimeIt.ViewModels
                 var nextInterval = Timer.Intervals.FirstOrDefault(t => t.Position == currentInterval.Position + 1);
                 if (nextInterval is null)
                 {
-                    StopTimer();
+                    if (Timer.Repetitions == Timer.ElapsedRepetitions + 1)
+                    {
+                        Timer.ElapsedRepetitions = 0;
+                        StopTimer();
+                    }
+                    else
+                    {
+                        Timer.ElapsedRepetitions++;
+                        foreach (var interval in Timer.Intervals)
+                        {
+                            interval.IsRunning = false;
+                            interval.TimeLeft = interval.Duration;
+                            if (interval.Position == 1)
+                                interval.IsRunning = true;
+                        }
+                        requestReDraw = true;
+                    }
                 }
                 else
                 {
                     nextInterval.IsRunning = true;
                     nextInterval.TimeLeft -= _fps;
                 }
-
             }
             else
             {
                 currentInterval.TimeLeft -= _fps;
             }
+            ElapsedTimeText = TimeSpan.FromSeconds(Timer.ElapsedTime).ToString(_timeSpanFormat);
             System.Diagnostics.Debug.WriteLine("--------------Updating current interval completed");
         }
 
-        public float GetTimerTotalTime()
+        public float GetTimerCycleTotalTime()
         {
             return Timer.Intervals.Sum(i => i.Duration);
         }
 
-        public float GetTimerTotalElapsedTime()
+        public float GetTimerCycleTotalElapsedTime()
         {
             float totalElapsedTime = Timer.Intervals.Sum(t => t.ElapsedTime);
             return totalElapsedTime;

@@ -19,24 +19,30 @@ namespace TimeIt
 
         public MainPage()
         {
-            InitializeComponent();
+            InitializeComponent();            
             ViewModel.InvalidateSurfaceEvent = canvasView.InvalidateSurface;
         }
 
-        protected override void OnSizeAllocated(double width, double height)
+        protected override void OnAppearing()
         {
-            base.OnSizeAllocated(width, height);
-            System.Diagnostics.Debug.WriteLine("size allocated");
+            base.OnAppearing();
+            System.Diagnostics.Debug.WriteLine("On appearing...");
+            if (ViewModel.navigated)
+            {
+                ViewModel.navigated = false;
+                ViewModel.requestReDraw = true;
+                canvasView.InvalidateSurface();
+            }
         }
 
         void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
         {
-            if (_rendering)
+            if (_rendering || ViewModel.navigated)
             {
                 System.Diagnostics.Debug.WriteLine("Canvas is being already rendered");
                 return;
             }
-
+            System.Diagnostics.Debug.WriteLine("Invalidate was called");
             SKImageInfo info = args.Info;
             SKSurface surface = args.Surface;
             SKCanvas canvas = surface.Canvas;
@@ -55,12 +61,12 @@ namespace TimeIt
                 if (ViewModel.customTimer?.IsRunning == true && 
                     !ViewModel.requestReDraw)
                 {
-                    float totalTime = ViewModel.GetTimerTotalTime();
-                    float totalElapsedTime = ViewModel.GetTimerTotalElapsedTime();
+                    float totalTime = ViewModel.GetTimerCycleTotalTime();
+                    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
                     float startAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime) - 90f;
                     //sometimes i need a *-1 in the sweepAngle o.o
                     float sweepAngle = ViewModel.CalculateAngle(1, totalTime) *-1;
-                    UpdateCurrentInterval(rect, canvas, totalElapsedTime, startAngle, sweepAngle);
+                    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
                     return;
                 }
 
@@ -72,7 +78,7 @@ namespace TimeIt
                 {
                     float startAngle = 0;
                     float sweepAngle = 0;
-                    float totalTime = ViewModel.GetTimerTotalTime();
+                    float totalTime = ViewModel.GetTimerCycleTotalTime();
 
                     foreach (var interval in ViewModel.Timer.Intervals.OrderBy(t => t.Position))
                     {
@@ -144,12 +150,12 @@ namespace TimeIt
                 if (ViewModel.customTimer?.IsRunning == true && ViewModel.requestReDraw ||
                     ViewModel.customTimer?.IsPaused == true && ViewModel.requestReDraw)
                 {
-                    float totalTime = ViewModel.GetTimerTotalTime();
+                    float totalTime = ViewModel.GetTimerCycleTotalTime();
 
-                    float totalElapsedTime = ViewModel.GetTimerTotalElapsedTime();
+                    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
                     float startAngle = -90f;
                     float sweepAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime);
-                    UpdateCurrentInterval(rect, canvas, totalElapsedTime, startAngle, sweepAngle);
+                    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
                     ViewModel.requestReDraw = false;
                 }
                 _rendering = false;
@@ -162,13 +168,11 @@ namespace TimeIt
             }
         }
 
-        void UpdateCurrentInterval(SKRect rect, SKCanvas canvas, float totalElapsedTime, float startAngle, float sweepAngle)
+        void UpdateCurrentInterval(SKRect rect, SKCanvas canvas, float startAngle, float sweepAngle)
         {
             var currentInterval = ViewModel.Timer.Intervals.FirstOrDefault(t => t.IsRunning);
             if (currentInterval is null)
                 throw new NullReferenceException("There arent 0 running intervals");
-
-            float totalTime = ViewModel.GetTimerTotalTime();
 
             using (var path = new SKPath())
             using (var textPaint = new SKPaint())
@@ -191,7 +195,6 @@ namespace TimeIt
                 canvas.DrawPath(path, transparentStrokePaint);
             }
             DrawDurationIntervalText(rect, canvas, currentInterval);
-            ViewModel.ElapsedTimeText = TimeSpan.FromSeconds(totalElapsedTime).ToString(_timeSpanFormat);
         }
 
         private void DrawDurationIntervalText(SKRect rect, SKCanvas canvas, IntervalItemViewModel currentInterval)
@@ -216,7 +219,7 @@ namespace TimeIt
 
             foreach (var interval in ViewModel.Timer.Intervals.OrderBy(i => i.Position))
             {
-                sweepAngle = ViewModel.CalculateAngle(interval.Duration, ViewModel.GetTimerTotalTime());
+                sweepAngle = ViewModel.CalculateAngle(interval.Duration, ViewModel.GetTimerCycleTotalTime());
                 if (interval.Position == currentInterval.Position)
                 {
                     break;

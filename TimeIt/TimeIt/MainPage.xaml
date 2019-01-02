@@ -104,7 +104,7 @@
                         FontSize="{OnPlatform Android='22',
                                               UWP='18'}"
                         HorizontalOptions="EndAndExpand"
-                        Text="{Binding Timer.Repetitions, Mode=OneWay}" />
+                        Text="{Binding Timer.RemainingRepetitions, Mode=OneWay}" />
                 </Grid>
                 <!--  Canvas  -->
                 <skia:SKCanvasView

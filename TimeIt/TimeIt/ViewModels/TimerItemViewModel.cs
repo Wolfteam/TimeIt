@@ -7,7 +7,7 @@ namespace TimeIt.ViewModels
     public class TimerItemViewModel : ViewModelBase
     {
         private string _name;
-        private int _repetitions;
+        private int _elapsedRepetitions;
         private ObservableCollection<IntervalItemViewModel> _intervals = new ObservableCollection<IntervalItemViewModel>();
 
         public string Name
@@ -16,10 +16,21 @@ namespace TimeIt.ViewModels
             set => Set(ref _name, value);
         }
 
-        public int Repetitions
+        public int Repetitions { get; set; }
+
+        public int RemainingRepetitions
         {
-            get => _repetitions;
-            set => Set(ref _repetitions, value);
+            get => Repetitions - ElapsedRepetitions;
+        }
+
+        public int ElapsedRepetitions
+        {
+            get => _elapsedRepetitions;
+            set
+            {
+                Set(ref _elapsedRepetitions, value);
+                RaisePropertyChanged(nameof(RemainingRepetitions));
+            }
         }
 
         public float RemainingTime
@@ -29,12 +40,21 @@ namespace TimeIt.ViewModels
 
         public float ElapsedTime
         {
-            get => Intervals?.Sum(i => i.ElapsedTime) ?? 0;
+            get
+            {
+                float cet = Intervals?.Sum(i => i.ElapsedTime) ?? 0;
+                float ctt = Intervals?.Sum(i => i.Duration) ?? 0;
+                return ctt * ElapsedRepetitions + cet;
+            }
         }
 
         public float TotalTime
         {
-            get => Intervals?.Sum(i => i.Duration) ?? 0;
+            get
+            {
+                float ctt = Intervals?.Sum(i => i.Duration) ?? 0;
+                return ctt * Repetitions;
+            }
         }
 
         public ObservableCollection<IntervalItemViewModel> Intervals
