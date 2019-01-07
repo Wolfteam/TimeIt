@@ -26,129 +26,37 @@ namespace TimeIt.ViewModels
             set => Set(ref _repetitions, value);
         }
 
-        public List<Interval> Intervals
+        public List<IntervalItemViewModel> Intervals
         {
-            get => new List<Interval>
+            get => new List<IntervalItemViewModel>
             {
-                new Interval
+                new IntervalItemViewModel
                 {
                     Duration = 13,
                     Name = "Workout",
-                    Position = 1
+                    Position = 1,
+                    Color = "#58ff00",
                 },
-                new Interval
+                new IntervalItemViewModel
                 {
                     Duration = 6,
                     Name = "Rest you motherfucker",
-                    Position = 3
+                    Position = 3,
+                    Color = "#0c00ff",
                 },
-                new Interval
+                new IntervalItemViewModel
                 {
                     Duration = 15,
                     Name = "Excercise",
-                    Position = 2
+                    Position = 2,
+                    Color = "#ff0000",
                 },
-                new Interval
+                new IntervalItemViewModel
                 {
                     Duration = 10,
-                    Name = "Intervalo con un nombre muy largo",
-                    Position = 4
-                },
-                                new Interval
-                {
-                    Duration = 13,
-                    Name = "Workout",
-                    Position = 1
-                },
-                new Interval
-                {
-                    Duration = 6,
-                    Name = "Rest you motherfucker",
-                    Position = 3
-                },
-                new Interval
-                {
-                    Duration = 15,
-                    Name = "Excercise",
-                    Position = 2
-                },
-                new Interval
-                {
-                    Duration = 10,
-                    Name = "Intervalo con un nombre muy largo",
-                    Position = 4
-                },
-                                new Interval
-                {
-                    Duration = 13,
-                    Name = "Workout",
-                    Position = 1
-                },
-                new Interval
-                {
-                    Duration = 6,
-                    Name = "Rest you motherfucker",
-                    Position = 3
-                },
-                new Interval
-                {
-                    Duration = 15,
-                    Name = "Excercise",
-                    Position = 2
-                },
-                new Interval
-                {
-                    Duration = 10,
-                    Name = "Intervalo con un nombre muy largo",
-                    Position = 4
-                },
-                                new Interval
-                {
-                    Duration = 13,
-                    Name = "Workout",
-                    Position = 1
-                },
-                new Interval
-                {
-                    Duration = 6,
-                    Name = "Rest you motherfucker",
-                    Position = 3
-                },
-                new Interval
-                {
-                    Duration = 15,
-                    Name = "Excercise",
-                    Position = 2
-                },
-                new Interval
-                {
-                    Duration = 10,
-                    Name = "Intervalo con un nombre muy largo",
-                    Position = 4
-                },
-                                new Interval
-                {
-                    Duration = 13,
-                    Name = "Workout",
-                    Position = 1
-                },
-                new Interval
-                {
-                    Duration = 6,
-                    Name = "Rest you motherfucker",
-                    Position = 3
-                },
-                new Interval
-                {
-                    Duration = 15,
-                    Name = "Excercise",
-                    Position = 2
-                },
-                new Interval
-                {
-                    Duration = 10,
-                    Name = "Intervalo con un nombre muy largo",
-                    Position = 4
+                    Name = "IntervalItemViewModelo con un nombre muy largo",
+                    Position = 4,
+                    Color = "#feff00",
                 }
             };
         }
@@ -158,7 +66,7 @@ namespace TimeIt.ViewModels
         {
             get
             {
-                int totalTime = Intervals.Sum(i => i.Duration);
+                float totalTime = Intervals.Sum(i => i.Duration);
                 return $"Total: {TimeSpan.FromSeconds(totalTime).ToString("c")}";
             }
         }

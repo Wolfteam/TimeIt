@@ -4,10 +4,12 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
+    xmlns:converters="clr-namespace:TimeIt.Converters"
     xmlns:models="clr-namespace:TimeIt.Models"
     Title="Add / Edit Timer"
     BindingContext="{Binding EditTimer, Source={StaticResource Locator}}"
-    NavigationPage.BackButtonTitle="Go back hdp">
+    NavigationPage.BackButtonTitle="Go back hdp"
+    Style="{StaticResource PageStyle}">
     <ContentPage.ToolbarItems>
         <ToolbarItem
             Order="Primary"
@@ -25,6 +27,9 @@
             Text="Delete" />
     </ContentPage.ToolbarItems>
 
+    <ContentPage.Resources>
+        <converters:StringToColorConverter x:Key="StringToColorConverter" />
+    </ContentPage.Resources>
 
     <ContentPage.Content>
         <!--<ScrollView>-->
@@ -36,29 +41,39 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Entry
+            <StackLayout
                 Grid.Row="0"
-                Placeholder="Timer name"
-                Text="{Binding TimerName, Mode=TwoWay}" />
-            <StackLayout Grid.Row="1" Orientation="Horizontal">
+                HorizontalOptions="Fill"
+                Orientation="Vertical">
+                <Label
+                    FontAttributes="Bold"
+                    Text="Name"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+                <Entry Placeholder="Timer name" Text="{Binding TimerName, Mode=TwoWay}" />
+            </StackLayout>
+            <StackLayout Grid.Row="1" Orientation="Vertical">
                 <Label
                     FontAttributes="Bold"
                     Text="Repetitions"
+                    TextColor="White"
                     VerticalOptions="Center" />
-                <Stepper
-                    BackgroundColor="Transparent"
-                    Increment="1"
-                    Maximum="99"
-                    Minimum="0"
-                    MinimumWidthRequest="100"
-                    Value="{Binding Repetitions, Mode=TwoWay}" />
-                <Entry
-                    FontAttributes="Bold"
-                    IsEnabled="False"
-                    Keyboard="Numeric"
-                    MinimumWidthRequest="100"
-                    Placeholder="0"
-                    Text="{Binding Repetitions, Mode=TwoWay}" />
+                <StackLayout HorizontalOptions="Fill" Orientation="Horizontal">
+                    <Stepper
+                        BackgroundColor="White"
+                        Increment="1"
+                        Maximum="99"
+                        Minimum="0"
+                        MinimumWidthRequest="100"
+                        Value="{Binding Repetitions, Mode=TwoWay}" />
+                    <Entry
+                        FontAttributes="Bold"
+                        IsEnabled="False"
+                        Keyboard="Numeric"
+                        MinimumWidthRequest="100"
+                        Placeholder="0"
+                        Text="{Binding Repetitions, Mode=TwoWay}" />
+                </StackLayout>
             </StackLayout>
             <StackLayout
                 Grid.Row="2"
@@ -73,22 +88,31 @@
                         FontAttributes="Bold"
                         HorizontalOptions="StartAndExpand"
                         Text="Intervals:"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Label
+                        HorizontalOptions="End"
+                        Text="Add a new interval"
+                        TextColor="White"
                         VerticalOptions="Center" />
                     <Button
                         BackgroundColor="Transparent"
                         FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
                                                   UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
                         FontSize="Medium"
-                        HorizontalOptions="EndAndExpand"
+                        HorizontalOptions="End"
                         Text="&#xf067;"
                         VerticalOptions="End" />
                 </StackLayout>
             </StackLayout>
-            <ListView Grid.Row="3" ItemsSource="{Binding Intervals, Mode=OneWay}">
+            <ListView
+                Grid.Row="3"
+                ItemsSource="{Binding Intervals, Mode=OneWay}"
+                SelectionMode="None">
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Interval">
+                    <DataTemplate>
                         <ViewCell>
-                            <Grid>
+                            <Grid Padding="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
@@ -97,28 +121,30 @@
                                     Grid.Column="0"
                                     HorizontalOptions="StartAndExpand"
                                     HorizontalTextAlignment="Start"
+                                    LineBreakMode="TailTruncation"
                                     Text="{Binding Name, Mode=OneWay}"
+                                    TextColor="{Binding Color, Mode=OneWay, Converter={StaticResource StringToColorConverter}}"
                                     VerticalOptions="Center" />
                                 <FlexLayout
                                     Grid.Column="1"
                                     Direction="Row"
                                     JustifyContent="End">
-                                    <Button
+                                    <!--<Button
                                         BackgroundColor="Transparent"
                                         FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
                                                                   UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
                                         FontSize="Medium"
                                         HorizontalOptions="Center"
                                         Text="&#xf0b2;"
-                                        TextColor="Black" />
-                                    <Button
+                                        TextColor="Black" />-->
+                                    <!--<Button
                                         BackgroundColor="Transparent"
                                         FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
                                                                   UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
                                         FontSize="Medium"
                                         HorizontalOptions="Center"
                                         Text="&#xf304;"
-                                        TextColor="Black" />
+                                        TextColor="Black" />-->
                                     <Button
                                         BackgroundColor="Transparent"
                                         FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
@@ -133,8 +159,16 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
                 <ListView.Footer>
-                    <StackLayout Orientation="Horizontal">
-                        <Label HorizontalOptions="End" Text="{Binding IntervalToTalTime, Mode=OneWay}" />
+                    <StackLayout
+                        Padding="10"
+                        HorizontalOptions="Fill"
+                        Orientation="Horizontal">
+                        <Label
+                            FontSize="{OnPlatform Android='22',
+                                                  UWP='18'}"
+                            HorizontalOptions="EndAndExpand"
+                            Text="{Binding IntervalToTalTime, Mode=OneWay}"
+                            TextColor="White" />
                     </StackLayout>
                 </ListView.Footer>
             </ListView>
