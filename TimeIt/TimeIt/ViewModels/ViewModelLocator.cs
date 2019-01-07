@@ -1,17 +1,15 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Views;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TimeIt.Enums;
 using TimeIt.Pages;
 using TimeIt.Services;
-using Xamarin.Forms;
 
 namespace TimeIt.ViewModels
 {
     public class ViewModelLocator
     {
+        public static bool WasAppInForeground { get; set; }
+
         public MainPageViewModel Main
             => SimpleIoc.Default.GetInstance<MainPageViewModel>();
 
@@ -28,6 +26,7 @@ namespace TimeIt.ViewModels
             navigation.Configure($"{AppPages.ADD_TIMER}", typeof(EditTimerPage));
 
             SimpleIoc.Default.Register<INavigationService>(() => navigation);
+
             SimpleIoc.Default.Register<MainPageViewModel>();
             SimpleIoc.Default.Register<EditTimerPageViewModel>();
         }

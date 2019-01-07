@@ -17,7 +17,7 @@ namespace TimeIt.ViewModels
         private readonly INavigationService _navigationService;
         private string _totalTimeText;
         private string _elapsedTimeText;
-        private bool _isTimerRunning;
+        private bool _startButtonEnabled = true;
         private TimerItemViewModel _timer;
 
         private const float _fps = 1f;
@@ -41,10 +41,10 @@ namespace TimeIt.ViewModels
             set => Set(ref _elapsedTimeText, value);
         }
 
-        public bool IsTimerRunning
+        public bool StartButtonEnabled
         {
-            get => _isTimerRunning;
-            set => Set(ref _isTimerRunning, value);
+            get => _startButtonEnabled;
+            set => Set(ref _startButtonEnabled, value);
         }
 
         public TimerItemViewModel Timer
@@ -161,11 +161,14 @@ namespace TimeIt.ViewModels
             });
 
             customTimer.Start();
-            IsTimerRunning = true;
+            StartButtonEnabled = false;
         }
 
         public void PauseTimer()
         {
+            if (customTimer is null)
+                return;
+
             if (customTimer.IsRunning)
             {
                 customTimer.Stop();
@@ -180,6 +183,9 @@ namespace TimeIt.ViewModels
 
         public void StopTimer()
         {
+            if (customTimer is null)
+                return;
+
             customTimer.Stop();
             customTimer.IsPaused = false;
 
@@ -189,7 +195,7 @@ namespace TimeIt.ViewModels
                 interval.TimeLeft = interval.Duration;
             }
             InvalidateSurfaceEvent.Invoke();
-            IsTimerRunning = true;
+            StartButtonEnabled = true;
             Timer.ElapsedRepetitions = 0;
             ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
         }

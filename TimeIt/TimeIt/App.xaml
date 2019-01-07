@@ -7,7 +7,7 @@
     <Application.Resources>
         <viewmodels:ViewModelLocator x:Key="Locator" />
         <Style x:Key="PageStyle" TargetType="ContentPage">
-            <Setter Property="BackgroundColor" Value="{OnPlatform Android='#4f4a4a', UWP='#271c1c'}" />
+            <Setter Property="BackgroundColor" Value="#2c2929" />
         </Style>
     </Application.Resources>
 </Application>

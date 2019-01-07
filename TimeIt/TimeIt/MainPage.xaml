@@ -3,6 +3,8 @@
     x:Class="TimeIt.MainPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:TimeIt.Converters"
+    xmlns:customControls="clr-namespace:TimeIt.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:TimeIt.Helpers"
     xmlns:local="clr-namespace:TimeIt"
@@ -28,6 +30,9 @@
             Text="Settings" />
     </ContentPage.ToolbarItems>
 
+    <ContentPage.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </ContentPage.Resources>
     <!--<OnPlatform x:TypeArguments="View">
         <OnPlatform.Platforms>
             <On Platform="Android">
@@ -61,9 +66,9 @@
                 <Grid
                     Grid.Row="0"
                     Padding="10"
-                    BackgroundColor="Coral"
                     HorizontalOptions="Fill">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
@@ -72,6 +77,12 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
+
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="TextColor" Value="White" />
+                        </Style>
+                    </Grid.Resources>
 
                     <Label
                         Grid.Row="0"
@@ -105,6 +116,13 @@
                                               UWP='18'}"
                         HorizontalOptions="EndAndExpand"
                         Text="{Binding Timer.RemainingRepetitions, Mode=OneWay}" />
+
+                    <BoxView
+                        Grid.Row="2"
+                        Grid.ColumnSpan="2"
+                        BackgroundColor="Red"
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand" />
                 </Grid>
                 <!--  Canvas  -->
                 <skia:SKCanvasView
@@ -113,26 +131,36 @@
                     HeightRequest="400"
                     PaintSurface="OnCanvasViewPaintSurface" />
                 <!--  Buttons  -->
-                <Grid Grid.Row="2" HorizontalOptions="Fill">
+                <Grid
+                    Grid.Row="2"
+                    Padding="10"
+                    HorizontalOptions="Fill">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-
-                    <Button
+                    <customControls:TimerActionButton
                         Grid.Column="0"
+                        BackgroundColor="Accent"
                         Command="{Binding StartTimerCommand}"
+                        IsEnabled="{Binding StartButtonEnabled, Mode=OneWay}"
                         Text="Start"
                         TextColor="White" />
-                    <Button
+
+                    <customControls:TimerActionButton
                         Grid.Column="1"
+                        BackgroundColor="Accent"
                         Command="{Binding PauseTimerCommand}"
+                        IsEnabled="{Binding StartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                         Text="Pause"
                         TextColor="White" />
-                    <Button
+
+                    <customControls:TimerActionButton
                         Grid.Column="2"
+                        BackgroundColor="Accent"
                         Command="{Binding StopTimerCommand}"
+                        IsEnabled="{Binding StartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                         Text="Stop"
                         TextColor="White" />
                 </Grid>
@@ -140,9 +168,9 @@
                 <Grid
                     Grid.Row="3"
                     Padding="10"
-                    BackgroundColor="Coral"
                     HorizontalOptions="Fill">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
@@ -152,8 +180,21 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="TextColor" Value="White" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <BoxView
                         Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        BackgroundColor="Red"
+                        HeightRequest="1"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Label
+                        Grid.Row="1"
                         Grid.Column="0"
                         FontAttributes="Bold"
                         FontSize="{OnPlatform Android='22',
@@ -161,7 +202,7 @@
                         HorizontalOptions="StartAndExpand"
                         Text="{Binding TotalTimeText, Mode=OneWay}" />
                     <Label
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Grid.Column="0"
                         FontSize="{OnPlatform Android='18',
                                               UWP='14'}"
@@ -169,7 +210,7 @@
                         Text="Total" />
 
                     <Label
-                        Grid.Row="0"
+                        Grid.Row="1"
                         Grid.Column="1"
                         FontAttributes="Bold"
                         FontSize="{OnPlatform Android='22',
@@ -178,7 +219,7 @@
                         Text="{Binding ElapsedTimeText, Mode=OneWay}" />
 
                     <Label
-                        Grid.Row="1"
+                        Grid.Row="2"
                         Grid.Column="1"
                         FontSize="{OnPlatform Android='18',
                                               UWP='14'}"

@@ -19,7 +19,7 @@ namespace TimeIt
 
         public MainPage()
         {
-            InitializeComponent();            
+            InitializeComponent();
             ViewModel.InvalidateSurfaceEvent = canvasView.InvalidateSurface;
         }
 
@@ -27,8 +27,9 @@ namespace TimeIt
         {
             base.OnAppearing();
             System.Diagnostics.Debug.WriteLine("On appearing...");
-            if (ViewModel.navigated)
+            if (ViewModel.navigated || ViewModelLocator.WasAppInForeground)
             {
+                ViewModelLocator.WasAppInForeground = false;
                 ViewModel.navigated = false;
                 ViewModel.requestReDraw = true;
                 canvasView.InvalidateSurface();
@@ -58,14 +59,14 @@ namespace TimeIt
 
             try
             {
-                if (ViewModel.customTimer?.IsRunning == true && 
+                if (ViewModel.customTimer?.IsRunning == true &&
                     !ViewModel.requestReDraw)
                 {
                     float totalTime = ViewModel.GetTimerCycleTotalTime();
                     float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
                     float startAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime) - 90f;
                     //sometimes i need a *-1 in the sweepAngle o.o
-                    float sweepAngle = ViewModel.CalculateAngle(1, totalTime) *-1;
+                    float sweepAngle = ViewModel.CalculateAngle(1, totalTime) * -1;
                     UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
                     return;
                 }
@@ -243,13 +244,14 @@ namespace TimeIt
                     intervalTimeTransparentPaint.Style = SKPaintStyle.StrokeAndFill;
                 intervalTimePaint.StrokeWidth =
                     intervalTimeTransparentPaint.StrokeWidth = 2;
+
                 //intervalTimePaint.TextScaleX =
                 //    intervalTimeTransparentPaint.TextScaleX = pathMeasure.Length / pathMeasure.Length * 0.6f;
 
                 float durationWidth = intervalTimePaint.MeasureText(ciText);
                 float durationHOffset = pathMeasure.Length / 2f - durationWidth / 2f;
                 //float durationHOffset = (float)(Math.PI * sweepAngle * radius / 360) - durationWidth / 2f;
-
+                //TODO: there is a small glitch with the colors here
                 //first we draw the "transparent" one
                 canvas.DrawTextOnPath(replacementText, path, durationHOffset, durationVOffset, intervalTimeTransparentPaint);
                 //and then the real one, with the corresponding color
@@ -269,14 +271,22 @@ namespace TimeIt
         {
             return ViewModel.IsDarkTheme() ?
                 SKColors.White :
-                SKColor.Parse("#271c1c");
+                SKColor.Parse("#2c2929");
         }
 
         private SKColor GetTransparentColor()
         {
+            switch (Device.RuntimePlatform)
+            {
+                case Device.Android:
+                    return ViewModel.IsDarkTheme() ?
+                        SKColors.Black :
+                        SKColors.White;
+            }
             return ViewModel.IsDarkTheme() ?
-                SKColor.Parse("#271c1c") :
+                SKColor.Parse("#2c2929") :
                 SKColors.White;
+
         }
 
         #region Old
