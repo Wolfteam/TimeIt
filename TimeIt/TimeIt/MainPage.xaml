@@ -10,6 +10,7 @@
     xmlns:local="clr-namespace:TimeIt"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+    xmlns:uc="clr-namespace:TimeIt.UserControls"
     Title="TimeIt"
     BindingContext="{Binding Main, Source={StaticResource Locator}}"
     SizeChanged="ContentPage_SizeChanged"
@@ -117,12 +118,7 @@
                         HorizontalOptions="EndAndExpand"
                         Text="{Binding Timer.RemainingRepetitions, Mode=OneWay}" />
 
-                    <BoxView
-                        Grid.Row="2"
-                        Grid.ColumnSpan="2"
-                        BackgroundColor="Red"
-                        HeightRequest="1"
-                        HorizontalOptions="FillAndExpand" />
+                    <uc:LineControl Grid.Row="2" Grid.ColumnSpan="2" />
                 </Grid>
                 <!--  Canvas  -->
                 <skia:SKCanvasView
@@ -186,12 +182,7 @@
                         </Style>
                     </Grid.Resources>
 
-                    <BoxView
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        BackgroundColor="Red"
-                        HeightRequest="1"
-                        HorizontalOptions="FillAndExpand" />
+                    <uc:LineControl Grid.Row="0" Grid.ColumnSpan="2" />
 
                     <Label
                         Grid.Row="1"

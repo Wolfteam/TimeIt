@@ -21,6 +21,7 @@ namespace TimeIt.ViewModels
         private TimerItemViewModel _timer;
 
         private const float _fps = 1f;
+        //TODO: REMOVE THIS AND MOVE IT TO A CONSTANTS FILE
         private const string _timeSpanFormat = "hh\\:mm\\:ss";
 
         public CustomTimer customTimer;
@@ -125,7 +126,7 @@ namespace TimeIt.ViewModels
             AddTimerCommand = new RelayCommand(() =>
             {
                 System.Diagnostics.Debug.WriteLine("Navigating to x page");
-                _navigationService.NavigateTo($"{AppPages.ADD_TIMER}");
+                _navigationService.NavigateTo($"{AppPages.TIMER}");
                 requestReDraw = true;
                 navigated = true;
             });

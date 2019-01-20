@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="TimeIt.Pages.IntervalPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
+    xmlns:cp="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
+    xmlns:uc="clr-namespace:TimeIt.UserControls"
+    x:Name="editIntervalPage"
+    Title="Add / Edit Interval"
+    BindingContext="{Binding EditInterval, Source={StaticResource Locator}}"
+    Style="{StaticResource PageStyle}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Order="Primary"
+            Priority="0"
+            Text="Save" />
+
+        <ToolbarItem
+            Order="Primary"
+            Priority="1"
+            Text="Discard" />
+
+        <ToolbarItem
+            Order="Secondary"
+            Priority="2"
+            Text="Delete" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <ScrollView>
+            <Grid x:Name="editorGrid" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackLayout
+                    Grid.Row="0"
+                    Margin="0,0,0,10"
+                    HorizontalOptions="Fill"
+                    Orientation="Vertical">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        Text="Name"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Entry
+                        MaxLength="30"
+                        Placeholder="Interval name"
+                        Text="{Binding Name, Mode=TwoWay}" />
+                </StackLayout>
+                <ContentView Grid.Row="1" Margin="0,0,0,10">
+                    <ContentView.Content>
+                        <OnPlatform x:TypeArguments="View">
+                            <OnPlatform.Platforms>
+                                <On Platform="UWP">
+                                    <Grid ColumnSpacing="50">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackLayout
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            HorizontalOptions="Fill"
+                                            Orientation="Vertical">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="{OnPlatform Android='18',
+                                                                      UWP='14'}"
+                                                Text="Interval color"
+                                                TextColor="White" />
+                                            <cp:ColorPickerEntry
+                                                x:Name="colorPickerUWP"
+                                                ColorPreviewButtonWidth="60"
+                                                DialogTitle="Pick a interval color"
+                                                HorizontalOptions="FillAndExpand"
+                                                SpaceBetweenEditorAndButton="10"
+                                                Color="{Binding SelectedColor, Mode=TwoWay}" />
+                                        </StackLayout>
+
+                                        <StackLayout
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            HorizontalOptions="Fill"
+                                            Orientation="Vertical">
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="{OnPlatform Android='18',
+                                                                      UWP='14'}"
+                                                Text="Position"
+                                                TextColor="White" />
+                                            <StackLayout HorizontalOptions="Fill" Orientation="Horizontal">
+                                                <Stepper
+                                                    Maximum="{Binding MaximumPosition, Mode=OneWay}"
+                                                    Minimum="{Binding MinimumPosition, Mode=OneWay}"
+                                                    Value="{Binding Position, Mode=TwoWay}" />
+                                                <Label
+                                                    FontSize="{OnPlatform Android='22',
+                                                                          UWP='18'}"
+                                                    Text="{Binding Position, Mode=TwoWay}"
+                                                    TextColor="White"
+                                                    VerticalTextAlignment="Center" />
+                                            </StackLayout>
+                                        </StackLayout>
+                                    </Grid>
+                                </On>
+
+                                <On Platform="Android">
+                                    <StackLayout HorizontalOptions="Fill" Orientation="Vertical">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="{OnPlatform Android='18',
+                                                                  UWP='14'}"
+                                            Text="Interval color"
+                                            TextColor="White" />
+                                        <cp:ColorPickerEntry
+                                            x:Name="colorPickerAndroid"
+                                            ColorPreviewButtonWidth="60"
+                                            DialogTitle="Pick a interval color"
+                                            HorizontalOptions="FillAndExpand"
+                                            SpaceBetweenEditorAndButton="10"
+                                            Color="{Binding SelectedColor, Mode=TwoWay}" />
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="{OnPlatform Android='18',
+                                                                  UWP='14'}"
+                                            Text="Position"
+                                            TextColor="White" />
+                                        <StackLayout HorizontalOptions="Fill" Orientation="Horizontal">
+                                            <Stepper
+                                                Maximum="{Binding MaximumPosition, Mode=OneWay}"
+                                                Minimum="{Binding MinimumPosition, Mode=OneWay}"
+                                                Value="{Binding Position, Mode=TwoWay}" />
+                                            <Label
+                                                FontSize="{OnPlatform Android='22',
+                                                                      UWP='18'}"
+                                                Text="{Binding Position, Mode=TwoWay}"
+                                                TextColor="White"
+                                                VerticalTextAlignment="Center" />
+                                        </StackLayout>
+                                    </StackLayout>
+                                </On>
+                            </OnPlatform.Platforms>
+                        </OnPlatform>
+                    </ContentView.Content>
+                </ContentView>
+                <StackLayout
+                    Grid.Row="2"
+                    Margin="0,0,0,10"
+                    HorizontalOptions="Fill"
+                    Orientation="Vertical">
+                    <uc:LineControl />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        Text="Minutes"
+                        TextColor="White" />
+                    <Slider
+                        HorizontalOptions="Fill"
+                        Maximum="99"
+                        Minimum="0"
+                        Value="{Binding Minutes, Mode=TwoWay}" />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        Text="Seconds"
+                        TextColor="White" />
+                    <Slider
+                        HorizontalOptions="Fill"
+                        Maximum="59"
+                        Minimum="{Binding MinimumSeconds, Mode=OneWay}"
+                        Value="{Binding Seconds, Mode=TwoWay}" />
+                    <uc:LineControl />
+                    <Label
+                        FontSize="{OnPlatform Android='22',
+                                              UWP='18'}"
+                        HorizontalOptions="EndAndExpand"
+                        Text="{Binding DurationString, Mode=OneWay}"
+                        TextColor="White" />
+                </StackLayout>
+            </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

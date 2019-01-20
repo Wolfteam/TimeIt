@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="TimeIt.Pages.TimerPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
+    xmlns:converters="clr-namespace:TimeIt.Converters"
+    xmlns:models="clr-namespace:TimeIt.Models"
+    xmlns:uc="clr-namespace:TimeIt.UserControls"
+    Title="Add / Edit Timer"
+    BindingContext="{Binding EditTimer, Source={StaticResource Locator}}"
+    NavigationPage.BackButtonTitle="Go back hdp"
+    Style="{StaticResource PageStyle}">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Order="Primary"
+            Priority="0"
+            Text="Save" />
+
+        <ToolbarItem
+            Order="Primary"
+            Priority="1"
+            Text="Discard" />
+
+        <ToolbarItem
+            Order="Secondary"
+            Priority="2"
+            Text="Delete" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Resources>
+        <converters:StringToColorConverter x:Key="StringToColorConverter" />
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <ScrollView>
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackLayout
+                    Grid.Row="0"
+                    Margin="0,0,0,10"
+                    HorizontalOptions="Fill"
+                    Orientation="Vertical">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        Text="Name"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Entry Placeholder="Timer name" Text="{Binding TimerName, Mode=TwoWay}" />
+                </StackLayout>
+                <StackLayout
+                    Grid.Row="1"
+                    HorizontalOptions="Fill"
+                    Orientation="Vertical">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="{OnPlatform Android='18',
+                                              UWP='14'}"
+                        Text="Repetitions"
+                        TextColor="White"
+                        VerticalOptions="Center" />
+                    <Grid VerticalOptions="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Slider
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Maximum="99"
+                            Minimum="0"
+                            Value="{Binding Repetitions, Mode=TwoWay}" />
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            FontAttributes="Bold"
+                            FontSize="{OnPlatform Android='22',
+                                                  UWP='18'}"
+                            HorizontalOptions="Center"
+                            Text="{Binding Repetitions, Mode=TwoWay}"
+                            TextColor="White" />
+                    </Grid>
+                </StackLayout>
+                <StackLayout
+                    Grid.Row="2"
+                    HorizontalOptions="Fill"
+                    Orientation="Vertical">
+                    <uc:LineControl />
+                    <Grid HorizontalOptions="Fill">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Grid.Column="0"
+                            FontAttributes="Bold"
+                            FontSize="{OnPlatform Android='18',
+                                                  UWP='14'}"
+                            HorizontalOptions="StartAndExpand"
+                            Text="Intervals:"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <StackLayout
+                            Grid.Column="1"
+                            Padding="0"
+                            HeightRequest="40"
+                            HorizontalOptions="EndAndExpand"
+                            Orientation="Horizontal"
+                            VerticalOptions="Center">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding AddNewIntervalCommand}" />
+                            </StackLayout.GestureRecognizers>
+                            <Label
+                                FontSize="{OnPlatform Android='18',
+                                                      UWP='14'}"
+                                Text="Add a new interval"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                          UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                FontSize="{OnPlatform Android='22',
+                                                      UWP='18'}"
+                                Text="&#xf067;"
+                                VerticalOptions="Center" />
+                        </StackLayout>
+                    </Grid>
+                </StackLayout>
+
+                <ListView
+                    Grid.Row="3"
+                    HeightRequest="300"
+                    ItemsSource="{Binding Intervals, Mode=OneWay}"
+                    RowHeight="60"
+                    SelectionMode="None"
+                    SeparatorColor="White">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Grid Margin="0,0,0,10" Padding="{OnPlatform UWP='10'}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        FontAttributes="Bold"
+                                        HorizontalOptions="StartAndExpand"
+                                        HorizontalTextAlignment="Start"
+                                        LineBreakMode="TailTruncation"
+                                        Text="{Binding Name, Mode=OneWay}"
+                                        TextColor="{Binding Color, Mode=OneWay, Converter={StaticResource StringToColorConverter}}"
+                                        VerticalOptions="Center" />
+                                    <FlexLayout
+                                        Grid.Row="0"
+                                        Grid.RowSpan="2"
+                                        Grid.Column="1"
+                                        Direction="Row"
+                                        JustifyContent="End">
+                                        <!--<Button
+                                        BackgroundColor="Transparent"
+                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="&#xf0b2;"
+                                        TextColor="Black" />-->
+                                        <!--<Button
+                                        BackgroundColor="Transparent"
+                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                        FontSize="Medium"
+                                        HorizontalOptions="Center"
+                                        Text="&#xf304;"
+                                        TextColor="Black" />-->
+                                        <Button
+                                            BackgroundColor="Transparent"
+                                            FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                      UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                            FontSize="Medium"
+                                            HorizontalOptions="Center"
+                                            Text="&#xf2ed;"
+                                            TextColor="{OnPlatform Android='White',
+                                                                   UWP='Black'}" />
+                                    </FlexLayout>
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Margin="10,0,0,0"
+                                        HorizontalOptions="StartAndExpand"
+                                        HorizontalTextAlignment="Start"
+                                        Text="{Binding DurationString, Mode=OneWay}"
+                                        TextColor="White"
+                                        VerticalOptions="End" />
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <StackLayout
+                    Grid.Row="4"
+                    Margin="0,30,0,0"
+                    Orientation="Vertical">
+                    <uc:LineControl />
+                    <StackLayout
+                        Padding="10"
+                        HorizontalOptions="Fill"
+                        Orientation="Vertical">
+                        <Label
+                            FontSize="{OnPlatform Android='22',
+                                                  UWP='18'}"
+                            HorizontalOptions="EndAndExpand"
+                            Text="{Binding IntervalToTalTime, Mode=OneWay}"
+                            TextColor="White" />
+                    </StackLayout>
+                </StackLayout>
+            </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

@@ -13,8 +13,11 @@ namespace TimeIt.ViewModels
         public MainPageViewModel Main
             => SimpleIoc.Default.GetInstance<MainPageViewModel>();
 
-        public EditTimerPageViewModel EditTimer
-            => SimpleIoc.Default.GetInstance<EditTimerPageViewModel>();
+        public TimerPageViewModel EditTimer
+            => SimpleIoc.Default.GetInstance<TimerPageViewModel>();
+
+        public IntervalPageViewModel EditInterval
+            => SimpleIoc.Default.GetInstance<IntervalPageViewModel>();
 
         public ViewModelLocator()
         {
@@ -23,12 +26,14 @@ namespace TimeIt.ViewModels
 
             var navigation = new CustomNavigationService();
             navigation.Configure($"{AppPages.HOME}", typeof(MainPage));
-            navigation.Configure($"{AppPages.ADD_TIMER}", typeof(EditTimerPage));
+            navigation.Configure($"{AppPages.TIMER}", typeof(TimerPage));
+            navigation.Configure($"{AppPages.INTERVAL}", typeof(IntervalPage));
 
             SimpleIoc.Default.Register<INavigationService>(() => navigation);
 
             SimpleIoc.Default.Register<MainPageViewModel>();
-            SimpleIoc.Default.Register<EditTimerPageViewModel>();
+            SimpleIoc.Default.Register<TimerPageViewModel>();
+            SimpleIoc.Default.Register<IntervalPageViewModel>();
         }
 
     }
