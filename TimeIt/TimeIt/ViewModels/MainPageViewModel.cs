@@ -1,13 +1,15 @@
-﻿using GalaSoft.MvvmLight;
+﻿using AutoMapper;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using TimeIt.Delegates;
 using TimeIt.Enums;
 using TimeIt.Helpers;
+using TimeIt.Interfaces;
 
 namespace TimeIt.ViewModels
 {
@@ -15,6 +17,9 @@ namespace TimeIt.ViewModels
     {
         #region Members
         private readonly INavigationService _navigationService;
+        private readonly ITimeItDataService _timeItDataService;
+        private readonly IMapper _mapper;
+        private readonly IMessenger _messenger;
         private string _totalTimeText;
         private string _elapsedTimeText;
         private bool _startButtonEnabled = true;
@@ -27,6 +32,7 @@ namespace TimeIt.ViewModels
         public CustomTimer customTimer;
         public bool requestReDraw;
         public bool navigated;
+        private bool _initialized;
         #endregion
 
         #region Properties
@@ -61,7 +67,11 @@ namespace TimeIt.ViewModels
 
 
         #region Commands
+        public ICommand LoadedCommand { get; private set; }
+
         public ICommand AddTimerCommand { get; set; }
+
+        public ICommand EditTimerCommand { get; set; }
 
         public ICommand OpenSettingsCommand { get; set; }
 
@@ -73,60 +83,39 @@ namespace TimeIt.ViewModels
         #endregion
 
 
-        public MainPageViewModel(INavigationService navigationService)
+        public MainPageViewModel(
+            INavigationService navigationService,
+            ITimeItDataService timeItDataService,
+            IMapper mapper,
+            IMessenger messenger)
         {
             _navigationService = navigationService;
-
+            _timeItDataService = timeItDataService;
+            _mapper = mapper;
+            _messenger = messenger;
             //TODO: Load a default timer in case there are not any saved
-            Timer = new TimerItemViewModel
-            {
-                Intervals = new ObservableCollection<IntervalItemViewModel>
-                {
-                    new IntervalItemViewModel
-                    {
-                        Duration = 6,
-                        Color = "#58ff00",
-                        Name = "Workout",
-                        Position = 1
-                    },
-                    new IntervalItemViewModel
-                    {
-                        Duration = 3,
-                        Color = "#0c00ff",
-                        Name = "Rest you motherfucker",
-                        Position = 3
-                    },
-                    new IntervalItemViewModel
-                    {
-                        Duration = 7,
-                        Color = "#ff0000",
-                        Name = "Excercise",
-                        Position = 2
-                    },
-                    new IntervalItemViewModel
-                    {
-                        Duration = 5,
-                        Color = "#feff00",
-                        Name = "Intervalo con un nombre muy largo",
-                        Position = 4
-                    }
-                },
-                Name = "Tibia",
-                Repetitions = 5
-            };
+            SetCommands();
 
-            foreach (var interval in Timer.Intervals)
-            {
-                interval.TimeLeft = interval.Duration;
-            }
+            Init();
+        }
 
-            TotalTimeText = TimeSpan.FromSeconds(Timer.TotalTime).ToString(_timeSpanFormat);
-            ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
+        public void SetCommands()
+        {
+            //LoadedCommand = new RelayCommand
+            //    (async () => await Init());
 
             AddTimerCommand = new RelayCommand(() =>
             {
-                System.Diagnostics.Debug.WriteLine("Navigating to x page");
                 _navigationService.NavigateTo($"{AppPages.TIMER}");
+                _messenger.Send(0, $"{MessageType.ADD_TIMER}");
+                requestReDraw = true;
+                navigated = true;
+            });
+
+            EditTimerCommand = new RelayCommand<int>((timerID) =>
+            {
+                _navigationService.NavigateTo($"{AppPages.TIMER}");
+                _messenger.Send(timerID, $"{MessageType.ADD_TIMER}");
                 requestReDraw = true;
                 navigated = true;
             });
@@ -141,6 +130,23 @@ namespace TimeIt.ViewModels
             StopTimerCommand = new RelayCommand(StopTimer);
         }
 
+        public async void Init()
+        {
+            if (_initialized)
+                return;
+
+            var timer = await _timeItDataService.GetTimer(1);
+            Timer = _mapper.Map<TimerItemViewModel>(timer);
+
+            foreach (var interval in Timer.Intervals)
+            {
+                interval.TimeLeft = interval.Duration;
+            }
+
+            TotalTimeText = TimeSpan.FromSeconds(Timer.TotalTime).ToString(_timeSpanFormat);
+            ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
+            _initialized = true;
+        }
 
         public void StartTimer()
         {

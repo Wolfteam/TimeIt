@@ -7,6 +7,7 @@
     xmlns:converters="clr-namespace:TimeIt.Converters"
     xmlns:models="clr-namespace:TimeIt.Models"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
+    x:Name="timerPage"
     Title="Add / Edit Timer"
     BindingContext="{Binding EditTimer, Source={StaticResource Locator}}"
     NavigationPage.BackButtonTitle="Go back hdp"
@@ -120,7 +121,7 @@
                             Orientation="Horizontal"
                             VerticalOptions="Center">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding AddNewIntervalCommand}" />
+                                <TapGestureRecognizer Command="{Binding AddIntervalCommand}" />
                             </StackLayout.GestureRecognizers>
                             <Label
                                 FontSize="{OnPlatform Android='18',
@@ -146,6 +147,12 @@
                     RowHeight="60"
                     SelectionMode="None"
                     SeparatorColor="White">
+                    <ListView.Behaviors>
+                        <behaviors:EventToCommandBehavior
+                            Command="{Binding EditIntervalCommand}"
+                            EventArgsPropertyPath="Item"
+                            EventName="ItemTapped" />
+                    </ListView.Behaviors>
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
@@ -167,7 +174,7 @@
                                         LineBreakMode="TailTruncation"
                                         Text="{Binding Name, Mode=OneWay}"
                                         TextColor="{Binding Color, Mode=OneWay, Converter={StaticResource StringToColorConverter}}"
-                                        VerticalOptions="Center" />
+                                        VerticalOptions="End" />
                                     <FlexLayout
                                         Grid.Row="0"
                                         Grid.RowSpan="2"
@@ -192,6 +199,8 @@
                                         TextColor="Black" />-->
                                         <Button
                                             BackgroundColor="Transparent"
+                                            Command="{Binding Path=BindingContext.RemoveIntervalCommand, Source={x:Reference timerPage}}"
+                                            CommandParameter="{Binding}"
                                             FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
                                                                       UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
                                             FontSize="Medium"
@@ -208,7 +217,7 @@
                                         HorizontalTextAlignment="Start"
                                         Text="{Binding DurationString, Mode=OneWay}"
                                         TextColor="White"
-                                        VerticalOptions="End" />
+                                        VerticalOptions="Start" />
                                 </Grid>
                             </ViewCell>
                         </DataTemplate>

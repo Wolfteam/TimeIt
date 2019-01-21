@@ -13,11 +13,13 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
+            Command="{Binding SaveCommand}"
             Order="Primary"
             Priority="0"
             Text="Save" />
 
         <ToolbarItem
+            Command="{Binding DiscardChangesCommand}"
             Order="Primary"
             Priority="1"
             Text="Discard" />
@@ -101,13 +103,14 @@
                                                 TextColor="White" />
                                             <StackLayout HorizontalOptions="Fill" Orientation="Horizontal">
                                                 <Stepper
+                                                    IsEnabled="{Binding IsPositionEnabled, Mode=OneWay}"
                                                     Maximum="{Binding MaximumPosition, Mode=OneWay}"
                                                     Minimum="{Binding MinimumPosition, Mode=OneWay}"
                                                     Value="{Binding Position, Mode=TwoWay}" />
                                                 <Label
                                                     FontSize="{OnPlatform Android='22',
                                                                           UWP='18'}"
-                                                    Text="{Binding Position, Mode=TwoWay}"
+                                                    Text="{Binding Position, Mode=OneWay}"
                                                     TextColor="White"
                                                     VerticalTextAlignment="Center" />
                                             </StackLayout>
@@ -138,13 +141,14 @@
                                             TextColor="White" />
                                         <StackLayout HorizontalOptions="Fill" Orientation="Horizontal">
                                             <Stepper
+                                                IsEnabled="{Binding IsPositionEnabled, Mode=OneWay}"
                                                 Maximum="{Binding MaximumPosition, Mode=OneWay}"
                                                 Minimum="{Binding MinimumPosition, Mode=OneWay}"
                                                 Value="{Binding Position, Mode=TwoWay}" />
                                             <Label
                                                 FontSize="{OnPlatform Android='22',
                                                                       UWP='18'}"
-                                                Text="{Binding Position, Mode=TwoWay}"
+                                                Text="{Binding Position, Mode=OneWay}"
                                                 TextColor="White"
                                                 VerticalTextAlignment="Center" />
                                         </StackLayout>
