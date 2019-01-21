@@ -10,6 +10,8 @@ namespace TimeIt.ViewModels
         private int _elapsedRepetitions;
         private ObservableCollection<IntervalItemViewModel> _intervals = new ObservableCollection<IntervalItemViewModel>();
 
+        public int TimerID { get; set; }
+
         public string Name
         {
             get => _name;

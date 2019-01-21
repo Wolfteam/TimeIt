@@ -10,6 +10,8 @@ namespace TimeIt.ViewModels
         private string _color;
         private int _position;
 
+        public int IntervalID { get; set; }
+
         public string Name
         {
             get => _name;

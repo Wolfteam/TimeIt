@@ -1,6 +1,9 @@
-﻿using GalaSoft.MvvmLight.Ioc;
+﻿using AutoMapper;
+using GalaSoft.MvvmLight.Ioc;
+using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using TimeIt.Enums;
+using TimeIt.Interfaces;
 using TimeIt.Pages;
 using TimeIt.Services;
 
@@ -28,8 +31,17 @@ namespace TimeIt.ViewModels
             navigation.Configure($"{AppPages.HOME}", typeof(MainPage));
             navigation.Configure($"{AppPages.TIMER}", typeof(TimerPage));
             navigation.Configure($"{AppPages.INTERVAL}", typeof(IntervalPage));
-
             SimpleIoc.Default.Register<INavigationService>(() => navigation);
+
+            var mapperConfig = new MapperConfiguration(config =>
+            {
+                config.AddProfiles(GetType().Assembly);
+            });
+            SimpleIoc.Default.Register(() => mapperConfig.CreateMapper());
+
+            SimpleIoc.Default.Register<IMessenger, Messenger>();
+            SimpleIoc.Default.Register<ITimeItDataService, TimeItDataService>();
+            SimpleIoc.Default.Register<ICustomDialogService, DialogService>();
 
             SimpleIoc.Default.Register<MainPageViewModel>();
             SimpleIoc.Default.Register<TimerPageViewModel>();

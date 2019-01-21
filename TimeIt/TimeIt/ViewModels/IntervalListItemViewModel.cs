@@ -4,6 +4,10 @@ namespace TimeIt.ViewModels
 {
     public class IntervalListItemViewModel
     {
+        public int IntervalID { get; set; }
+
+        public string InMemoryIntervalID { get; set; }
+
         public string Name { get; set; }
 
         public float Duration { get; set; }
