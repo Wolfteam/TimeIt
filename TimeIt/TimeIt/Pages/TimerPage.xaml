@@ -4,6 +4,7 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
+    xmlns:c="clr-namespace:TimeIt.Controls"
     xmlns:converters="clr-namespace:TimeIt.Converters"
     xmlns:models="clr-namespace:TimeIt.Models"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
@@ -40,7 +41,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackLayout
@@ -140,13 +141,13 @@
                     </Grid>
                 </StackLayout>
 
-                <ListView
+                <c:IntervalListView
                     Grid.Row="3"
-                    HeightRequest="300"
                     ItemsSource="{Binding Intervals, Mode=OneWay}"
                     RowHeight="60"
                     SelectionMode="None"
-                    SeparatorColor="White">
+                    SeparatorColor="White"
+                    VerticalOptions="FillAndExpand">
                     <ListView.Behaviors>
                         <behaviors:EventToCommandBehavior
                             Command="{Binding EditIntervalCommand}"
@@ -222,7 +223,7 @@
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
-                </ListView>
+                </c:IntervalListView>
 
                 <StackLayout
                     Grid.Row="4"
