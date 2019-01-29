@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TemplatedView
+    x:Class="TimeIt.UserControls.SnackBar"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <TemplatedView.ControlTemplate>
+        <ControlTemplate>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Margin="20,5,5,5"
+                    FontFamily="{TemplateBinding FontFamily}"
+                    FontSize="{TemplateBinding FontSize}"
+                    HorizontalOptions="FillAndExpand"
+                    LineBreakMode="WordWrap"
+                    Text="{TemplateBinding Message}"
+                    TextColor="{TemplateBinding TextColor}"
+                    VerticalOptions="Center" />
+
+                <Button
+                    x:Name="closeButton"
+                    Grid.Column="1"
+                    Margin="2"
+                    BackgroundColor="{TemplateBinding CloseButtonBackGroundColor}"
+                    Clicked="CloseButton_Clicked"
+                    FontFamily="{TemplateBinding FontFamily}"
+                    FontSize="{TemplateBinding FontSisze}"
+                    HorizontalOptions="End"
+                    Text="{TemplateBinding CloseButtonText}"
+                    TextColor="{TemplateBinding ButtonTextColor}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </ControlTemplate>
+    </TemplatedView.ControlTemplate>
+</TemplatedView>
