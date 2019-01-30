@@ -147,5 +147,13 @@ namespace TimeIt.Services
             var interval = timers.SelectMany(t => t.Intervals).FirstOrDefault(i => i.IntervalID == intervalID);
             return Task.FromResult(interval);
         }
+
+        public async Task<bool> RemoveInterval(int timerID, int intervalID)
+        {
+            var timer = await GetTimer(timerID);
+            var interval = await GetInterval(intervalID);
+            timer.Intervals.Remove(interval);
+            return true;
+        }
     }
 }

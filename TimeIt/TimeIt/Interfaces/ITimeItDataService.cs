@@ -14,5 +14,6 @@ namespace TimeIt.Interfaces
         Task<Interval> AddInterval(int timerID, Interval interval);
         Task<IEnumerable<Interval>> GetIntervals(int timerID);
         Task<Interval> GetInterval(int intervalID);
+        Task<bool> RemoveInterval(int timerID, int intervalID);
     }
 }
