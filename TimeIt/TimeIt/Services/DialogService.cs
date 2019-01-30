@@ -1,4 +1,5 @@
-﻿using Rg.Plugins.Popup.Services;
+﻿using Plugin.Toasts;
+using Rg.Plugins.Popup.Services;
 using System.Threading.Tasks;
 using TimeIt.Controls;
 using TimeIt.Interfaces;
@@ -8,6 +9,30 @@ namespace TimeIt.Services
 {
     public class DialogService : ICustomDialogService
     {
+        private readonly IToastNotificator _toastNotificator;
+        private readonly ISimpleMessage _simpleMessage;
+
+        public DialogService(IToastNotificator toastNotificator, ISimpleMessage simpleMessage)
+        {
+            _toastNotificator = toastNotificator;
+            _simpleMessage = simpleMessage;
+        }
+
+        public async Task ShowNotification(string title, string msg)
+        {
+            var options = new NotificationOptions()
+            {
+                Title = title,
+                Description = msg,
+            };
+            var result = await _toastNotificator.Notify(options);
+        }
+
+        public void ShowSimpleMessage(string message, bool longDelay = false)
+        {
+            _simpleMessage.ShowMessage(message, longDelay);
+        }
+
         public async Task<bool> ShowConfirmationDialogAsync(string title, string message)
         {
             return await ShowConfirmationDialogAsync(title, message, "Ok", "Cancel");

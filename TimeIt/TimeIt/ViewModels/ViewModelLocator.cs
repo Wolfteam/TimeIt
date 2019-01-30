@@ -2,10 +2,12 @@
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
+using Plugin.Toasts;
 using TimeIt.Enums;
 using TimeIt.Interfaces;
 using TimeIt.Pages;
 using TimeIt.Services;
+using Xamarin.Forms;
 
 namespace TimeIt.ViewModels
 {
@@ -42,6 +44,9 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register<IMessenger, Messenger>();
             SimpleIoc.Default.Register<ITimeItDataService, TimeItDataService>();
             SimpleIoc.Default.Register<ICustomDialogService, DialogService>();
+
+            SimpleIoc.Default.Register(() => DependencyService.Get<IToastNotificator>());
+            SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
 
             SimpleIoc.Default.Register<MainPageViewModel>();
             SimpleIoc.Default.Register<TimerPageViewModel>();
