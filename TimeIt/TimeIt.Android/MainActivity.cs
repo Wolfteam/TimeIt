@@ -6,6 +6,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Xamarin.Forms;
+using Plugin.Toasts;
 
 namespace TimeIt.Droid
 {
@@ -20,7 +22,9 @@ namespace TimeIt.Droid
             base.OnCreate(savedInstanceState);
 
             Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            Forms.Init(this, savedInstanceState);
+            DependencyService.Register<ToastNotification>();
+            ToastNotification.Init(this);
             LoadApplication(new App());
         }
 
