@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Plugin.Toasts.UWP;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -52,7 +53,8 @@ namespace TimeIt.UWP
 
                 Rg.Plugins.Popup.Popup.Init();
                 Xamarin.Forms.Forms.Init(e);
-
+                Xamarin.Forms.DependencyService.Register<ToastNotification>(); // Register your dependency
+                ToastNotification.Init();
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: Load state from previously suspended application
