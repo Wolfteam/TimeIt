@@ -9,10 +9,10 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label
                     Margin="20,5,5,5"
-                    FontFamily="{TemplateBinding FontFamily}"
                     FontSize="{TemplateBinding FontSize}"
                     HorizontalOptions="FillAndExpand"
                     LineBreakMode="WordWrap"
@@ -21,16 +21,27 @@
                     VerticalOptions="Center" />
 
                 <Button
-                    x:Name="closeButton"
+                    x:Name="okButton"
                     Grid.Column="1"
-                    Margin="2"
-                    BackgroundColor="{TemplateBinding CloseButtonBackGroundColor}"
+                    Margin="5"
+                    Clicked="OkButton_Clicked"
+                    FontSize="{TemplateBinding FontSisze}"
+                    HorizontalOptions="End"
+                    IsVisible="{TemplateBinding ShowOkButton}"
+                    Text="{TemplateBinding OkButtonText}"
+                    TextColor="{TemplateBinding OkButtonTextColor}"
+                    VerticalOptions="Center" />
+
+
+                <Button
+                    x:Name="closeButton"
+                    Grid.Column="2"
+                    Margin="5"
                     Clicked="CloseButton_Clicked"
-                    FontFamily="{TemplateBinding FontFamily}"
                     FontSize="{TemplateBinding FontSisze}"
                     HorizontalOptions="End"
                     Text="{TemplateBinding CloseButtonText}"
-                    TextColor="{TemplateBinding ButtonTextColor}"
+                    TextColor="{TemplateBinding CloseButtonTextColor}"
                     VerticalOptions="Center" />
             </Grid>
         </ControlTemplate>
