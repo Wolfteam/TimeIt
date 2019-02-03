@@ -12,6 +12,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20190201022545_SeedDb.cs" />
+    <Compile Remove="Migrations\20190201024659_SeedDb.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Amporis.Xamarin.Forms.ColorPicker" Version="1.0.21" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.1" />
@@ -69,5 +74,29 @@
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\References\10.0.17134.0\Windows.Foundation.UniversalApiContract\6.0.0.0\Windows.Foundation.UniversalApiContract.winmd</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Pages\Dialogs\ConfirmationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Pages\IntervalPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Pages\TimerPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="UserControls\LineControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="UserControls\SnackBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 </Project>
