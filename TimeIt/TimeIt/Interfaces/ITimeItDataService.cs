@@ -9,7 +9,7 @@ namespace TimeIt.Interfaces
         Task<Timer> AddTimer(Timer timer);
         Task<IEnumerable<Timer>> GetAllTimers();
         Task<Timer> GetTimer(int timerID);
-
+        Task<Timer> UpdateTimer(Timer timer);
 
         Task<Interval> AddInterval(int timerID, Interval interval);
         Task<IEnumerable<Interval>> GetIntervals(int timerID);
