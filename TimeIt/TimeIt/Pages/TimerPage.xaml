@@ -15,16 +15,19 @@
     Style="{StaticResource PageStyle}">
     <ContentPage.ToolbarItems>
         <ToolbarItem
+            Command="{Binding SaveTimerCommand}"
             Order="Primary"
             Priority="0"
             Text="Save" />
 
         <ToolbarItem
+            Command="{Binding DiscardChangesCommand}"
             Order="Primary"
             Priority="1"
             Text="Discard" />
 
         <ToolbarItem
+            Command="{Binding RemoveTimerCommand}"
             Order="Secondary"
             Priority="2"
             Text="Delete" />
@@ -35,154 +38,159 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <ScrollView>
-            <Grid Margin="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <StackLayout
-                    Grid.Row="0"
-                    Margin="0,0,0,10"
-                    HorizontalOptions="Fill"
-                    Orientation="Vertical">
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        Text="Name"
-                        TextColor="White"
-                        VerticalOptions="Center" />
-                    <Entry Placeholder="Timer name" Text="{Binding TimerName, Mode=TwoWay}" />
-                </StackLayout>
-                <StackLayout
-                    Grid.Row="1"
-                    HorizontalOptions="Fill"
-                    Orientation="Vertical">
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        Text="Repetitions"
-                        TextColor="White"
-                        VerticalOptions="Center" />
-                    <Grid VerticalOptions="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Slider
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Maximum="99"
-                            Minimum="0"
-                            Value="{Binding Repetitions, Mode=TwoWay}" />
+            <ScrollView>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackLayout
+                        Grid.Row="0"
+                        Margin="0,0,0,10"
+                        HorizontalOptions="Fill"
+                        Orientation="Vertical">
                         <Label
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            FontAttributes="Bold"
-                            FontSize="{OnPlatform Android='22',
-                                                  UWP='18'}"
-                            HorizontalOptions="Center"
-                            Text="{Binding Repetitions, Mode=TwoWay}"
-                            TextColor="White" />
-                    </Grid>
-                </StackLayout>
-                <StackLayout
-                    Grid.Row="2"
-                    HorizontalOptions="Fill"
-                    Orientation="Vertical">
-                    <uc:LineControl />
-                    <Grid HorizontalOptions="Fill">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Label
-                            Grid.Column="0"
                             FontAttributes="Bold"
                             FontSize="{OnPlatform Android='18',
                                                   UWP='14'}"
-                            HorizontalOptions="StartAndExpand"
-                            Text="Intervals:"
+                            Text="Name"
                             TextColor="White"
                             VerticalOptions="Center" />
-                        <StackLayout
-                            Grid.Column="1"
-                            Padding="0"
-                            HeightRequest="40"
-                            HorizontalOptions="EndAndExpand"
-                            Orientation="Horizontal"
-                            VerticalOptions="Center">
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding AddIntervalCommand}" />
-                            </StackLayout.GestureRecognizers>
+                        <Entry Placeholder="Timer name" Text="{Binding TimerName, Mode=TwoWay}" />
+                    </StackLayout>
+                    <StackLayout
+                        Grid.Row="1"
+                        HorizontalOptions="Fill"
+                        Orientation="Vertical">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="{OnPlatform Android='18',
+                                                  UWP='14'}"
+                            Text="Repetitions"
+                            TextColor="White"
+                            VerticalOptions="Center" />
+                        <Grid VerticalOptions="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Slider
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Maximum="99"
+                                Minimum="1"
+                                Value="{Binding Repetitions, Mode=TwoWay}" />
                             <Label
-                                FontSize="{OnPlatform Android='18',
-                                                      UWP='14'}"
-                                Text="Add a new interval"
-                                TextColor="White"
-                                VerticalOptions="Center" />
-                            <Label
-                                FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
-                                                          UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                FontAttributes="Bold"
                                 FontSize="{OnPlatform Android='22',
                                                       UWP='18'}"
-                                Text="&#xf067;"
+                                HorizontalOptions="Center"
+                                Text="{Binding Repetitions, Mode=TwoWay}"
+                                TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                    <StackLayout
+                        Grid.Row="2"
+                        HorizontalOptions="Fill"
+                        Orientation="Vertical">
+                        <uc:LineControl />
+                        <Grid HorizontalOptions="Fill">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label
+                                Grid.Column="0"
+                                FontAttributes="Bold"
+                                FontSize="{OnPlatform Android='18',
+                                                      UWP='14'}"
+                                HorizontalOptions="StartAndExpand"
+                                Text="Intervals:"
+                                TextColor="White"
                                 VerticalOptions="Center" />
-                        </StackLayout>
-                    </Grid>
-                </StackLayout>
-
-                <c:IntervalListView
-                    Grid.Row="3"
-                    ItemsSource="{Binding Intervals, Mode=OneWay}"
-                    RowHeight="60"
-                    SelectionMode="None"
-                    SeparatorColor="White"
-                    VerticalOptions="FillAndExpand">
-                    <ListView.Behaviors>
-                        <behaviors:EventToCommandBehavior
-                            Command="{Binding EditIntervalCommand}"
-                            EventArgsPropertyPath="Item"
-                            EventName="ItemTapped" />
-                    </ListView.Behaviors>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ViewCell>
-                                <Grid Margin="0,0,0,10" Padding="{OnPlatform UWP='10'}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Label
-                                        Grid.Row="0"
-                                        Grid.Column="0"
-                                        FontAttributes="Bold"
-                                        HorizontalOptions="StartAndExpand"
-                                        HorizontalTextAlignment="Start"
-                                        LineBreakMode="TailTruncation"
-                                        Text="{Binding Name, Mode=OneWay}"
-                                        TextColor="{Binding Color, Mode=OneWay, Converter={StaticResource StringToColorConverter}}"
-                                        VerticalOptions="End" />
-                                    <FlexLayout
-                                        Grid.Row="0"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="1"
-                                        Direction="Row"
-                                        JustifyContent="End">
-                                        <!--<Button
+                            <StackLayout
+                                Grid.Column="1"
+                                Padding="0"
+                                HeightRequest="40"
+                                HorizontalOptions="EndAndExpand"
+                                Orientation="Horizontal"
+                                VerticalOptions="Center">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding AddIntervalCommand}" />
+                                </StackLayout.GestureRecognizers>
+                                <Label
+                                    FontSize="{OnPlatform Android='18',
+                                                          UWP='14'}"
+                                    Text="Add a new interval"
+                                    TextColor="White"
+                                    VerticalOptions="Center" />
+                                <Label
+                                    FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                              UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                    FontSize="{OnPlatform Android='22',
+                                                          UWP='18'}"
+                                    Text="&#xf067;"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </Grid>
+                    </StackLayout>
+                    <c:IntervalListView
+                        Grid.Row="3"
+                        ItemsSource="{Binding Intervals, Mode=OneWay}"
+                        RowHeight="60"
+                        SelectionMode="None"
+                        SeparatorColor="White"
+                        VerticalOptions="FillAndExpand">
+                        <ListView.Behaviors>
+                            <behaviors:EventToCommandBehavior
+                                Command="{Binding EditIntervalCommand}"
+                                EventArgsPropertyPath="Item"
+                                EventName="ItemTapped" />
+                        </ListView.Behaviors>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid Margin="0,0,0,10" Padding="{OnPlatform UWP='10'}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            FontAttributes="Bold"
+                                            HorizontalOptions="StartAndExpand"
+                                            HorizontalTextAlignment="Start"
+                                            LineBreakMode="TailTruncation"
+                                            Text="{Binding Name, Mode=OneWay}"
+                                            TextColor="{Binding Color, Mode=OneWay, Converter={StaticResource StringToColorConverter}}"
+                                            VerticalOptions="End" />
+                                        <FlexLayout
+                                            Grid.Row="0"
+                                            Grid.RowSpan="2"
+                                            Grid.Column="1"
+                                            Direction="Row"
+                                            JustifyContent="End">
+                                            <!--<Button
                                         BackgroundColor="Transparent"
                                         FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
                                                                   UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
@@ -190,7 +198,7 @@
                                         HorizontalOptions="Center"
                                         Text="&#xf0b2;"
                                         TextColor="Black" />-->
-                                        <!--<Button
+                                            <!--<Button
                                         BackgroundColor="Transparent"
                                         FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
                                                                   UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
@@ -198,51 +206,51 @@
                                         HorizontalOptions="Center"
                                         Text="&#xf304;"
                                         TextColor="Black" />-->
-                                        <Button
-                                            BackgroundColor="Transparent"
-                                            Command="{Binding Path=BindingContext.RemoveIntervalCommand, Source={x:Reference timerPage}}"
-                                            CommandParameter="{Binding}"
-                                            FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
-                                                                      UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
-                                            FontSize="Medium"
-                                            HorizontalOptions="Center"
-                                            Text="&#xf2ed;"
-                                            TextColor="{OnPlatform Android='White',
-                                                                   UWP='Black'}" />
-                                    </FlexLayout>
-                                    <Label
-                                        Grid.Row="1"
-                                        Grid.Column="0"
-                                        Margin="10,0,0,0"
-                                        HorizontalOptions="StartAndExpand"
-                                        HorizontalTextAlignment="Start"
-                                        Text="{Binding DurationString, Mode=OneWay}"
-                                        TextColor="White"
-                                        VerticalOptions="Start" />
-                                </Grid>
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </c:IntervalListView>
-
-                <StackLayout
-                    Grid.Row="4"
-                    Margin="0,30,0,0"
-                    Orientation="Vertical">
-                    <uc:LineControl />
+                                            <Button
+                                                BackgroundColor="Transparent"
+                                                Command="{Binding Path=BindingContext.RemoveIntervalCommand, Source={x:Reference timerPage}}"
+                                                CommandParameter="{Binding}"
+                                                FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
+                                                                          UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                                FontSize="Medium"
+                                                HorizontalOptions="Center"
+                                                Text="&#xf2ed;"
+                                                TextColor="{OnPlatform Android='White',
+                                                                       UWP='Black'}" />
+                                        </FlexLayout>
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            Margin="10,0,0,0"
+                                            HorizontalOptions="StartAndExpand"
+                                            HorizontalTextAlignment="Start"
+                                            Text="{Binding DurationString, Mode=OneWay}"
+                                            TextColor="White"
+                                            VerticalOptions="Start" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </c:IntervalListView>
                     <StackLayout
-                        Padding="10"
-                        HorizontalOptions="Fill"
+                        Grid.Row="4"
+                        Margin="0,30,0,0"
                         Orientation="Vertical">
-                        <Label
-                            FontSize="{OnPlatform Android='22',
-                                                  UWP='18'}"
-                            HorizontalOptions="EndAndExpand"
-                            Text="{Binding IntervalToTalTime, Mode=OneWay}"
-                            TextColor="White" />
+                        <uc:LineControl />
+                        <StackLayout
+                            Padding="10"
+                            HorizontalOptions="Fill"
+                            Orientation="Vertical">
+                            <Label
+                                FontSize="{OnPlatform Android='22',
+                                                      UWP='18'}"
+                                HorizontalOptions="EndAndExpand"
+                                Text="{Binding IntervalToTalTime, Mode=OneWay}"
+                                TextColor="White" />
+                        </StackLayout>
                     </StackLayout>
-                </StackLayout>
-            </Grid>
-        </ScrollView>
+                </Grid>
+            </ScrollView>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
