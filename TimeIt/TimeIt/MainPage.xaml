@@ -3,29 +3,42 @@
     x:Class="TimeIt.MainPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
     xmlns:converters="clr-namespace:TimeIt.Converters"
     xmlns:customControls="clr-namespace:TimeIt.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:TimeIt.Helpers"
     xmlns:local="clr-namespace:TimeIt"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+    xmlns:pcCards="clr-namespace:PanCardView;assembly=PanCardView"
+    xmlns:pcControls="clr-namespace:PanCardView.Controls;assembly=PanCardView"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
+    x:Name="TimeItMainPage"
     Title="TimeIt"
     BindingContext="{Binding Main, Source={StaticResource Locator}}"
-    SizeChanged="ContentPage_SizeChanged"
     Style="{StaticResource PageStyle}"
     mc:Ignorable="d">
 
+    <ContentPage.Behaviors>
+        <behaviors:EventToCommandBehavior Command="{Binding OnAppearingCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+
     <ContentPage.ToolbarItems>
-        <ToolbarItem
-            Name="AddMenuItem"
+        <customControls:BindableToolbarItem
             Command="{Binding AddTimerCommand}"
+            IsVisible="{Binding CanNavigate}"
             Order="Default"
             Priority="0"
             Text="Add Timer" />
-        <ToolbarItem
-            Name="SettingsMenuItem"
+        <customControls:BindableToolbarItem
+            Command="{Binding EditTimerCommand}"
+            IsVisible="{Binding CanNavigate}"
+            Order="Default"
+            Priority="0"
+            Text="Edit Timer" />
+        <customControls:BindableToolbarItem
+            Command="{Binding OpenSettingsCommand}"
+            IsVisible="{Binding CanNavigate}"
             Order="Secondary"
             Priority="1"
             Text="Settings" />
@@ -33,6 +46,19 @@
 
     <ContentPage.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+
+        <ResourceDictionary>
+            <Style x:Key="ActiveIndicator" TargetType="Frame">
+                <Setter Property="BorderColor" Value="Red" />
+                <Setter Property="BackgroundColor" Value="Red" />
+                <Setter Property="OutlineColor" Value="Red" />
+            </Style>
+            <Style x:Key="InactiveIndicator" TargetType="Frame">
+                <Setter Property="BorderColor" Value="White" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="OutlineColor" Value="Red" />
+            </Style>
+        </ResourceDictionary>
     </ContentPage.Resources>
     <!--<OnPlatform x:TypeArguments="View">
         <OnPlatform.Platforms>
@@ -55,7 +81,7 @@
     </OnPlatform>-->
 
     <ContentPage.Content>
-        <ScrollView Orientation="Both" VerticalOptions="FillAndExpand">
+        <pcControls:ParentScrollView Orientation="Both" VerticalOptions="FillAndExpand">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -99,7 +125,7 @@
                         FontSize="{OnPlatform Android='22',
                                               UWP='18'}"
                         HorizontalOptions="StartAndExpand"
-                        Text="{Binding Timer.Name, Mode=OneWay}" />
+                        Text="{Binding CurrentTimerName, Mode=OneWay}" />
 
                     <Label
                         Grid.Row="0"
@@ -116,16 +142,45 @@
                         FontSize="{OnPlatform Android='22',
                                               UWP='18'}"
                         HorizontalOptions="EndAndExpand"
-                        Text="{Binding Timer.RemainingRepetitions, Mode=OneWay}" />
+                        Text="{Binding RemainingRepetitions, Mode=OneWay}" />
 
-                    <uc:LineControl Grid.Row="2" Grid.ColumnSpan="2" />
+                    <uc:LineControl
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
                 </Grid>
                 <!--  Canvas  -->
-                <skia:SKCanvasView
-                    x:Name="canvasView"
+                <pcCards:CarouselView
+                    x:Name="CarouselView"
                     Grid.Row="1"
                     HeightRequest="400"
-                    PaintSurface="OnCanvasViewPaintSurface" />
+                    IsCyclical="False"
+                    IsViewCacheEnabled="False"
+                    ItemsSource="{Binding Timers, Mode=OneWay}"
+                    SelectedIndex="{Binding CurrentPage, Mode=TwoWay}"
+                    VerticalSwipeThresholdDistance="{OnPlatform Android=1000000}">
+                    <pcCards:CarouselView.ItemTemplate>
+                        <DataTemplate>
+                            <uc:TimerControl BindingContext="{Binding}" />
+                        </DataTemplate>
+                    </pcCards:CarouselView.ItemTemplate>
+                    <!--  <pcControls:IndicatorsControl  -->
+                    <!--  BackgroundColor="Transparent"  -->
+                    <!--  SelectedIndicatorStyle="{x:StaticResource ActiveIndicator}"  -->
+                    <!--  UnselectedIndicatorStyle="{x:StaticResource InactiveIndicator}">  -->
+                    <!--     <pcControls:IndicatorsControl.ItemTemplate> -->
+                    <!--         <DataTemplate> -->
+                    <!--  <pcControls:IndicatorItemView  -->
+                    <!--  BackgroundColor="White"  -->
+                    <!--  BorderColor="Red"  -->
+                    <!--  OutlineColor="Black" />  -->
+                    <!--         </DataTemplate> -->
+                    <!--     </pcControls:IndicatorsControl.ItemTemplate> -->
+                    <!-- </pcControls:IndicatorsControl> -->
+
+                    <pcControls:LeftArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
+                    <pcControls:RightArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
+                </pcCards:CarouselView>
                 <!--  Buttons  -->
                 <Grid
                     Grid.Row="2"
@@ -182,7 +237,10 @@
                         </Style>
                     </Grid.Resources>
 
-                    <uc:LineControl Grid.Row="0" Grid.ColumnSpan="2" />
+                    <uc:LineControl
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
 
                     <Label
                         Grid.Row="1"
@@ -218,6 +276,6 @@
                         Text="Elapsed" />
                 </Grid>
             </Grid>
-        </ScrollView>
+        </pcControls:ParentScrollView>
     </ContentPage.Content>
 </ContentPage>

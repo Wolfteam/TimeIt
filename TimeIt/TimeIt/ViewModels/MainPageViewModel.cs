@@ -4,38 +4,56 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using TimeIt.Delegates;
 using TimeIt.Enums;
 using TimeIt.Helpers;
 using TimeIt.Interfaces;
+using Xamarin.Forms;
 
 namespace TimeIt.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
         #region Members
+
         private readonly INavigationService _navigationService;
         private readonly ITimeItDataService _timeItDataService;
         private readonly IMapper _mapper;
         private readonly IMessenger _messenger;
+
+        private string _currentTimerName;
+        private int _remainingRepetitions;
         private string _totalTimeText;
         private string _elapsedTimeText;
         private bool _startButtonEnabled = true;
-        private TimerItemViewModel _timer;
+        private int _currentPage = 0;
+        private bool _canNavigate = true;
+        private ObservableCollection<TimerItemViewModel> _timers = new ObservableCollection<TimerItemViewModel>();
 
-        private const float _fps = 1f;
-        //TODO: REMOVE THIS AND MOVE IT TO A CONSTANTS FILE
-        private const string _timeSpanFormat = "hh\\:mm\\:ss";
-
-        public CustomTimer customTimer;
-        public bool requestReDraw;
-        public bool navigated;
+        public bool Navigated;
         private bool _initialized;
+
         #endregion
 
         #region Properties
+
+        public string CurrentTimerName
+        {
+            get => _currentTimerName;
+            set => Set(ref _currentTimerName, value);
+        }
+
+        public int RemainingRepetitions
+        {
+            get => _remainingRepetitions;
+            set => Set(ref _remainingRepetitions, value);
+        }
+
         public string TotalTimeText
         {
             get => _totalTimeText;
@@ -54,34 +72,54 @@ namespace TimeIt.ViewModels
             set => Set(ref _startButtonEnabled, value);
         }
 
-        public TimerItemViewModel Timer
+        public int CurrentPage
         {
-            get => _timer;
-            set => Set(ref _timer, value);
+            get => _currentPage;
+            set
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Position changed. New position = {value}. OldPosition = {_currentPage}");
+                Set(ref _currentPage, value);
+                if (_currentPage >= 0)
+                    CurrentSelectedTimerChanged();
+            }
         }
-        #endregion
 
-        #region Events
-        public InvalidateSurfaceEvent InvalidateSurfaceEvent { get; set; }
-        #endregion
+        public ObservableCollection<TimerItemViewModel> Timers
+        {
+            get => _timers;
+            set => Set(ref _timers, value);
+        }
 
+        public bool CanNavigate
+        {
+            get => _canNavigate;
+            set
+            {
+                Set(ref _canNavigate, value);
+                Timers[CurrentPage].InvalidateSurfaceEvent.Invoke();
+            }
+        }
+
+        #endregion
 
         #region Commands
-        public ICommand LoadedCommand { get; private set; }
 
-        public ICommand AddTimerCommand { get; set; }
+        public ICommand OnAppearingCommand { get; private set; }
 
-        public ICommand EditTimerCommand { get; set; }
+        public ICommand AddTimerCommand { get; private set; }
 
-        public ICommand OpenSettingsCommand { get; set; }
+        public ICommand EditTimerCommand { get; private set; }
 
-        public ICommand StartTimerCommand { get; set; }
+        public ICommand OpenSettingsCommand { get; private set; }
 
-        public ICommand PauseTimerCommand { get; set; }
+        public ICommand StartTimerCommand { get; private set; }
 
-        public ICommand StopTimerCommand { get; set; }
+        public ICommand PauseTimerCommand { get; private set; }
+
+        public ICommand StopTimerCommand { get; private set; }
+
         #endregion
-
 
         public MainPageViewModel(
             INavigationService navigationService,
@@ -93,183 +131,158 @@ namespace TimeIt.ViewModels
             _timeItDataService = timeItDataService;
             _mapper = mapper;
             _messenger = messenger;
-            //TODO: Load a default timer in case there are not any saved
-            SetCommands();
 
-            Init();
+            SetCommands();
+            RegisterMessages();
         }
 
-        public void SetCommands()
+        private void SetCommands()
         {
-            //LoadedCommand = new RelayCommand
-            //    (async () => await Init());
+            OnAppearingCommand = new RelayCommand(() =>
+            {
+                System.Diagnostics.Debug.WriteLine("On appearing...");
+                if (!Navigated && !ViewModelLocator.WasAppInForeground)
+                    return;
+                ViewModelLocator.WasAppInForeground = false;
+                _messenger.Send(true, $"{MessageType.ON_NAVIGATED_BACK}");
+            });
 
             AddTimerCommand = new RelayCommand(() =>
             {
                 _navigationService.NavigateTo($"{AppPages.TIMER}");
                 _messenger.Send(0, $"{MessageType.ADD_TIMER}");
-                requestReDraw = true;
-                navigated = true;
+                Navigated = true;
             });
 
-            EditTimerCommand = new RelayCommand<int>((timerID) =>
+            EditTimerCommand = new RelayCommand(() =>
             {
+                var currentTimer = Timers[CurrentPage];
                 _navigationService.NavigateTo($"{AppPages.TIMER}");
-                _messenger.Send(timerID, $"{MessageType.ADD_TIMER}");
-                requestReDraw = true;
-                navigated = true;
+                _messenger.Send(currentTimer.TimerID, $"{MessageType.ADD_TIMER}");
+                Navigated = true;
             });
 
-            OpenSettingsCommand = new RelayCommand
-                (() => _navigationService.NavigateTo($"{AppPages.SETTINGS}"));
+            OpenSettingsCommand = new RelayCommand(() => { });
 
-            StartTimerCommand = new RelayCommand(StartTimer);
+            StartTimerCommand = new RelayCommand(() =>
+            {
+                Timers[CurrentPage].StartTimer();
+                CanNavigate = false;
+            });
 
-            PauseTimerCommand = new RelayCommand(PauseTimer);
+            PauseTimerCommand = new RelayCommand(() =>
+            {
+                Timers[CurrentPage].PauseTimer();
+            });
 
-            StopTimerCommand = new RelayCommand(StopTimer);
+            StopTimerCommand = new RelayCommand(() =>
+            {
+                Timers[CurrentPage].StopTimer();
+                CanNavigate = true;
+            });
         }
 
-        public async void Init()
+        private void RegisterMessages()
+        {
+            _messenger.Register<bool>(
+                this,
+                $"{MessageType.MP_START_BUTTON_IS_ENABLED}",
+                isEnabled => StartButtonEnabled = isEnabled);
+
+            _messenger.Register<float>(
+                this,
+                $"{MessageType.MP_ELAPSED_TIME_CHANGED}",
+                seconds => ElapsedTimeText = TimeSpan.FromSeconds(seconds).ToString(Constans.DefaultTimeSpanFormat));
+
+            _messenger.Register<float>(
+                this,
+                $"{MessageType.MP_TOTAL_TIME_CHANGED}",
+                seconds => TotalTimeText = TimeSpan.FromSeconds(seconds).ToString(Constans.DefaultTimeSpanFormat));
+
+            _messenger.Register<int>(
+                this,
+                $"{MessageType.MP_REMAINING_REPETITIONS_CHANGED}",
+                repetitions => RemainingRepetitions = repetitions);
+
+            _messenger.Register<TimerItemViewModel>(
+                this,
+                $"{MessageType.MP_TIMER_CREATED}",
+                timer => OnTimerModified(OperationType.CREATED, timer));
+
+            _messenger.Register<TimerItemViewModel>(
+                this,
+                $"{MessageType.MP_TIMER_UPDATED}",
+                timer => OnTimerModified(OperationType.UPDATED, timer));
+        }
+
+        public async Task Init()
         {
             if (_initialized)
                 return;
 
-            var timer = await _timeItDataService.GetTimer(1);
-            Timer = _mapper.Map<TimerItemViewModel>(timer);
-
-            foreach (var interval in Timer.Intervals)
+            var timers = await _timeItDataService.GetAllTimers();
+            var vms = new List<TimerItemViewModel>();
+            foreach (var timer in timers)
             {
-                interval.TimeLeft = interval.Duration;
+                var vm = new TimerItemViewModel(_messenger);
+                _mapper.Map(timer, vm);
+                vm.SetDefaultTimeLeft();
+                vms.Add(vm);
             }
 
-            TotalTimeText = TimeSpan.FromSeconds(Timer.TotalTime).ToString(_timeSpanFormat);
-            ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
+            Timers = new ObservableCollection<TimerItemViewModel>(vms);
+
+            if (Device.RuntimePlatform == Device.Android)
+                CurrentSelectedTimerChanged();
+
             _initialized = true;
         }
 
-        public void StartTimer()
+        private void OnTimerModified(OperationType operation, TimerItemViewModel timer)
         {
-            //just a sanity check
-            if (customTimer?.IsRunning == true || customTimer?.IsPaused == true)
+            switch (operation)
+            {
+                case OperationType.CREATED:
+                    Timers.Add(timer);
+                    CurrentPage = Timers.Count - 1;
+                    break;
+                case OperationType.UPDATED:
+                    var currentTimer = Timers.FirstOrDefault(t => t.TimerID == timer.TimerID);
+                    if (currentTimer is null)
+                        throw new NullReferenceException(
+                            $"The timer that was updated doesnt exists in the view. TimerID = {timer.TimerID}");
+                    int index = Timers.IndexOf(currentTimer);
+                    Timers.RemoveAt(index);
+                    Timers.Insert(index, timer);
+                    CurrentPage = index;
+                    break;
+                case OperationType.DELETED:
+                    var timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timer.TimerID);
+                    Timers.Remove(timerToRemove);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(operation), operation,
+                        "The provided OperationType doesnt exists");
+            }
+
+        }
+
+        private void CurrentSelectedTimerChanged()
+        {
+            if (Timers.Count == 0)
+            {
+                CurrentTimerName = string.Empty;
+                RemainingRepetitions = 0;
+                TotalTimeText = string.Empty;
+                ElapsedTimeText = string.Empty;
                 return;
-            foreach (var interval in Timer.Intervals)
-            {
-                if (interval.TimeLeft <= 0)
-                    interval.TimeLeft = interval.Duration;
-                if (interval.Position == 1)
-                    interval.IsRunning = true;
             }
-            TotalTimeText = TimeSpan.FromSeconds(Timer.TotalTime).ToString(_timeSpanFormat);
-            customTimer = new CustomTimer(TimeSpan.FromSeconds(_fps), () =>
-            {
-                UpdateCurrentInterval();
-                InvalidateSurfaceEvent.Invoke();
-            });
 
-            customTimer.Start();
-            StartButtonEnabled = false;
+            var currentTimer = Timers[CurrentPage];
+            CurrentTimerName = currentTimer.Name;
+            RemainingRepetitions = currentTimer.RemainingRepetitions;
+            TotalTimeText = TimeSpan.FromSeconds(currentTimer.TotalTime).ToString(Constans.DefaultTimeSpanFormat);
+            ElapsedTimeText = TimeSpan.FromSeconds(currentTimer.ElapsedTime).ToString(Constans.DefaultTimeSpanFormat);
         }
-
-        public void PauseTimer()
-        {
-            if (customTimer is null)
-                return;
-
-            if (customTimer.IsRunning)
-            {
-                customTimer.Stop();
-                customTimer.IsPaused = true;
-            }
-            else
-            {
-                customTimer.Start();
-                customTimer.IsPaused = false;
-            }
-        }
-
-        public void StopTimer()
-        {
-            if (customTimer is null)
-                return;
-
-            customTimer.Stop();
-            customTimer.IsPaused = false;
-
-            foreach (var interval in Timer.Intervals)
-            {
-                interval.IsRunning = false;
-                interval.TimeLeft = interval.Duration;
-            }
-            InvalidateSurfaceEvent.Invoke();
-            StartButtonEnabled = true;
-            Timer.ElapsedRepetitions = 0;
-            ElapsedTimeText = TimeSpan.FromSeconds(0).ToString(_timeSpanFormat);
-        }
-
-        public void UpdateCurrentInterval()
-        {
-            var currentInterval = Timer.Intervals.FirstOrDefault(t => t.IsRunning);
-            if (currentInterval is null)
-                throw new NullReferenceException("There arent 0 running intervals");
-            System.Diagnostics.Debug.WriteLine("--------------Updating current interval started");
-            System.Diagnostics.Debug.WriteLine($"Interval = {currentInterval.Name}, time left = {currentInterval.TimeLeft}");
-
-            if (currentInterval.TimeLeft <= 0)
-            {
-                currentInterval.IsRunning = false;
-                var nextInterval = Timer.Intervals.FirstOrDefault(t => t.Position == currentInterval.Position + 1);
-                if (nextInterval is null)
-                {
-                    if (Timer.Repetitions == Timer.ElapsedRepetitions + 1)
-                    {
-                        Timer.ElapsedRepetitions = 0;
-                        StopTimer();
-                    }
-                    else
-                    {
-                        Timer.ElapsedRepetitions++;
-                        foreach (var interval in Timer.Intervals)
-                        {
-                            interval.IsRunning = false;
-                            interval.TimeLeft = interval.Duration;
-                            if (interval.Position == 1)
-                                interval.IsRunning = true;
-                        }
-                        requestReDraw = true;
-                    }
-                }
-                else
-                {
-                    nextInterval.IsRunning = true;
-                    nextInterval.TimeLeft -= _fps;
-                }
-            }
-            else
-            {
-                currentInterval.TimeLeft -= _fps;
-            }
-            ElapsedTimeText = TimeSpan.FromSeconds(Timer.ElapsedTime).ToString(_timeSpanFormat);
-            System.Diagnostics.Debug.WriteLine("--------------Updating current interval completed");
-        }
-
-        public float GetTimerCycleTotalTime()
-        {
-            return Timer.Intervals.Sum(i => i.Duration);
-        }
-
-        public float GetTimerCycleTotalElapsedTime()
-        {
-            float totalElapsedTime = Timer.Intervals.Sum(t => t.ElapsedTime);
-            return totalElapsedTime;
-        }
-
-        public float CalculateAngle(float time, float totalTime)
-        {
-            float intervalAngle = time * 360f / totalTime;
-            return intervalAngle;
-        }
-
-        public bool IsDarkTheme() => true;
     }
 }

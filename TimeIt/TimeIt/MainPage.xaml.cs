@@ -1,7 +1,6 @@
-﻿using SkiaSharp;
-using SkiaSharp.Views.Forms;
-using System;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using TimeIt.UserControls;
 using TimeIt.ViewModels;
 using Xamarin.Forms;
 
@@ -9,287 +8,17 @@ namespace TimeIt
 {
     public partial class MainPage : ContentPage
     {
-        private volatile bool _rendering = false;
-        private string _timeSpanFormat = "hh\\:mm\\:ss";
-
-        public MainPageViewModel ViewModel
-        {
-            get => (MainPageViewModel)BindingContext;
-        }
+        private MainPageViewModel ViewModel
+            => (MainPageViewModel) BindingContext;
 
         public MainPage()
         {
             InitializeComponent();
-            ViewModel.InvalidateSurfaceEvent = canvasView.InvalidateSurface;
-        }
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            System.Diagnostics.Debug.WriteLine("On appearing...");
-            if (ViewModel.navigated || ViewModelLocator.WasAppInForeground)
-            {
-                ViewModelLocator.WasAppInForeground = false;
-                ViewModel.navigated = false;
-                ViewModel.requestReDraw = true;
-                canvasView.InvalidateSurface();
-            }
-        }
-
-        void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
-        {
-            if (_rendering || ViewModel.navigated)
-            {
-                System.Diagnostics.Debug.WriteLine("Canvas is being already rendered");
-                return;
-            }
-            System.Diagnostics.Debug.WriteLine("Invalidate was called");
-            SKImageInfo info = args.Info;
-            SKSurface surface = args.Surface;
-            SKCanvas canvas = surface.Canvas;
-
-            float explodeOffset = 50;
-            float radius = Math.Min(info.Width / 2.5f, info.Height / 2.5f);
-
-            //0 = i
-            float yPoint = (info.Height / 2);
-            SKPoint center = new SKPoint(info.Width / 2, yPoint + (radius * 2 * 0) + (explodeOffset * 0));
-            SKRect rect = new SKRect(center.X - radius, center.Y - radius,
-                                     center.X + radius, center.Y + radius);
-
-            try
-            {
-                if (ViewModel.customTimer?.IsRunning == true &&
-                    !ViewModel.requestReDraw)
-                {
-                    float totalTime = ViewModel.GetTimerCycleTotalTime();
-                    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
-                    float startAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime) - 90f;
-                    //sometimes i need a *-1 in the sweepAngle o.o
-                    float sweepAngle = ViewModel.CalculateAngle(1, totalTime) * -1;
-                    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
-                    return;
-                }
-
-                System.Diagnostics.Debug.WriteLine($"{args.Surface.Canvas.LocalClipBounds.IsEmpty}");
-                System.Diagnostics.Debug.WriteLine("--------------Rendering the timer started");
-                _rendering = true;
-                canvas.Clear();
-                for (int i = 0; i < 1; i++)
-                {
-                    float startAngle = 0;
-                    float sweepAngle = 0;
-                    float totalTime = ViewModel.GetTimerCycleTotalTime();
-
-                    foreach (var interval in ViewModel.Timer.Intervals.OrderBy(t => t.Position))
-                    {
-                        System.Diagnostics.Debug.WriteLine($"----Rendering Interval = {interval.Name} started");
-                        sweepAngle = ViewModel.CalculateAngle(interval.Duration, totalTime);
-                        System.Diagnostics.Debug.WriteLine($"Duration = {interval.Duration}, Start angle = {startAngle}, final angle = {sweepAngle}");
-                        using (var path = new SKPath())
-                        using (var intervalTextPaint = new SKPaint()
-                        {
-                            Color = GetTextColor()
-                        })
-                        using (var strokePaint = new SKPaint()
-                        {
-                            Color = SKColor.Parse(interval.Color),
-                            Style = SKPaintStyle.Stroke,
-                            StrokeCap = SKStrokeCap.Butt
-                        })
-                        using (var contourPaint = new SKPaint()
-                        {
-                            Color = SKColors.Black,
-                            Style = SKPaintStyle.Stroke,
-                            StrokeCap = SKStrokeCap.Butt
-                        })
-                        {
-                            intervalTextPaint.TextSize = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry));
-                            strokePaint.StrokeWidth = intervalTextPaint.TextSize;
-                            contourPaint.StrokeWidth = (float)(1.25 * strokePaint.StrokeWidth);
-
-                            switch (Device.RuntimePlatform)
-                            {
-                                case Device.Android:
-                                    strokePaint.StrokeWidth =
-                                        intervalTextPaint.TextSize *= 2.5f;
-                                    break;
-                            }
-                            //draw the arc
-                            path.AddArc(rect, startAngle - 90f, sweepAngle);
-                            canvas.DrawPath(path, contourPaint);
-                            canvas.DrawPath(path, strokePaint);
-
-                            var pathMeasure = new SKPathMeasure(path, false, 1);
-
-                            //draw the interval name text
-                            intervalTextPaint.TextScaleX = 1.2f;
-
-                            string intervalName = string.Empty;
-                            if (intervalTextPaint.MeasureText(interval.Name) >= pathMeasure.Length)
-                            {
-                                intervalName = $"{interval.Name}...";
-                                float charWidth = intervalTextPaint.MeasureText(intervalName) / intervalName.Length;
-                                float diff = intervalTextPaint.MeasureText(intervalName) - pathMeasure.Length * 0.8f;
-                                int charsToRemove = (int)Math.Floor(diff / charWidth);
-                                intervalName = $"{intervalName.Substring(0, interval.Name.Length - charsToRemove)}...";
-                            }
-                            else
-                                intervalName = interval.Name;
-
-                            float textWidth = intervalTextPaint.MeasureText(intervalName);
-                            float nameHOffset = pathMeasure.Length / 2f - textWidth / 2f;
-
-                            canvas.DrawTextOnPath(intervalName, path, nameHOffset, -strokePaint.StrokeWidth, intervalTextPaint);
-                        }
-                        DrawDurationIntervalText(rect, canvas, interval);
-                        startAngle += sweepAngle;
-                        System.Diagnostics.Debug.WriteLine($"----Rendering Interval = {interval.Name} completed");
-                    }
-                }
-
-                if (ViewModel.customTimer?.IsRunning == true && ViewModel.requestReDraw ||
-                    ViewModel.customTimer?.IsPaused == true && ViewModel.requestReDraw)
-                {
-                    float totalTime = ViewModel.GetTimerCycleTotalTime();
-
-                    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
-                    float startAngle = -90f;
-                    float sweepAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime);
-                    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
-                    ViewModel.requestReDraw = false;
-                }
-                _rendering = false;
-                System.Diagnostics.Debug.WriteLine("--------------Rendering the timer completed");
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                throw e;
-            }
-        }
-
-        void UpdateCurrentInterval(SKRect rect, SKCanvas canvas, float startAngle, float sweepAngle)
-        {
-            var currentInterval = ViewModel.Timer.Intervals.FirstOrDefault(t => t.IsRunning);
-            if (currentInterval is null)
-                throw new NullReferenceException("There arent 0 running intervals");
-
-            using (var path = new SKPath())
-            using (var textPaint = new SKPaint())
-            using (var transparentStrokePaint = new SKPaint
-            {
-                Color = GetTransparentColor(),
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry)) + 1f,
-                StrokeCap = SKStrokeCap.Butt
-            })
-            {
-                switch (Device.RuntimePlatform)
-                {
-                    case Device.Android:
-                        transparentStrokePaint.StrokeWidth *= 2.5f;
-                        break;
-                }
-
-                path.AddArc(rect, startAngle, sweepAngle);
-                canvas.DrawPath(path, transparentStrokePaint);
-            }
-            DrawDurationIntervalText(rect, canvas, currentInterval);
-        }
-
-        private void DrawDurationIntervalText(SKRect rect, SKCanvas canvas, IntervalItemViewModel currentInterval)
-        {
-            float textSize = (float)Device.GetNamedSize(NamedSize.Small, typeof(Entry)) * 1.5f;
-            float durationVOffset = (float)Device.GetNamedSize(NamedSize.Small, typeof(Entry)) * 2f;
-
-            switch (Device.RuntimePlatform)
-            {
-                case Device.Android:
-                    durationVOffset *= 2.5f;
-                    textSize *= 2.5f;
-                    break;
-            }
-
-            //Here i create two text, one that will be drawn with a "transparent" color
-            //and the other one that will be drawn over the "transparent" one
-            string ciText = TimeSpan.FromSeconds(currentInterval.TimeLeft).ToString(_timeSpanFormat);
-            string replacementText = TimeSpan.FromSeconds(currentInterval.TimeLeft + 1).ToString(_timeSpanFormat);
-            float startAngle = 0;
-            float sweepAngle = 0;
-
-            foreach (var interval in ViewModel.Timer.Intervals.OrderBy(i => i.Position))
-            {
-                sweepAngle = ViewModel.CalculateAngle(interval.Duration, ViewModel.GetTimerCycleTotalTime());
-                if (interval.Position == currentInterval.Position)
-                {
-                    break;
-                }
-                startAngle += sweepAngle;
-            }
-
-
-            using (var path = new SKPath())
-            using (var intervalTimePaint = new SKPaint())
-            using (var intervalTimeTransparentPaint = new SKPaint())
-            {
-                path.AddArc(rect, startAngle - 90f, sweepAngle);
-                var pathMeasure = new SKPathMeasure(path, false, 1);
-
-                intervalTimePaint.Color = SKColor.Parse(currentInterval.Color);
-                intervalTimeTransparentPaint.Color = GetTransparentColor();
-                intervalTimePaint.TextSize =
-                    intervalTimeTransparentPaint.TextSize = textSize;
-                intervalTimePaint.Style =
-                    intervalTimeTransparentPaint.Style = SKPaintStyle.StrokeAndFill;
-                intervalTimePaint.StrokeWidth =
-                    intervalTimeTransparentPaint.StrokeWidth = 2;
-
-                //intervalTimePaint.TextScaleX =
-                //    intervalTimeTransparentPaint.TextScaleX = pathMeasure.Length / pathMeasure.Length * 0.6f;
-
-                float durationWidth = intervalTimePaint.MeasureText(ciText);
-                float durationHOffset = pathMeasure.Length / 2f - durationWidth / 2f;
-                //float durationHOffset = (float)(Math.PI * sweepAngle * radius / 360) - durationWidth / 2f;
-                //TODO: there is a small glitch with the colors here
-                //first we draw the "transparent" one
-                canvas.DrawTextOnPath(replacementText, path, durationHOffset, durationVOffset, intervalTimeTransparentPaint);
-                //and then the real one, with the corresponding color
-                canvas.DrawTextOnPath(ciText, path, durationHOffset, durationVOffset, intervalTimePaint);
-            }
-        }
-
-        private void ContentPage_SizeChanged(object sender, EventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine($"Size changed. Width = {Width} - Height = {Height}");
-            if (ViewModel.customTimer?.IsRunning == true ||
-                ViewModel.customTimer?.IsPaused == true)
-                ViewModel.requestReDraw = true;
-        }
-
-        private SKColor GetTextColor()
-        {
-            return ViewModel.IsDarkTheme() ?
-                SKColors.White :
-                SKColor.Parse("#2c2929");
-        }
-
-        private SKColor GetTransparentColor()
-        {
-            switch (Device.RuntimePlatform)
-            {
-                case Device.Android:
-                    return ViewModel.IsDarkTheme() ?
-                        SKColors.Black :
-                        SKColors.White;
-            }
-            return ViewModel.IsDarkTheme() ?
-                SKColor.Parse("#2c2929") :
-                SKColors.White;
-
+            ViewModel.Init().GetAwaiter().GetResult();
         }
 
         #region Old
+
         //void StartTimer()
         //{
         //    System.Diagnostics.Debug.WriteLine("--------------Starting the timer...");
@@ -374,10 +103,11 @@ namespace TimeIt
         //    }
         //    System.Diagnostics.Debug.WriteLine("--------------Updating current interval completed");
         //}
+
         #endregion
 
-
         #region Old 2
+
         //private float CalculateFinalAngle(int intervalDuration, float totalTime)
         //{
         //    float intervalAngle = intervalDuration * 360 / totalTime;
@@ -390,10 +120,11 @@ namespace TimeIt
         //    float intervalAngle = elapsedTime * 360 / totalTime;
         //    return intervalAngle;
         //}
+
         #endregion
 
-
         #region Not being used
+
         //private void canvasView_PaintSurface(object sender, SKPaintSurfaceEventArgs e)
         //{
         //    SKSurface surface = e.Surface;
@@ -488,6 +219,7 @@ namespace TimeIt
         //{
         //    canvasView.InvalidateSurface();
         //} 
+
         #endregion
     }
 }
