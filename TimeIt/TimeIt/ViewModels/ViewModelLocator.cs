@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight.Views;
 using Plugin.Toasts;
 using TimeIt.Enums;
 using TimeIt.Interfaces;
+using TimeIt.Models;
 using TimeIt.Pages;
 using TimeIt.Services;
 using Xamarin.Forms;
@@ -47,6 +48,8 @@ namespace TimeIt.ViewModels
 
             SimpleIoc.Default.Register(() => DependencyService.Get<IToastNotificator>());
             SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
+            SimpleIoc.Default.Register(() => new TimeItDbContext());
+
 
             SimpleIoc.Default.Register<MainPageViewModel>();
             SimpleIoc.Default.Register<TimerPageViewModel>();

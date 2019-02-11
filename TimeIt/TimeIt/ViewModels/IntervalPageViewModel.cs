@@ -156,11 +156,11 @@ namespace TimeIt.ViewModels
             _messenger.Register<int>(
                 this,
                 $"{MessageType.ADD_INTERVAL}",
-                 (numberOfItems) => Init(numberOfItems));
+                 Init);
             _messenger.Register<(IntervalListItemViewModel, int)>(
                 this,
                 $"{MessageType.EDIT_INTERVAL}",
-                 (tuple) => Init(tuple.Item1, tuple.Item2));
+                 tuple => Init(tuple.Item1, tuple.Item2));
         }
 
         public void Init(int numberOfItems)
