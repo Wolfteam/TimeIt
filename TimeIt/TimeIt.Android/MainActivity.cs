@@ -8,6 +8,7 @@ using Android.Widget;
 using Android.OS;
 using Xamarin.Forms;
 using Plugin.Toasts;
+using PanCardView.Droid;
 
 namespace TimeIt.Droid
 {
@@ -25,6 +26,7 @@ namespace TimeIt.Droid
             Forms.Init(this, savedInstanceState);
             DependencyService.Register<ToastNotification>();
             ToastNotification.Init(this);
+            CardsViewRenderer.Preserve();
             LoadApplication(new App());
         }
 
