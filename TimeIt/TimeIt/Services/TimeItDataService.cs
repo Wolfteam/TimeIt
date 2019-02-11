@@ -39,6 +39,7 @@ namespace TimeIt.Services
         {
             return await _timeItDbContext
                 .Timers
+                .Include(t => t.Intervals)
                 .ToListAsync();
         }
 
