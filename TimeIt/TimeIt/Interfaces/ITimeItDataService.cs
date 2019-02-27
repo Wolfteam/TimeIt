@@ -10,6 +10,7 @@ namespace TimeIt.Interfaces
         Task<IEnumerable<Timer>> GetAllTimers();
         Task<Timer> GetTimer(int timerID);
         Task<Timer> UpdateTimer(Timer timer);
+        Task<bool> RemoveTimer(int timerID);
 
         Task<Interval> AddInterval(int timerID, Interval interval);
         Task<IEnumerable<Interval>> GetIntervals(int timerID);

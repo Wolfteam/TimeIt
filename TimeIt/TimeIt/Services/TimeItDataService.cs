@@ -76,6 +76,17 @@ namespace TimeIt.Services
             return true;
         }
 
+        public async Task<bool> RemoveTimer(int timerID)
+        {
+            var timerToRemove = await GetTimer(timerID);
+            if (timerToRemove is null)
+                throw new ArgumentException($"The provided timerID = {timerID} does not exists", nameof(timerID));
+
+            _timeItDbContext.Timers.Remove(timerToRemove);
+            await _timeItDbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<Timer> UpdateTimer(Timer timer)
         {
             _timeItDbContext.Entry(timer).State = EntityState.Modified;

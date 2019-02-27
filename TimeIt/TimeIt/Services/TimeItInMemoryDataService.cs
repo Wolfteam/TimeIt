@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TimeIt.Interfaces;
@@ -162,6 +163,16 @@ namespace TimeIt.Services
             int index = timers.IndexOf(timerToRemove);
             timers[index] = timer;
             return await Task.FromResult(timer);
+        }
+
+        public async Task<bool> RemoveTimer(int timerID)
+        {
+            var timer = await GetTimer(timerID);
+            if (timer is null)
+                throw new ArgumentException($"The provided timerID = {timerID} does not exists", nameof(timerID));
+
+            timers.Remove(timer);
+            return true;
         }
     }
 }
