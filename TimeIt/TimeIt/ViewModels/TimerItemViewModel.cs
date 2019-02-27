@@ -117,6 +117,8 @@ namespace TimeIt.ViewModels
             }
 
             _messenger.Send(TotalTime, $"{MessageType.MP_TOTAL_TIME_CHANGED}");
+            _messenger.Send(false, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
+
             CustomTimer = new CustomTimer(TimeSpan.FromSeconds(_fps), () =>
             {
                 UpdateCurrentInterval();
@@ -124,7 +126,6 @@ namespace TimeIt.ViewModels
             });
 
             CustomTimer.Start();
-            _messenger.Send(false, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
         }
 
         public void PauseTimer()
@@ -169,9 +170,9 @@ namespace TimeIt.ViewModels
             var currentInterval = Intervals.FirstOrDefault(t => t.IsRunning);
             if (currentInterval is null)
                 throw new NullReferenceException("There arent 0 running intervals");
-            System.Diagnostics.Debug.WriteLine("--------------Vm-Updating current interval started");
+            System.Diagnostics.Debug.WriteLine("Vm - Updating current interval started");
             System.Diagnostics.Debug.WriteLine(
-                $"Vm-Interval = {currentInterval.Name}, time left = {currentInterval.TimeLeft}");
+                $"--------------Vm - Interval = {currentInterval.Name}, time left = {currentInterval.TimeLeft}");
 
             if (currentInterval.TimeLeft <= 0)
             {
@@ -210,7 +211,7 @@ namespace TimeIt.ViewModels
             }
 
             _messenger.Send(ElapsedTime, $"{MessageType.MP_ELAPSED_TIME_CHANGED}");
-            System.Diagnostics.Debug.WriteLine("--------------Vm-Updating current interval completed");
+            System.Diagnostics.Debug.WriteLine("Vm - Updating current interval completed");
         }
 
         public float GetTimerCycleTotalTime()

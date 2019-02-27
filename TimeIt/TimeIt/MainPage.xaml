@@ -26,19 +26,25 @@
     <ContentPage.ToolbarItems>
         <customControls:BindableToolbarItem
             Command="{Binding AddTimerCommand}"
-            IsVisible="{Binding CanNavigate}"
+            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Default"
             Priority="0"
             Text="Add Timer" />
         <customControls:BindableToolbarItem
             Command="{Binding EditTimerCommand}"
-            IsVisible="{Binding CanNavigate}"
+            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Default"
             Priority="0"
             Text="Edit Timer" />
         <customControls:BindableToolbarItem
+            Command="{Binding RemoveTimerCommand}"
+            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
+            Order="Secondary"
+            Priority="1"
+            Text="Delete" />
+        <customControls:BindableToolbarItem
             Command="{Binding OpenSettingsCommand}"
-            IsVisible="{Binding CanNavigate}"
+            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Secondary"
             Priority="1"
             Text="Settings" />
@@ -155,6 +161,8 @@
                     Grid.Row="1"
                     HeightRequest="400"
                     IsCyclical="False"
+                    IsEnabled="{Binding StartButtonEnabled, Mode=OneWay}"
+                    IsUserInteractionEnabled="{Binding StartButtonEnabled, Mode=OneWay}"
                     IsViewCacheEnabled="False"
                     ItemsSource="{Binding Timers, Mode=OneWay}"
                     SelectedIndex="{Binding CurrentPage, Mode=TwoWay}"

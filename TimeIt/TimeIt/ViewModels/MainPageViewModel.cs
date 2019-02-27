@@ -9,7 +9,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using TimeIt.Delegates;
 using TimeIt.Enums;
 using TimeIt.Helpers;
 using TimeIt.Interfaces;
@@ -25,7 +24,7 @@ namespace TimeIt.ViewModels
         private readonly ITimeItDataService _timeItDataService;
         private readonly IMapper _mapper;
         private readonly IMessenger _messenger;
-
+        private readonly ICustomDialogService _dialogService;
         private string _currentTimerName;
         private int _remainingRepetitions;
         private string _totalTimeText;
@@ -111,6 +110,8 @@ namespace TimeIt.ViewModels
 
         public ICommand EditTimerCommand { get; private set; }
 
+        public ICommand RemoveTimerCommand { get; private set; }
+
         public ICommand OpenSettingsCommand { get; private set; }
 
         public ICommand StartTimerCommand { get; private set; }
@@ -125,12 +126,14 @@ namespace TimeIt.ViewModels
             INavigationService navigationService,
             ITimeItDataService timeItDataService,
             IMapper mapper,
-            IMessenger messenger)
+            IMessenger messenger,
+            ICustomDialogService dialogService)
         {
             _navigationService = navigationService;
             _timeItDataService = timeItDataService;
             _mapper = mapper;
             _messenger = messenger;
+            _dialogService = dialogService;
 
             SetCommands();
             RegisterMessages();
@@ -162,23 +165,31 @@ namespace TimeIt.ViewModels
                 Navigated = true;
             });
 
+            RemoveTimerCommand = new RelayCommand
+                (async () => await RemomveCurrentTimerAsync());
+
             OpenSettingsCommand = new RelayCommand(() => { });
 
             StartTimerCommand = new RelayCommand(() =>
             {
-                Timers[CurrentPage].StartTimer();
-                CanNavigate = false;
+                //CanNavigate = false;
+                if (Timers.Count > 0)
+                {
+                    Timers[CurrentPage].StartTimer();
+                }
             });
 
             PauseTimerCommand = new RelayCommand(() =>
             {
-                Timers[CurrentPage].PauseTimer();
+                if (Timers.Count > 0)
+                    Timers[CurrentPage].PauseTimer();
             });
 
             StopTimerCommand = new RelayCommand(() =>
             {
-                Timers[CurrentPage].StopTimer();
-                CanNavigate = true;
+                if (Timers.Count > 0)
+                    Timers[CurrentPage].StopTimer();
+                //CanNavigate = true;
             });
         }
 
@@ -213,6 +224,11 @@ namespace TimeIt.ViewModels
                 this,
                 $"{MessageType.MP_TIMER_UPDATED}",
                 timer => OnTimerModified(OperationType.UPDATED, timer));
+
+            _messenger.Register<int>(
+                this,
+                $"{MessageType.MP_TIMER_REMOVED}",
+                timerID => OnTimerModified(OperationType.DELETED, null, timerID));
         }
 
         public async Task Init()
@@ -238,7 +254,7 @@ namespace TimeIt.ViewModels
             _initialized = true;
         }
 
-        private void OnTimerModified(OperationType operation, TimerItemViewModel timer)
+        private void OnTimerModified(OperationType operation, TimerItemViewModel timer, int? timerID = null)
         {
             switch (operation)
             {
@@ -257,7 +273,11 @@ namespace TimeIt.ViewModels
                     CurrentPage = index;
                     break;
                 case OperationType.DELETED:
-                    var timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timer.TimerID);
+                    TimerItemViewModel timerToRemove;
+                    if (timerID.HasValue)
+                        timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timerID);
+                    else
+                        timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timer.TimerID);
                     Timers.Remove(timerToRemove);
                     break;
                 default:
@@ -271,6 +291,7 @@ namespace TimeIt.ViewModels
         {
             if (Timers.Count == 0)
             {
+                StartButtonEnabled = false;
                 CurrentTimerName = string.Empty;
                 RemainingRepetitions = 0;
                 TotalTimeText = string.Empty;
@@ -279,10 +300,30 @@ namespace TimeIt.ViewModels
             }
 
             var currentTimer = Timers[CurrentPage];
+            StartButtonEnabled = true;
             CurrentTimerName = currentTimer.Name;
             RemainingRepetitions = currentTimer.RemainingRepetitions;
             TotalTimeText = TimeSpan.FromSeconds(currentTimer.TotalTime).ToString(Constans.DefaultTimeSpanFormat);
             ElapsedTimeText = TimeSpan.FromSeconds(currentTimer.ElapsedTime).ToString(Constans.DefaultTimeSpanFormat);
+        }
+
+        private async Task RemomveCurrentTimerAsync()
+        {
+            var currentTimer = Timers[CurrentPage];
+            bool deleteTimer = await _dialogService
+                .ShowConfirmationDialogAsync("Confirm", $"Are you sure you want to delete timer {currentTimer.Name} ?");
+
+            if (!deleteTimer)
+                return;
+
+            bool wasRemoved = await _timeItDataService.RemoveTimer(currentTimer.TimerID);
+            if (!wasRemoved)
+            {
+                _dialogService.ShowSimpleMessage($"An error occurred while trying to delete timer {currentTimer.Name}");
+                return;
+            }
+            Timers.Remove(currentTimer);
+            _dialogService.ShowSimpleMessage($"Timer {currentTimer.Name} was successfully removed");
         }
     }
 }

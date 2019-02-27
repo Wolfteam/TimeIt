@@ -19,7 +19,7 @@ namespace TimeIt.UserControls
 
         public TimerControl()
         {
-            InitializeComponent();
+                InitializeComponent();
         }
 
         protected override void OnBindingContextChanged()
@@ -173,7 +173,7 @@ namespace TimeIt.UserControls
         {
             var currentInterval = ViewModel.Intervals.FirstOrDefault(t => t.IsRunning);
             if (currentInterval is null)
-                throw new NullReferenceException("There arent 0 running intervals");
+                throw new NullReferenceException($"Timer = {ViewModel.Name} doesnt have a interval that is running");
 
             using (var path = new SKPath())
             using (var textPaint = new SKPaint())

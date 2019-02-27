@@ -104,7 +104,7 @@ namespace TimeIt.ViewModels
                 (() => _navigationService.GoBack());
 
             RemoveTimerCommand = new RelayCommand
-                (() => _dialogService.ShowSimpleMessage("not implemented yet !"));
+                (async () => await RemoveTimerAsync());
 
             AddIntervalCommand = new RelayCommand(() =>
             {
@@ -247,6 +247,31 @@ namespace TimeIt.ViewModels
             updatedTimer.SetDefaultTimeLeft();
 
             _messenger.Send(updatedTimer, $"{MessageType.MP_TIMER_UPDATED}");
+            _navigationService.GoBack();
+        }
+
+        public async Task RemoveTimerAsync()
+        {
+            if (_timerID == 0)
+            {
+                _navigationService.GoBack();
+                return;
+            }
+
+            bool deleteTimer = await _dialogService
+                .ShowConfirmationDialogAsync("Confirm", $"Are you sure you want to delete timer {TimerName} ?");
+
+            if (!deleteTimer)
+                return;
+
+            bool wasRemoved = await _timeItDataService.RemoveTimer(_timerID);
+            if (!wasRemoved)
+            {
+                _dialogService.ShowSimpleMessage($"An error occurred while trying to delete the timer");
+                return;
+            }
+            _dialogService.ShowSimpleMessage($"Timer was successfully removed");
+            _messenger.Send(_timerID, $"{MessageType.MP_TIMER_REMOVED}");
             _navigationService.GoBack();
         }
 
