@@ -280,6 +280,8 @@ namespace TimeIt.ViewModels
             switch (operation)
             {
                 case OperationType.CREATED:
+                    //the new one is moving an existing one
+                    MoveIntervals(interval.Position);
                     Intervals.Insert(interval.Position - 1, interval);
                     break;
                 case OperationType.UPDATED:
@@ -308,7 +310,9 @@ namespace TimeIt.ViewModels
                     }
                     else
                     {
-                        Intervals.Remove(oldInterval);
+                        Intervals.RemoveAt(index);
+                        //the new one is moving an existing one
+                        MoveIntervals(interval.Position);
                         Intervals.Insert(interval.Position - 1, interval);
                     }
 
@@ -316,6 +320,8 @@ namespace TimeIt.ViewModels
                 case OperationType.DELETED:
                     var intervalToRemove = Intervals.FirstOrDefault(i => i.IntervalID == interval.IntervalID);
                     Intervals.Remove(intervalToRemove);
+                    //the new one is moving an existing one
+                    MoveIntervals(interval.Position, add: false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(operation), operation,
@@ -323,6 +329,21 @@ namespace TimeIt.ViewModels
             }
 
             RaisePropertyChanged(() => IntervalToTalTime);
+        }
+
+        private void MoveIntervals(int fromPosition, int steps = 1, bool add = true)
+        {
+            if (Intervals.Any(i => i.Position == fromPosition))
+            {
+                var intervalsToMove = Intervals.Where(i => i.Position >= fromPosition);
+                foreach (var intervalToMove in intervalsToMove)
+                {
+                    if (add)
+                        intervalToMove.Position += steps;
+                    else
+                        intervalToMove.Position -= steps;
+                }
+            }
         }
     }
 }
