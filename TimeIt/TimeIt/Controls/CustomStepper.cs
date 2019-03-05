@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Plugin.Iconize;
+using System;
 using Xamarin.Forms;
 
 namespace TimeIt.Controls
@@ -94,35 +95,35 @@ namespace TimeIt.Controls
                     : NamedSize.Medium, 
                 typeof(Button));
 
-            PlusBtn = new Button
+            PlusBtn = new IconButton
             {
                 BackgroundColor = Color.Transparent,
                 FontSize = fontSize,
-                Text = "\uf055",
+                Text = "fas-plus-circle",
                 TextColor = Color.Red,
                 FontAttributes = FontAttributes.Bold,
             };
 
-            MinusBtn = new Button
+            MinusBtn = new IconButton
             {
                 BackgroundColor = Color.Transparent,
                 FontSize = fontSize,
-                Text = "\uf056",
+                Text = "fas-minus-circle",
                 TextColor = Color.Red,
                 FontAttributes = FontAttributes.Bold,
             };
 
-            switch (Device.RuntimePlatform)
-            {
-                case Device.UWP:
-                    PlusBtn.FontFamily =
-                        MinusBtn.FontFamily = "Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free";
-                    break;
-                case Device.Android:
-                    PlusBtn.FontFamily =
-                        MinusBtn.FontFamily = "fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid";
-                    break;
-            }
+            //switch (Device.RuntimePlatform)
+            //{
+            //    case Device.UWP:
+            //        PlusBtn.FontFamily =
+            //            MinusBtn.FontFamily = "Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free";
+            //        break;
+            //    case Device.Android:
+            //        PlusBtn.FontFamily =
+            //            MinusBtn.FontFamily = "fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid";
+            //        break;
+            //}
 
             PlusBtn.Clicked += PlusBtnClicked;
             MinusBtn.Clicked += MinusBtnClicked;

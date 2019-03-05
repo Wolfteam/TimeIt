@@ -6,6 +6,7 @@
     xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
     xmlns:c="clr-namespace:TimeIt.Controls"
     xmlns:converters="clr-namespace:TimeIt.Converters"
+    xmlns:iconize="clr-namespace:Plugin.Iconize;assembly=Plugin.Iconize"
     xmlns:models="clr-namespace:TimeIt.Models"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
     x:Name="timerPage"
@@ -14,20 +15,26 @@
     NavigationPage.BackButtonTitle="Go back hdp"
     Style="{StaticResource PageStyle}">
     <ContentPage.ToolbarItems>
-        <ToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding SaveTimerCommand}"
+            Icon="fas-save"
+            IconColor="White"
             Order="Primary"
             Priority="0"
             Text="Save" />
 
-        <ToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding DiscardChangesCommand}"
+            Icon="fas-times"
+            IconColor="White"
             Order="Primary"
             Priority="1"
             Text="Discard" />
 
-        <ToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding RemoveTimerCommand}"
+            Icon="fas-trash-alt"
+            IconColor="White"
             Order="Secondary"
             Priority="2"
             Text="Delete" />
@@ -125,6 +132,7 @@
                                 VerticalOptions="Center" />
                             <StackLayout
                                 Grid.Column="1"
+                                Margin="0,0,20,0"
                                 Padding="0"
                                 HeightRequest="40"
                                 HorizontalOptions="EndAndExpand"
@@ -139,13 +147,12 @@
                                     Text="Add a new interval"
                                     TextColor="White"
                                     VerticalOptions="Center" />
-                                <Label
-                                    FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
-                                                              UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
+                                <iconize:IconLabel
                                     FontSize="{OnPlatform Android='22',
                                                           UWP='18'}"
-                                    Text="&#xf067;"
-                                    VerticalOptions="Center" />
+                                    Text="fas-plus-circle"
+                                    TextColor="White"
+                                    VerticalTextAlignment="Center" />
                             </StackLayout>
                         </Grid>
                     </StackLayout>
@@ -190,33 +197,14 @@
                                             Grid.Column="1"
                                             Direction="Row"
                                             JustifyContent="End">
-                                            <!--<Button
-                                        BackgroundColor="Transparent"
-                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
-                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
-                                        FontSize="Medium"
-                                        HorizontalOptions="Center"
-                                        Text="&#xf0b2;"
-                                        TextColor="Black" />-->
-                                            <!--<Button
-                                        BackgroundColor="Transparent"
-                                        FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
-                                                                  UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
-                                        FontSize="Medium"
-                                        HorizontalOptions="Center"
-                                        Text="&#xf304;"
-                                        TextColor="Black" />-->
-                                            <Button
+                                            <iconize:IconButton
                                                 BackgroundColor="Transparent"
                                                 Command="{Binding Path=BindingContext.RemoveIntervalCommand, Source={x:Reference timerPage}}"
                                                 CommandParameter="{Binding}"
-                                                FontFamily="{x:OnPlatform Android='fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid',
-                                                                          UWP='Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free'}"
                                                 FontSize="Medium"
                                                 HorizontalOptions="Center"
-                                                Text="&#xf2ed;"
-                                                TextColor="{OnPlatform Android='White',
-                                                                       UWP='Black'}" />
+                                                Text="fas-trash-alt"
+                                                TextColor="White" />
                                         </FlexLayout>
                                         <Label
                                             Grid.Row="1"

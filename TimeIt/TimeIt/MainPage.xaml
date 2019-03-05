@@ -8,6 +8,7 @@
     xmlns:customControls="clr-namespace:TimeIt.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:TimeIt.Helpers"
+    xmlns:iconize="clr-namespace:Plugin.Iconize;assembly=Plugin.Iconize"
     xmlns:local="clr-namespace:TimeIt"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pcCards="clr-namespace:PanCardView;assembly=PanCardView"
@@ -24,26 +25,34 @@
     </ContentPage.Behaviors>
 
     <ContentPage.ToolbarItems>
-        <customControls:BindableToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding AddTimerCommand}"
+            Icon="fas-plus"
+            IconColor="White"
             IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Default"
             Priority="0"
             Text="Add Timer" />
-        <customControls:BindableToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding EditTimerCommand}"
+            Icon="fas-pen"
+            IconColor="White"
             IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Default"
             Priority="0"
             Text="Edit Timer" />
-        <customControls:BindableToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding RemoveTimerCommand}"
+            Icon="fas-trash-alt"
+            IconColor="White"
             IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Secondary"
             Priority="1"
             Text="Delete" />
-        <customControls:BindableToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding OpenSettingsCommand}"
+            Icon="fas-cog"
+            IconColor="White"
             IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Secondary"
             Priority="1"

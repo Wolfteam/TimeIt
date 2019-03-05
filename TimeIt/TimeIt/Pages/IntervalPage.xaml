@@ -6,6 +6,7 @@
     xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
     xmlns:c="clr-namespace:TimeIt.Controls"
     xmlns:cp="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
+    xmlns:iconize="clr-namespace:Plugin.Iconize;assembly=Plugin.Iconize"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
     x:Name="editIntervalPage"
     Title="Add / Edit Interval"
@@ -13,14 +14,18 @@
     Style="{StaticResource PageStyle}">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding SaveCommand}"
+            Icon="fas-save"
+            IconColor="White"
             Order="Primary"
             Priority="0"
             Text="Save" />
 
-        <ToolbarItem
+        <iconize:IconToolbarItem
             Command="{Binding DiscardChangesCommand}"
+            Icon="fas-times"
+            IconColor="White"
             Order="Primary"
             Priority="1"
             Text="Discard" />
