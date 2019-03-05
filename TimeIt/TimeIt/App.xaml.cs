@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Views;
+using Plugin.Iconize;
 using System;
 using TimeIt.Services;
 using TimeIt.ViewModels;
@@ -17,7 +18,7 @@ namespace TimeIt
             InitializeComponent();
             //TODO: I SHOULD REMOVE THE HARDCODED FONT SIZES FROM THE MAIN PAGE
             //TODO: I SHOULD MOVE THIS COLORS
-            var page = new NavigationPage(new MainPage());
+            var page = new IconNavigationPage(new MainPage());
             string barBgColor = "#1d1a1a";
             page.BarBackgroundColor = Color.FromHex(barBgColor);
             page.BarTextColor = Color.White;
@@ -26,6 +27,11 @@ namespace TimeIt
 
             //this is to place the toolbar to the bottom on uwp
             MainPage.On<Xamarin.Forms.PlatformConfiguration.Windows>().SetToolbarPlacement(ToolbarPlacement.Bottom);
+
+            Iconize
+                .With(new Plugin.Iconize.Fonts.FontAwesomeRegularModule())
+                .With(new Plugin.Iconize.Fonts.FontAwesomeBrandsModule())
+                .With(new Plugin.Iconize.Fonts.FontAwesomeSolidModule());
         }
 
         protected override void OnStart()
