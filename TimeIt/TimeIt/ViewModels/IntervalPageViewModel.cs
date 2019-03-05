@@ -25,10 +25,10 @@ namespace TimeIt.ViewModels
         private string _inMemoryIntervalID;
         private string _name;
         private Color _selectedColor;
-        private int _position;
+        private double _position;
 
-        private int _maximumPosition;
-        private int _minimumPosition;
+        private double _maximumPosition;
+        private double _minimumPosition;
         private int _minimumSeconds;
         private int _minutes;
         private int _seconds;
@@ -48,19 +48,24 @@ namespace TimeIt.ViewModels
             set => Set(ref _selectedColor, value);
         }
 
-        public int Position
+        public double Position
         {
             get => _position;
-            set => Set(ref _position, value);
+            set
+            {
+                if (_position == value)
+                    return;
+                Set(ref _position, value);
+            }
         }
 
-        public int MaximumPosition
+        public double MaximumPosition
         {
             get => _maximumPosition;
             set => Set(ref _maximumPosition, value);
         }
 
-        public int MinimumPosition
+        public double MinimumPosition
         {
             get => _minimumPosition;
             set => Set(ref _minimumPosition, value);
@@ -175,7 +180,8 @@ namespace TimeIt.ViewModels
                 IsPositionEnabled = false;
                 return;
             }
-            MaximumPosition = Position = numberOfItems + 1;
+            MaximumPosition = numberOfItems + 1;
+            Position = numberOfItems + 1;
         }
 
         public void Init(IntervalListItemViewModel interval, int numberOfItems)
@@ -188,7 +194,6 @@ namespace TimeIt.ViewModels
             Name = interval.Name;
             SelectedColor = Color.FromHex(interval.Color);
             SetMinutesAndSeconds(interval.Duration);
-            Position = interval.Position;
             //this happens when there are no items added in the list
             if (numberOfItems == 1)
             {
@@ -196,6 +201,8 @@ namespace TimeIt.ViewModels
                 IsPositionEnabled = false;
             }
             MaximumPosition = numberOfItems;
+            Position = interval.Position;
+            System.Diagnostics.Debug.WriteLine($"Init: Position = {Position} - Max = {MaximumPosition}");
         }
 
         private void CleanUp()
@@ -203,9 +210,17 @@ namespace TimeIt.ViewModels
             _intervalID = 0;
             Name = string.Empty;
 
-            IsPositionEnabled = true;
-            MinimumPosition = 1;
-            MaximumPosition = Position = 2;
+            if (!IsPositionEnabled)
+                IsPositionEnabled = true;
+
+            if (MaximumPosition != 2)
+                MaximumPosition = 2;
+
+            if (MinimumPosition != 1)
+                MinimumPosition = 1;
+
+            if (Position != 2)
+                Position = 2;
 
             SetMinutesAndSeconds(45);
             SelectedColor = Color.Yellow;
@@ -225,7 +240,7 @@ namespace TimeIt.ViewModels
         private IntervalListItemViewModel GetIntervalData()
         {
             bool shouldGenerateNewGuid = string.IsNullOrEmpty(_inMemoryIntervalID);
-            string guid =  !_isInEditMode || (_isInEditMode && _intervalID == 0 && shouldGenerateNewGuid) ?
+            string guid = !_isInEditMode || (_isInEditMode && _intervalID == 0 && shouldGenerateNewGuid) ?
                 Guid.NewGuid().ToString() :
                  _inMemoryIntervalID;
             var interval = new IntervalListItemViewModel
@@ -234,7 +249,7 @@ namespace TimeIt.ViewModels
                 Duration = (float)GetIntervalDuration().TotalSeconds,
                 IntervalID = _intervalID,
                 Name = Name,
-                Position = Position,
+                Position = (int)Position,
                 InMemoryIntervalID = guid
             };
 

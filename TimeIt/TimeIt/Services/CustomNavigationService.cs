@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TimeIt.Enums;
 using Xamarin.Forms;
 
 namespace TimeIt.Services
@@ -39,7 +38,7 @@ namespace TimeIt.Services
         public void GoBack()
         {
             var navigation = GetNavigationPage();
-            navigation.PopAsync();
+            Device.BeginInvokeOnMainThread(async () => await navigation.PopAsync());
         }
 
         public void NavigateTo(string pageKey)
@@ -86,7 +85,7 @@ namespace TimeIt.Services
 
                     var page = constructor.Invoke(parameters) as Page;
                     var navigation = GetNavigationPage();
-                    navigation.PushAsync(page);
+                    Device.BeginInvokeOnMainThread(async () => await navigation.PushAsync(page));
                 }
                 else
                 {

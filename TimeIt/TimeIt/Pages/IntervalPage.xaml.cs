@@ -14,13 +14,13 @@ namespace TimeIt.Pages
 
             switch (Device.RuntimePlatform)
             {
-                case Device.Android:
-                    colorPickerAndroid.RootContainer = editorGrid;
-                    colorPickerAndroid.DialogSettings = new ColorDialogSettings
-                    {
-                        DialogColor = Color.Gray
-                    };
-                    break;
+                //case Device.Android:
+                //    colorPickerAndroid.RootContainer = editorGrid;
+                //    colorPickerAndroid.DialogSettings = new ColorDialogSettings
+                //    {
+                //        DialogColor = Color.Gray
+                //    };
+                //    break;
                 default:
                     colorPickerUWP.RootContainer = editorGrid;
                     colorPickerUWP.DialogSettings = new ColorDialogSettings
