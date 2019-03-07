@@ -273,11 +273,7 @@ namespace TimeIt.ViewModels
                     CurrentPage = index;
                     break;
                 case OperationType.DELETED:
-                    TimerItemViewModel timerToRemove;
-                    if (timerID.HasValue)
-                        timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timerID);
-                    else
-                        timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timer.TimerID);
+                    var timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timerID);
                     Timers.Remove(timerToRemove);
                     break;
                 default:

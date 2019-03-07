@@ -153,7 +153,7 @@ namespace TimeIt.ViewModels
                 var timer = await _timeItDataService.GetTimer(timerID);
                 TimerName = timer.Name;
                 Repetitions = timer.Repetitions;
-                Intervals = _mapper.Map<ObservableCollection<IntervalListItemViewModel>>(timer.Intervals);
+                Intervals = _mapper.Map<ObservableCollection<IntervalListItemViewModel>>(timer.Intervals.OrderBy(i => i.Position));
             }
             RaisePropertyChanged(() => IntervalToTalTime);
         }
@@ -185,11 +185,9 @@ namespace TimeIt.ViewModels
 
         public async Task SaveTimerAsync()
         {
-            if (Intervals.Count == 0)
-            {
-                _dialogService.ShowSimpleMessage("You need to add at least one interval");
+            bool isTimerValid = IsTimerValid();
+            if (!isTimerValid)
                 return;
-            }
 
             var timer = new Timer
             {
@@ -209,38 +207,17 @@ namespace TimeIt.ViewModels
 
         public async Task UpdateTimerAsync()
         {
-            if (Intervals.Count == 0)
-            {
-                _dialogService.ShowSimpleMessage("You need to add at least one interval");
+            bool isTimerValid = IsTimerValid();
+            if (!isTimerValid)
                 return;
-            }
 
             var timerToUpdate = await _timeItDataService.GetTimer(_timerID);
             timerToUpdate.Name = TimerName;
             timerToUpdate.Repetitions = Repetitions;
 
-            var newIntervals = _mapper.Map<List<Interval>>(Intervals.Where(i => i.IntervalID == 0));
+            var newIntervals = _mapper.Map<IEnumerable<Interval>>(Intervals);
 
-            var updatedIntervals = _mapper.Map<List<Interval>>(Intervals.Where(i => i.IntervalID != 0));
-
-            var intervalsToUpdate = timerToUpdate.Intervals
-                .Where(i => updatedIntervals.Any(ui => ui.IntervalID == i.IntervalID));
-            foreach (var interval in intervalsToUpdate)
-            {
-                var ui = updatedIntervals.FirstOrDefault(i => i.IntervalID == interval.IntervalID);
-                //just in case...
-                if (ui is null)
-                    continue;
-                interval.Color = ui.Color;
-                interval.Duration = ui.Duration;
-                interval.Name = ui.Name;
-                interval.Position = ui.Position;
-            }
-
-            foreach (var interval in newIntervals)
-                timerToUpdate.Intervals.Add(interval);
-
-            await _timeItDataService.UpdateTimer(timerToUpdate);
+            await _timeItDataService.UpdateTimer(timerToUpdate, newIntervals);
 
             var vm = new TimerItemViewModel(_messenger);
             var updatedTimer = _mapper.Map(timerToUpdate, vm);
@@ -281,7 +258,8 @@ namespace TimeIt.ViewModels
             {
                 case OperationType.CREATED:
                     //the new one is moving an existing one
-                    MoveIntervals(interval.Position);
+                    if (Intervals.Count > 0)
+                        MoveIntervals(interval.Position, Intervals.Select(i => i.Position).Max(), true);
                     Intervals.Insert(interval.Position - 1, interval);
                     break;
                 case OperationType.UPDATED:
@@ -308,11 +286,15 @@ namespace TimeIt.ViewModels
                                 break;
                         }
                     }
+                    //the new one is moving an existing one
                     else
                     {
                         Intervals.RemoveAt(index);
-                        //the new one is moving an existing one
-                        MoveIntervals(interval.Position);
+                        bool add = interval.Position < oldInterval.Position;
+                        if (add)
+                            MoveIntervals(interval.Position, oldInterval.Position, add);
+                        else
+                            MoveIntervals(oldInterval.Position, interval.Position, add);
                         Intervals.Insert(interval.Position - 1, interval);
                     }
 
@@ -321,7 +303,8 @@ namespace TimeIt.ViewModels
                     var intervalToRemove = Intervals.FirstOrDefault(i => i.IntervalID == interval.IntervalID);
                     Intervals.Remove(intervalToRemove);
                     //the new one is moving an existing one
-                    MoveIntervals(interval.Position, add: false);
+                    if (Intervals.Count > 0)
+                        MoveIntervals(interval.Position, Intervals.Select(i => i.Position).Max(), false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(operation), operation,
@@ -331,19 +314,32 @@ namespace TimeIt.ViewModels
             RaisePropertyChanged(() => IntervalToTalTime);
         }
 
-        private void MoveIntervals(int fromPosition, int steps = 1, bool add = true)
+        private void MoveIntervals(int fromPosition, int untilPosition, bool add, int steps = 1)
         {
-            if (Intervals.Any(i => i.Position == fromPosition))
+            var intervalsToMove = Intervals.Where(i => i.Position >= fromPosition && i.Position <= untilPosition);
+            foreach (var intervalToMove in intervalsToMove)
             {
-                var intervalsToMove = Intervals.Where(i => i.Position >= fromPosition);
-                foreach (var intervalToMove in intervalsToMove)
-                {
-                    if (add)
-                        intervalToMove.Position += steps;
-                    else
-                        intervalToMove.Position -= steps;
-                }
+                if (add)
+                    intervalToMove.Position += steps;
+                else
+                    intervalToMove.Position -= steps;
             }
+        }
+
+        private bool IsTimerValid()
+        {
+            if (Intervals.Count == 0)
+            {
+                _dialogService.ShowSimpleMessage("You need to add at least one interval");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(TimerName))
+            {
+                _dialogService.ShowSimpleMessage("You need to provide a timer name");
+                return false;
+            }
+            return true;
         }
     }
 }
