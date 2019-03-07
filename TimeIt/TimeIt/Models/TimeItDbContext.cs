@@ -22,6 +22,17 @@ namespace TimeIt.Models
                     v => v.ToHexString(true),
                     v => Color.FromHex(v));
 
+            modelBuilder.Entity<Interval>()
+                .HasIndex(t => t.TimerID);
+
+            modelBuilder.Entity<Interval>()
+                .HasIndex(t => new { t.TimerID, t.Position }).IsUnique();
+
+            modelBuilder.Entity<Interval>()
+                .HasOne(i => i.Timer)
+                .WithMany(t => t.Intervals)
+                .HasForeignKey(i => i.TimerID);
+
             modelBuilder.Entity<Timer>().HasData(new Timer
             {
                 TimerID = 1,
@@ -63,7 +74,7 @@ namespace TimeIt.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string databasePath = "";
-            //if you want to run migrations, you need to move to comment this code...
+            //if you want to run migrations, you need to comment this code...
             switch (Device.RuntimePlatform)
             {
                 case Device.iOS:
