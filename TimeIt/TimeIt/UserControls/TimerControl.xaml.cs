@@ -19,7 +19,7 @@ namespace TimeIt.UserControls
 
         public TimerControl()
         {
-                InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnBindingContextChanged()
@@ -38,8 +38,8 @@ namespace TimeIt.UserControls
         private void ContentView_SizeChanged(object sender, EventArgs e)
         {
             System.Diagnostics.Debug.WriteLine($"Size changed. Width = {Width} - Height = {Height}");
-            if (ViewModel.CustomTimer?.IsRunning == true ||
-                ViewModel.CustomTimer?.IsPaused == true)
+            if (ViewModel?.CustomTimer?.IsRunning == true ||
+                ViewModel?.CustomTimer?.IsPaused == true)
                 ViewModel.RequestReDraw = true;
         }
 
@@ -50,6 +50,13 @@ namespace TimeIt.UserControls
                 System.Diagnostics.Debug.WriteLine("Canvas is being already rendered");
                 return;
             }
+
+            if (ViewModel is null)
+            {
+                System.Diagnostics.Debug.WriteLine("View model is null from OnCanvasViewPaintSurface");
+                return;
+            }
+
             System.Diagnostics.Debug.WriteLine("Invalidate was called");
             SKImageInfo info = args.Info;
             SKSurface surface = args.Surface;
@@ -61,13 +68,13 @@ namespace TimeIt.UserControls
             var center = new SKPoint(info.Width / 2f, yPoint);
             var rect = new SKRect(center.X - radius, center.Y - radius,
                                      center.X + radius, center.Y + radius);
-
-            float totalTime = ViewModel.GetTimerCycleTotalTime();
             float startAngle = 0;
             float sweepAngle;
 
             try
             {
+                float totalTime = ViewModel.GetTimerCycleTotalTime();
+
                 if (ViewModel.CustomTimer?.IsRunning == true &&
                     !ViewModel.RequestReDraw)
                 {
@@ -90,10 +97,6 @@ namespace TimeIt.UserControls
                     sweepAngle = ViewModel.CalculateAngle(interval.Duration, totalTime);
                     //System.Diagnostics.Debug.WriteLine($"Duration = {interval.Duration}, Start angle = {startAngle}, final angle = {sweepAngle}");
                     using (var path = new SKPath())
-                    using (var intervalTextPaint = new SKPaint
-                    {
-                        Color = GetTextColor()
-                    })
                     using (var strokePaint = new SKPaint
                     {
                         Color = SKColor.Parse(interval.Color),
@@ -107,44 +110,24 @@ namespace TimeIt.UserControls
                         StrokeCap = SKStrokeCap.Butt
                     })
                     {
-                        intervalTextPaint.TextSize = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry));
-                        strokePaint.StrokeWidth = intervalTextPaint.TextSize;
+                        strokePaint.StrokeWidth = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry));
                         contourPaint.StrokeWidth = (float)(1.25 * strokePaint.StrokeWidth);
+                        strokePaint.StrokeWidth *= Device.RuntimePlatform == Device.Android
+                            ? 2.5f
+                            : 1f;
 
-                        switch (Device.RuntimePlatform)
-                        {
-                            case Device.Android:
-                                strokePaint.StrokeWidth =
-                                    intervalTextPaint.TextSize *= 2.5f;
-                                break;
-                        }
                         //draw the arc
                         path.AddArc(rect, startAngle - 90f, sweepAngle);
                         canvas.DrawPath(path, contourPaint);
                         canvas.DrawPath(path, strokePaint);
 
-                        var pathMeasure = new SKPathMeasure(path);
+                        //Draw the interval duration text
+                        DrawIntervalDuration(rect, canvas, interval);
 
-                        //draw the interval name text
-                        intervalTextPaint.TextScaleX = 1.2f;
-                        //TODO: IF THE INTERVAL IS SMALL, DURATION AND INTERVAL NAME TEXT GETS CUT
-                        string intervalName;
-                        if (intervalTextPaint.MeasureText(interval.Name) >= pathMeasure.Length)
-                        {
-                            float charWidth = intervalTextPaint.MeasureText(interval.Name) / interval.Name.Length;
-                            float diff = intervalTextPaint.MeasureText(interval.Name) - pathMeasure.Length * 0.8f;
-                            int charsToRemove = (int)Math.Floor(diff / charWidth);
-                            intervalName = $"{interval.Name.Substring(0, interval.Name.Length - charsToRemove)}...";
-                        }
-                        else
-                            intervalName = interval.Name;
-
-                        float textWidth = intervalTextPaint.MeasureText(intervalName);
-                        float nameHOffset = pathMeasure.Length / 2f - textWidth / 2f;
-
-                        canvas.DrawTextOnPath(intervalName, path, nameHOffset, -strokePaint.StrokeWidth, intervalTextPaint);
+                        //Draw the interval name
+                        DrawIntervalName(path, canvas, interval, -strokePaint.StrokeWidth);
                     }
-                    DrawDurationIntervalText(rect, canvas, interval);
+
                     startAngle += sweepAngle;
                     //System.Diagnostics.Debug.WriteLine($"----Rendering Interval = {interval.Name} completed");
                 }
@@ -195,10 +178,48 @@ namespace TimeIt.UserControls
                 path.AddArc(rect, startAngle, sweepAngle);
                 canvas.DrawPath(path, transparentStrokePaint);
             }
-            DrawDurationIntervalText(rect, canvas, currentInterval);
+            DrawIntervalDuration(rect, canvas, currentInterval);
         }
 
-        private void DrawDurationIntervalText(SKRect rect, SKCanvas canvas, IntervalItemViewModel currentInterval)
+        private void DrawIntervalName(SKPath intervalPath, SKCanvas canvas, IntervalItemViewModel currentInterval, float vOffset)
+        {
+            using (var intervalTextPaint = new SKPaint
+            {
+                Color = GetTextColor(),
+                TextScaleX = 1.2f
+            })
+            {
+                var pathMeasure = new SKPathMeasure(intervalPath);
+
+                intervalTextPaint.TextSize = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry));
+                intervalTextPaint.TextSize *= Device.RuntimePlatform == Device.Android
+                    ? 2.5f
+                    : 1f;
+                float initialTextSize = intervalTextPaint.TextSize;
+                SetIntervalTextSize(intervalTextPaint, pathMeasure.Length);
+
+                string intervalName;
+                if (intervalTextPaint.MeasureText(currentInterval.Name) >= pathMeasure.Length)
+                {
+                    float charWidth = intervalTextPaint.MeasureText(currentInterval.Name) / currentInterval.Name.Length;
+                    float diff = intervalTextPaint.MeasureText(currentInterval.Name) - pathMeasure.Length * 0.8f;
+                    int charsToRemove = (int)Math.Floor(diff / charWidth);
+                    intervalName = $"{currentInterval.Name.Substring(0, currentInterval.Name.Length - charsToRemove)}...";
+                }
+                //if the new text size is too small, just return
+                else if (IsIntervalTextSizeTooSmall(initialTextSize,intervalTextPaint.TextSize))
+                    return;
+                else
+                    intervalName = currentInterval.Name;
+
+                float textWidth = intervalTextPaint.MeasureText(intervalName);
+                float nameHOffset = pathMeasure.Length / 2f - textWidth / 2f;
+
+                canvas.DrawTextOnPath(intervalName, intervalPath, nameHOffset, vOffset, intervalTextPaint);
+            }
+        }
+
+        private void DrawIntervalDuration(SKRect rect, SKCanvas canvas, IntervalItemViewModel currentInterval)
         {
             float textSize = (float)Device.GetNamedSize(NamedSize.Small, typeof(Entry)) * 1.5f;
             float durationVOffset = (float)Device.GetNamedSize(NamedSize.Small, typeof(Entry)) * 2f;
@@ -245,6 +266,12 @@ namespace TimeIt.UserControls
                 intervalTimePaint.StrokeWidth =
                     intervalTimeTransparentPaint.StrokeWidth = 2;
 
+                float initialTextSize = intervalTimePaint.TextSize;
+                SetIntervalTextSize(intervalTimePaint, pathMeasure.Length);
+                SetIntervalTextSize(intervalTimeTransparentPaint, pathMeasure.Length);
+
+                if (IsIntervalTextSizeTooSmall(initialTextSize, intervalTimePaint.TextSize))
+                    return;
                 //intervalTimePaint.TextScaleX =
                 //    intervalTimeTransparentPaint.TextScaleX = pathMeasure.Length / pathMeasure.Length * 0.6f;
 
@@ -257,6 +284,30 @@ namespace TimeIt.UserControls
                 //and then the real one, with the corresponding color
                 canvas.DrawTextOnPath(ciText, path, durationHOffset, durationVOffset, intervalTimePaint);
             }
+        }
+
+        private void SetIntervalTextSize(SKPaint sKPaint, float max)
+        {
+            float minimum = 0;
+            bool enoughSpace = false;
+            string minimumChars = "00:00:00";
+            while (!enoughSpace)
+            {
+                minimum = sKPaint.MeasureText(minimumChars);
+                //we want a 20% extra space
+                enoughSpace = minimum * 1.2f < max;
+                if (enoughSpace)
+                    break;
+                //if there is not enough space, decrement it by 10%
+                sKPaint.TextSize -= 0.1f * sKPaint.TextSize;
+                sKPaint.TextScaleX -= 0.1f * sKPaint.TextScaleX;
+                sKPaint.StrokeWidth -= 0.1f * sKPaint.StrokeWidth;
+            }
+        }
+
+        private bool IsIntervalTextSizeTooSmall(float originalSize, float newSize)
+        {
+            return newSize <= originalSize * 0.7f;
         }
 
         private SKColor GetTextColor()
