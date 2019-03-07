@@ -10,11 +10,15 @@ namespace TimeIt.Interfaces
         Task<IEnumerable<Timer>> GetAllTimers();
         Task<Timer> GetTimer(int timerID);
         Task<Timer> UpdateTimer(Timer timer);
+        Task<Timer> UpdateTimer(Timer timer, IEnumerable<Interval> intervals);
         Task<bool> RemoveTimer(int timerID);
 
         Task<Interval> AddInterval(int timerID, Interval interval);
         Task<IEnumerable<Interval>> GetIntervals(int timerID);
         Task<Interval> GetInterval(int intervalID);
         Task<bool> RemoveInterval(int timerID, int intervalID);
+        Task<bool> RemoveIntervals(int timerID);
+
+        Task<int> SaveChangesAsync();
     }
 }

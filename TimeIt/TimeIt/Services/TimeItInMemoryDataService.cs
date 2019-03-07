@@ -174,5 +174,26 @@ namespace TimeIt.Services
             timers.Remove(timer);
             return true;
         }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return Task.FromResult(1);
+        }
+
+        public async Task<bool> RemoveIntervals(int timerID)
+        {
+            var timer = await GetTimer(timerID);
+            timer.Intervals.Clear();
+            return await Task.FromResult(true);
+        }
+
+        public Task<Timer> UpdateTimer(Timer timer, IEnumerable<Interval> intervals)
+        {
+            var timerToRemove = timers.FirstOrDefault(t => t.TimerID == timer.TimerID);
+            int index = timers.IndexOf(timerToRemove);
+            timer.Intervals = intervals.ToList();
+            timers[index] = timer;
+            return Task.FromResult(timer);
+        }
     }
 }
