@@ -113,18 +113,6 @@ namespace TimeIt.Controls
                 FontAttributes = FontAttributes.Bold,
             };
 
-            //switch (Device.RuntimePlatform)
-            //{
-            //    case Device.UWP:
-            //        PlusBtn.FontFamily =
-            //            MinusBtn.FontFamily = "Assets/fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free";
-            //        break;
-            //    case Device.Android:
-            //        PlusBtn.FontFamily =
-            //            MinusBtn.FontFamily = "fonts/fa-Free-Solid-900.otf#Font Awesome 5 Free Solid";
-            //        break;
-            //}
-
             PlusBtn.Clicked += PlusBtnClicked;
             MinusBtn.Clicked += MinusBtnClicked;
             Entry = new Label
@@ -143,7 +131,6 @@ namespace TimeIt.Controls
             Children.Add(MinusBtn);
             Children.Add(Entry);
             Children.Add(PlusBtn);
-
         }
 
         private void MinusBtnClicked(object sender, EventArgs e)

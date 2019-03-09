@@ -4,6 +4,8 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Views;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using TimeIt.Enums;
 using TimeIt.Extensions;
@@ -33,6 +35,9 @@ namespace TimeIt.ViewModels
         private int _minutes;
         private int _seconds;
         private bool _isPositionEnabled;
+
+        private static Random _rnd = new Random();
+        private static FieldInfo[] _colors = typeof(Color).GetFields(BindingFlags.Static | BindingFlags.Public);
         #endregion
 
         #region Properties
@@ -223,7 +228,7 @@ namespace TimeIt.ViewModels
                 Position = 2;
 
             SetMinutesAndSeconds(45);
-            SelectedColor = Color.Yellow;
+            SelectedColor = (Color)_colors[_rnd.Next(_colors.Count())].GetValue(Color.Red);
         }
 
         private void UpdateMinimumSeconds(int minutes)
