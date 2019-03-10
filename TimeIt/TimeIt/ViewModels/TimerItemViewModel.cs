@@ -103,6 +103,14 @@ namespace TimeIt.ViewModels
                 OnNavigatedBack);
         }
 
+        public void UnregisterMessages()
+        {
+            _messenger.Unregister<bool>(
+                this,
+                $"{MessageType.ON_NAVIGATED_BACK}",
+                OnNavigatedBack);
+        }
+
         public void StartTimer()
         {
             //just a sanity check

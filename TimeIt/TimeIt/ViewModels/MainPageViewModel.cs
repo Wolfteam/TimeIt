@@ -12,7 +12,6 @@ using System.Windows.Input;
 using TimeIt.Enums;
 using TimeIt.Helpers;
 using TimeIt.Interfaces;
-using Xamarin.Forms;
 
 namespace TimeIt.ViewModels
 {
@@ -30,6 +29,10 @@ namespace TimeIt.ViewModels
         private string _totalTimeText;
         private string _elapsedTimeText;
         private bool _startButtonEnabled = true;
+        private bool _mainButtonsAreVisible = true;
+        private bool _isAddTimerButtonVisible = true;
+        private bool _isEditTimerButtonVisible;
+        private bool _isDeleteTimerButtonVisible;
         private int _currentPage = 0;
         private bool _canNavigate = true;
         private ObservableCollection<TimerItemViewModel> _timers = new ObservableCollection<TimerItemViewModel>();
@@ -65,10 +68,34 @@ namespace TimeIt.ViewModels
             set => Set(ref _elapsedTimeText, value);
         }
 
-        public bool StartButtonEnabled
+        public bool IsStartButtonEnabled
         {
             get => _startButtonEnabled;
             set => Set(ref _startButtonEnabled, value);
+        }
+
+        public bool MainButtonsAreVisible
+        {
+            get => _mainButtonsAreVisible;
+            set => Set(ref _mainButtonsAreVisible, value);
+        }
+
+        public bool IsAddTimerButtonVisible
+        {
+            get => _isAddTimerButtonVisible;
+            set => Set(ref _isAddTimerButtonVisible, value);
+        }
+
+        public bool IsEditTimerButtonVisible
+        {
+            get => _isEditTimerButtonVisible;
+            set => Set(ref _isEditTimerButtonVisible, value);
+        }
+
+        public bool IsDeleteTimerButtonVisible
+        {
+            get => _isDeleteTimerButtonVisible;
+            set => Set(ref _isDeleteTimerButtonVisible, value);
         }
 
         public int CurrentPage
@@ -79,8 +106,7 @@ namespace TimeIt.ViewModels
                 System.Diagnostics.Debug.WriteLine(
                     $"Position changed. New position = {value}. OldPosition = {_currentPage}");
                 Set(ref _currentPage, value);
-                if (_currentPage >= 0)
-                    CurrentSelectedTimerChanged();
+                CurrentSelectedTimerChanged();
             }
         }
 
@@ -99,7 +125,6 @@ namespace TimeIt.ViewModels
                 Timers[CurrentPage].InvalidateSurfaceEvent.Invoke();
             }
         }
-
         #endregion
 
         #region Commands
@@ -198,7 +223,13 @@ namespace TimeIt.ViewModels
             _messenger.Register<bool>(
                 this,
                 $"{MessageType.MP_START_BUTTON_IS_ENABLED}",
-                isEnabled => StartButtonEnabled = isEnabled);
+                isEnabled =>
+                {
+                    IsStartButtonEnabled = 
+                        IsAddTimerButtonVisible =
+                            IsEditTimerButtonVisible =
+                                IsDeleteTimerButtonVisible = isEnabled;
+                });
 
             _messenger.Register<float>(
                 this,
@@ -248,8 +279,7 @@ namespace TimeIt.ViewModels
 
             Timers = new ObservableCollection<TimerItemViewModel>(vms);
 
-            if (Device.RuntimePlatform == Device.Android)
-                CurrentSelectedTimerChanged();
+            CurrentSelectedTimerChanged();
 
             _initialized = true;
         }
@@ -274,6 +304,7 @@ namespace TimeIt.ViewModels
                     break;
                 case OperationType.DELETED:
                     var timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timerID);
+                    timerToRemove.UnregisterMessages();
                     Timers.Remove(timerToRemove);
                     break;
                 default:
@@ -287,16 +318,27 @@ namespace TimeIt.ViewModels
         {
             if (Timers.Count == 0)
             {
-                StartButtonEnabled = false;
-                CurrentTimerName = string.Empty;
+                IsEditTimerButtonVisible =
+                    IsDeleteTimerButtonVisible = false;
+
+                MainButtonsAreVisible = false;
+                CurrentTimerName = "N/A";
                 RemainingRepetitions = 0;
-                TotalTimeText = string.Empty;
-                ElapsedTimeText = string.Empty;
+                TotalTimeText = "00:00:00";
+                ElapsedTimeText = "00:00:00";
                 return;
             }
 
+            if (CurrentPage < 0)
+                return;
+
+            IsAddTimerButtonVisible =
+                IsEditTimerButtonVisible =
+                    IsDeleteTimerButtonVisible = true;
+
             var currentTimer = Timers[CurrentPage];
-            StartButtonEnabled = true;
+            MainButtonsAreVisible =
+                IsStartButtonEnabled = true;
             CurrentTimerName = currentTimer.Name;
             RemainingRepetitions = currentTimer.RemainingRepetitions;
             TotalTimeText = TimeSpan.FromSeconds(currentTimer.TotalTime).ToString(Constans.DefaultTimeSpanFormat);
@@ -318,6 +360,7 @@ namespace TimeIt.ViewModels
                 _dialogService.ShowSimpleMessage($"An error occurred while trying to delete timer {currentTimer.Name}");
                 return;
             }
+            currentTimer.UnregisterMessages();
             Timers.Remove(currentTimer);
             _dialogService.ShowSimpleMessage($"Timer {currentTimer.Name} was successfully removed");
         }

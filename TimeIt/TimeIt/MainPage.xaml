@@ -29,7 +29,7 @@
             Command="{Binding AddTimerCommand}"
             Icon="fas-plus"
             IconColor="White"
-            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
+            IsVisible="{Binding IsAddTimerButtonVisible, Mode=OneWay}"
             Order="Default"
             Priority="0"
             Text="Add Timer" />
@@ -37,7 +37,7 @@
             Command="{Binding EditTimerCommand}"
             Icon="fas-pen"
             IconColor="White"
-            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
+            IsVisible="{Binding IsEditTimerButtonVisible, Mode=OneWay}"
             Order="Default"
             Priority="0"
             Text="Edit Timer" />
@@ -45,7 +45,7 @@
             Command="{Binding RemoveTimerCommand}"
             Icon="fas-trash-alt"
             IconColor="White"
-            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
+            IsVisible="{Binding IsDeleteTimerButtonVisible, Mode=OneWay}"
             Order="Secondary"
             Priority="1"
             Text="Delete" />
@@ -53,7 +53,6 @@
             Command="{Binding OpenSettingsCommand}"
             Icon="fas-cog"
             IconColor="White"
-            IsVisible="{Binding StartButtonEnabled, Mode=OneWay}"
             Order="Secondary"
             Priority="1"
             Text="Settings" />
@@ -170,8 +169,8 @@
                     Grid.Row="1"
                     HeightRequest="400"
                     IsCyclical="False"
-                    IsEnabled="{Binding StartButtonEnabled, Mode=OneWay}"
-                    IsUserInteractionEnabled="{Binding StartButtonEnabled, Mode=OneWay}"
+                    IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
+                    IsUserInteractionEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
                     IsViewCacheEnabled="False"
                     ItemsSource="{Binding Timers, Mode=OneWay}"
                     SelectedIndex="{Binding CurrentPage, Mode=TwoWay}"
@@ -212,7 +211,8 @@
                         Grid.Column="0"
                         BackgroundColor="Accent"
                         Command="{Binding StartTimerCommand}"
-                        IsEnabled="{Binding StartButtonEnabled, Mode=OneWay}"
+                        IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
+                        IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                         Text="Start"
                         TextColor="White" />
 
@@ -220,7 +220,8 @@
                         Grid.Column="1"
                         BackgroundColor="Accent"
                         Command="{Binding PauseTimerCommand}"
-                        IsEnabled="{Binding StartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                        IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                        IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                         Text="Pause"
                         TextColor="White" />
 
@@ -228,7 +229,8 @@
                         Grid.Column="2"
                         BackgroundColor="Accent"
                         Command="{Binding StopTimerCommand}"
-                        IsEnabled="{Binding StartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                        IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                        IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                         Text="Stop"
                         TextColor="White" />
                 </Grid>

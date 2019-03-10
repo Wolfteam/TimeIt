@@ -21,6 +21,7 @@ namespace TimeIt.ViewModels
         private readonly ITimeItDataService _timeItDataService;
         private readonly IMapper _mapper;
         private readonly IMessenger _messenger;
+        private readonly ICustomDialogService _dialogService;
 
         private bool _isInEditMode;
         private int _intervalID;
@@ -132,12 +133,14 @@ namespace TimeIt.ViewModels
             INavigationService navigationService,
             ITimeItDataService timeItDataService,
             IMapper mapper,
-            IMessenger messenger)
+            IMessenger messenger,
+            ICustomDialogService dialogService)
         {
             _navigationService = navigationService;
             _timeItDataService = timeItDataService;
             _mapper = mapper;
             _messenger = messenger;
+            _dialogService = dialogService;
 
             //to avoid a crash... minimum must be set before maximum for a stepper
             CleanUp();
@@ -147,13 +150,8 @@ namespace TimeIt.ViewModels
 
         public void SetCommands()
         {
-            SaveCommand = new RelayCommand(() =>
-            {
-                var interval = GetIntervalData();
-                var operation = !_isInEditMode ? OperationType.CREATED : OperationType.UPDATED;
-                _navigationService.GoBack();
-                _messenger.Send((operation, interval), $"{MessageType.INTERVAL_ADDED_EDITED}");
-            });
+            SaveCommand = new RelayCommand
+                (SaveInterval);
 
             DiscardChangesCommand = new RelayCommand(() =>
             {
@@ -208,6 +206,19 @@ namespace TimeIt.ViewModels
             MaximumPosition = numberOfItems;
             Position = interval.Position;
             System.Diagnostics.Debug.WriteLine($"Init: Position = {Position} - Max = {MaximumPosition}");
+        }
+
+        private void SaveInterval()
+        {
+            if (string.IsNullOrEmpty(Name))
+            {
+                _dialogService.ShowSimpleMessage("You need to provide an Interval name");
+                return;
+            }
+            var interval = GetIntervalData();
+            var operation = !_isInEditMode ? OperationType.CREATED : OperationType.UPDATED;
+            _navigationService.GoBack();
+            _messenger.Send((operation, interval), $"{MessageType.INTERVAL_ADDED_EDITED}");
         }
 
         private void CleanUp()
