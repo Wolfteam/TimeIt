@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Views;
 using Plugin.Iconize;
 using System;
+using TimeIt.Helpers;
 using TimeIt.Services;
 using TimeIt.ViewModels;
 using Xamarin.Forms;
@@ -17,11 +18,11 @@ namespace TimeIt
         {
             InitializeComponent();
             //TODO: I SHOULD REMOVE THE HARDCODED FONT SIZES FROM THE MAIN PAGE
-            //TODO: I SHOULD MOVE THIS COLORS
-            var page = new IconNavigationPage(new MainPage());
-            string barBgColor = "#1d1a1a";
-            page.BarBackgroundColor = Color.FromHex(barBgColor);
-            page.BarTextColor = Color.White;
+            var page = new IconNavigationPage(new MainPage())
+            {
+                BarBackgroundColor = (Color)Current.Resources[AppConstants.AppBarBackgroundColorKey],
+                BarTextColor = Color.White
+            };
 
             MainPage = page;
 

@@ -234,12 +234,12 @@ namespace TimeIt.ViewModels
             _messenger.Register<float>(
                 this,
                 $"{MessageType.MP_ELAPSED_TIME_CHANGED}",
-                seconds => ElapsedTimeText = TimeSpan.FromSeconds(seconds).ToString(Constans.DefaultTimeSpanFormat));
+                seconds => ElapsedTimeText = TimeSpan.FromSeconds(seconds).ToString(AppConstants.DefaultTimeSpanFormat));
 
             _messenger.Register<float>(
                 this,
                 $"{MessageType.MP_TOTAL_TIME_CHANGED}",
-                seconds => TotalTimeText = TimeSpan.FromSeconds(seconds).ToString(Constans.DefaultTimeSpanFormat));
+                seconds => TotalTimeText = TimeSpan.FromSeconds(seconds).ToString(AppConstants.DefaultTimeSpanFormat));
 
             _messenger.Register<int>(
                 this,
@@ -341,8 +341,8 @@ namespace TimeIt.ViewModels
                 IsStartButtonEnabled = true;
             CurrentTimerName = currentTimer.Name;
             RemainingRepetitions = currentTimer.RemainingRepetitions;
-            TotalTimeText = TimeSpan.FromSeconds(currentTimer.TotalTime).ToString(Constans.DefaultTimeSpanFormat);
-            ElapsedTimeText = TimeSpan.FromSeconds(currentTimer.ElapsedTime).ToString(Constans.DefaultTimeSpanFormat);
+            TotalTimeText = TimeSpan.FromSeconds(currentTimer.TotalTime).ToString(AppConstants.DefaultTimeSpanFormat);
+            ElapsedTimeText = TimeSpan.FromSeconds(currentTimer.ElapsedTime).ToString(AppConstants.DefaultTimeSpanFormat);
         }
 
         private async Task RemomveCurrentTimerAsync()
