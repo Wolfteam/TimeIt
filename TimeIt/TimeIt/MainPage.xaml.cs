@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using TimeIt.UserControls;
-using TimeIt.ViewModels;
+﻿using TimeIt.ViewModels;
 using Xamarin.Forms;
 
 namespace TimeIt
@@ -9,12 +6,11 @@ namespace TimeIt
     public partial class MainPage : ContentPage
     {
         private MainPageViewModel ViewModel
-            => (MainPageViewModel) BindingContext;
+            => (MainPageViewModel)BindingContext;
 
         public MainPage()
         {
             InitializeComponent();
-            ViewModel.Init().GetAwaiter().GetResult();
         }
 
         #region Old

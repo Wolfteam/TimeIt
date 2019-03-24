@@ -166,9 +166,10 @@ namespace TimeIt.ViewModels
 
         private void SetCommands()
         {
-            OnAppearingCommand = new RelayCommand(() =>
+            OnAppearingCommand = new RelayCommand(async() =>
             {
                 System.Diagnostics.Debug.WriteLine("On appearing...");
+                await Init();
                 if (!Navigated && !ViewModelLocator.WasAppInForeground)
                     return;
                 ViewModelLocator.WasAppInForeground = false;
@@ -193,7 +194,11 @@ namespace TimeIt.ViewModels
             RemoveTimerCommand = new RelayCommand
                 (async () => await RemomveCurrentTimerAsync());
 
-            OpenSettingsCommand = new RelayCommand(() => { });
+            OpenSettingsCommand = new RelayCommand(() =>
+            {
+                _navigationService.NavigateTo($"{AppPages.SETTINGS}");
+                Navigated = true;
+            });
 
             StartTimerCommand = new RelayCommand(() =>
             {
@@ -225,7 +230,7 @@ namespace TimeIt.ViewModels
                 $"{MessageType.MP_START_BUTTON_IS_ENABLED}",
                 isEnabled =>
                 {
-                    IsStartButtonEnabled = 
+                    IsStartButtonEnabled =
                         IsAddTimerButtonVisible =
                             IsEditTimerButtonVisible =
                                 IsDeleteTimerButtonVisible = isEnabled;

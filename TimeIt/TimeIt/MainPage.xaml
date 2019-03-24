@@ -46,8 +46,8 @@
             Icon="fas-trash-alt"
             IconColor="White"
             IsVisible="{Binding IsDeleteTimerButtonVisible, Mode=OneWay}"
-            Order="Secondary"
-            Priority="1"
+            Order="Primary"
+            Priority="0"
             Text="Delete" />
         <iconize:IconToolbarItem
             Command="{Binding OpenSettingsCommand}"
@@ -163,6 +163,7 @@
                         Grid.Column="0"
                         Grid.ColumnSpan="2" />
                 </Grid>
+
                 <!--  Canvas  -->
                 <pcCards:CarouselView
                     x:Name="CarouselView"
@@ -180,19 +181,11 @@
                             <uc:TimerControl BindingContext="{Binding}" />
                         </DataTemplate>
                     </pcCards:CarouselView.ItemTemplate>
-                    <!--  <pcControls:IndicatorsControl  -->
-                    <!--  BackgroundColor="Transparent"  -->
-                    <!--  SelectedIndicatorStyle="{x:StaticResource ActiveIndicator}"  -->
-                    <!--  UnselectedIndicatorStyle="{x:StaticResource InactiveIndicator}">  -->
-                    <!--     <pcControls:IndicatorsControl.ItemTemplate> -->
-                    <!--         <DataTemplate> -->
-                    <!--  <pcControls:IndicatorItemView  -->
-                    <!--  BackgroundColor="White"  -->
-                    <!--  BorderColor="Red"  -->
-                    <!--  OutlineColor="Black" />  -->
-                    <!--         </DataTemplate> -->
-                    <!--     </pcControls:IndicatorsControl.ItemTemplate> -->
-                    <!-- </pcControls:IndicatorsControl> -->
+
+                    <pcControls:IndicatorsControl
+                        SelectedIndicatorStyle="{x:StaticResource ActiveIndicator}"
+                        ToFadeDuration="2500"
+                        UnselectedIndicatorStyle="{x:StaticResource InactiveIndicator}" />
 
                     <pcControls:LeftArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
                     <pcControls:RightArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
@@ -211,6 +204,7 @@
                         Grid.Column="0"
                         BackgroundColor="Accent"
                         Command="{Binding StartTimerCommand}"
+                        FontAttributes="{x:OnPlatform UWP=Bold}"
                         IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
                         IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                         Text="Start"
@@ -220,6 +214,7 @@
                         Grid.Column="1"
                         BackgroundColor="Accent"
                         Command="{Binding PauseTimerCommand}"
+                        FontAttributes="{x:OnPlatform UWP=Bold}"
                         IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                         IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                         Text="Pause"
@@ -229,6 +224,7 @@
                         Grid.Column="2"
                         BackgroundColor="Accent"
                         Command="{Binding StopTimerCommand}"
+                        FontAttributes="{x:OnPlatform UWP=Bold}"
                         IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                         IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                         Text="Stop"

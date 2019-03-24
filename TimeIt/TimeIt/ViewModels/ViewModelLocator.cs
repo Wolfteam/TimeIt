@@ -25,6 +25,9 @@ namespace TimeIt.ViewModels
         public IntervalPageViewModel EditInterval
             => SimpleIoc.Default.GetInstance<IntervalPageViewModel>();
 
+        public SettingsPageViewModel Settings
+            => SimpleIoc.Default.GetInstance<SettingsPageViewModel>();
+
         public ViewModelLocator()
         {
             if (SimpleIoc.Default.IsRegistered<INavigationService>())
@@ -34,6 +37,7 @@ namespace TimeIt.ViewModels
             navigation.Configure($"{AppPages.HOME}", typeof(MainPage));
             navigation.Configure($"{AppPages.TIMER}", typeof(TimerPage));
             navigation.Configure($"{AppPages.INTERVAL}", typeof(IntervalPage));
+            navigation.Configure($"{AppPages.SETTINGS}", typeof(SettingsPage));
             SimpleIoc.Default.Register<INavigationService>(() => navigation);
 
             var mapperConfig = new MapperConfiguration(config =>
@@ -45,6 +49,7 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register<IMessenger, Messenger>();
             SimpleIoc.Default.Register<ITimeItDataService, TimeItDataService>();
             SimpleIoc.Default.Register<ICustomDialogService, DialogService>();
+            SimpleIoc.Default.Register<IAppSettingsService, AppSettingsService>();
 
             SimpleIoc.Default.Register(() => DependencyService.Get<IToastNotificator>());
             SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
@@ -54,6 +59,7 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register<MainPageViewModel>();
             SimpleIoc.Default.Register<TimerPageViewModel>();
             SimpleIoc.Default.Register<IntervalPageViewModel>();
+            SimpleIoc.Default.Register<SettingsPageViewModel>();
         }
 
     }
