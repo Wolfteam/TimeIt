@@ -10,9 +10,25 @@ using Xamarin.Forms.Xaml;
 namespace TimeIt.UserControls
 {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class LineControl : ContentView
+	public partial class LineControl : TemplatedView
 	{
-		public LineControl ()
+        public static readonly BindableProperty LineColorProperty = BindableProperty.Create(nameof(LineColor), typeof(Color), typeof(LineControl), Color.Red);
+
+        public static readonly BindableProperty LineHeightProperty = BindableProperty.Create(nameof(LineHeight), typeof(double), typeof(LineControl), 1.00);
+
+        public Color LineColor
+        {
+            get { return (Color)GetValue(LineColorProperty); }
+            set { SetValue(LineColorProperty, value); }
+        }
+
+        public double LineHeight
+        {
+            get { return (double)GetValue(LineHeightProperty); }
+            set { SetValue(LineHeightProperty, value); }
+        }
+
+        public LineControl ()
 		{
 			InitializeComponent ();
 		}

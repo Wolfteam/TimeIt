@@ -7,9 +7,9 @@ using Xamarin.Forms.Xaml;
 namespace TimeIt.Pages.Dialogs
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ConfirmationDialog : ContentView, IConfirmationDialog
+    public partial class ConfirmationDialog : ContentView, IConfirmationDialog<bool>
     {
-        public OnConfirmDialogButtonClick OnOptionSelected { get; set; }
+        public OnConfirmDialogButtonClick<bool> OnOptionSelected { get; set; }
 
         public ConfirmationDialog(string title, string message, string okButtontext, string cancelButtonText)
         {
@@ -22,12 +22,12 @@ namespace TimeIt.Pages.Dialogs
 
         private void OkButton_Clicked(object sender, EventArgs e)
         {
-            OnOptionSelected?.Invoke(true);
+            OnOptionSelected?.Invoke(true, false);
         }
 
         private void CancelButton_Clicked(object sender, EventArgs e)
         {
-            OnOptionSelected?.Invoke(false);
+            OnOptionSelected?.Invoke(false, false);
         }
     }
 }

@@ -38,5 +38,22 @@ namespace TimeIt.Interfaces
         /// <param name="noButtonText">The 'No' button text.</param>
         /// <returns>Task&lt;System.Boolean&gt;.</returns>
         Task<bool> ShowConfirmationDialogAsync(string title, string message, string okButtonText, string cancelButtonText);
+
+        /// <summary>
+        /// Opens a modal with a slider whoose values
+        /// are between <paramref name="min"/> and <paramref name="max"/>
+        /// </summary>
+        /// <param name="title">The title</param>
+        /// <param name="currentValue">The current slider value</param>
+        /// <param name="min">The min value</param>
+        /// <param name="max">The max value</param>
+        /// <param name="steps">The steps</param>
+        /// <returns>If pressed ok button, it returns the selected value, otherwise null</returns>
+        Task<double?> ShowSliderDialogAsync(
+            string title,
+            double currentValue,
+            double min = 0,
+            double max = 100,
+            double steps = 1);
     }
 }

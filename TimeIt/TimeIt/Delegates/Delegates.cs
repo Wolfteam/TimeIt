@@ -12,5 +12,5 @@
     /// Used to indicate wether the ok or cancel button was clicked
     /// </summary>
     /// <param name="ok">True for ok, false for cancel / background click / dismiss</param>
-    public delegate void OnConfirmDialogButtonClick(bool ok);
+    public delegate void OnConfirmDialogButtonClick<T>(T result, bool isDismissed);
 }

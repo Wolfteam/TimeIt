@@ -2,11 +2,11 @@
 
 namespace TimeIt.Interfaces
 {
-    public interface IConfirmationDialog
+    public interface IConfirmationDialog<T>
     {
         /// <summary>
         /// Event used to indicate that a button (ok / cancel / dismiss) was clicked
         /// </summary>
-        OnConfirmDialogButtonClick OnOptionSelected { get; set; }
+        OnConfirmDialogButtonClick<T> OnOptionSelected { get; set; }
     }
 }

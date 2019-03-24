@@ -42,19 +42,33 @@ namespace TimeIt.Services
         {
             var dialog = new ConfirmationDialog(title, message, okButtonText, cancelButtonText);
             var popup = new BaseDialog<bool>(dialog);
-            dialog.OnOptionSelected = (optionSelected) =>
-            {
-                popup.PageClosedTaskCompletionSource.SetResult(optionSelected);
-            };
 
             await PopupNavigation.Instance.PushAsync(popup);
 
-            var result = await popup.PageClosedTask;
+            var (result, isDismissed) = await popup.PageClosedTask;
 
             await PopupNavigation.Instance.PopAsync();
 
-            return result;
+            return isDismissed ? false : result;
         }
 
+        public async Task<double?> ShowSliderDialogAsync(
+            string title,
+            double currentValue,
+            double min = 0,
+            double max = 100,
+            double steps = 1)
+        {
+            var dialog = new SliderDialog(title, min, max, steps, currentValue);
+            var popup = new BaseDialog<double>(dialog);
+
+            await PopupNavigation.Instance.PushAsync(popup);
+
+            var (result, isDismissed) = await popup.PageClosedTask;
+
+            await PopupNavigation.Instance.PopAsync();
+
+            return isDismissed ? (double?)null : result;
+        }
     }
 }

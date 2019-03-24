@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="TimeIt.Pages.Dialogs.SliderDialog"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:uc="clr-namespace:TimeIt.UserControls">
+    <StackLayout
+        Margin="20"
+        Padding="20"
+        BackgroundColor="Black"
+        HorizontalOptions="Center"
+        Orientation="Vertical"
+        VerticalOptions="Center"
+        WidthRequest="300">
+        <Label
+            x:Name="titleLabel"
+            FontAttributes="Bold"
+            FontSize="{OnPlatform Android='22',
+                                  UWP='18'}"
+            TextColor="White" />
+        <uc:LineControl />
+        <Grid Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid VerticalOptions="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Slider
+                    x:Name="slider"
+                    MaximumTrackColor="White"
+                    MinimumTrackColor="Red"
+                    ThumbColor="Red"
+                    ValueChanged="Slider_ValueChanged" />
+                <Label
+                    x:Name="currentValueLabel"
+                    Grid.Column="1"
+                    FontAttributes="Bold"
+                    FontSize="{OnPlatform Android='20',
+                                          UWP='16'}"
+                    HorizontalTextAlignment="End"
+                    TextColor="Red" />
+            </Grid>
+            <Grid Grid.Row="1" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    x:Name="okButton"
+                    Grid.Column="0"
+                    Clicked="OkButton_Clicked"
+                    Text="Ok"
+                    Visual="Material" />
+                <Button
+                    x:Name="cancelButton"
+                    Grid.Column="1"
+                    Clicked="CancelButton_Clicked"
+                    Text="Cancel"
+                    Visual="Material" />
+            </Grid>
+        </Grid>
+    </StackLayout>
+
+</ContentView>

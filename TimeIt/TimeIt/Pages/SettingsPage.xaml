@@ -1,0 +1,354 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="TimeIt.Pages.SettingsPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:TimeIt.Converters"
+    xmlns:uc="clr-namespace:TimeIt.UserControls"
+    Title="Settings"
+    BindingContext="{Binding Settings, Source={StaticResource Locator}}"
+    Style="{StaticResource PageStyle}">
+
+    <ContentPage.Resources>
+        <ColumnDefinitionCollection x:Key="SettingsColumns">
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </ColumnDefinitionCollection>
+        <Thickness x:Key="SettingsMargin">
+            <Thickness.Bottom>10</Thickness.Bottom>
+        </Thickness>
+        <converters:NotificationTypeToStringConverter x:Key="NotificationTypeToStringConverter" />
+    </ContentPage.Resources>
+    <!--<TableView Intent="Settings">
+        <TableRoot>
+            <TableSection Title="Notifications" TextColor="White">
+                <SwitchCell
+                    On="{Binding AreNotificationsEnabled, Mode=TwoWay}"
+                    OnColor="Red"
+                    Text="Enable" />
+                <ViewCell IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Grid.Column="0"
+                            HorizontalOptions="Start"
+                            IsVisible="{x:OnPlatform Android=True,
+                                                     Default=False}"
+                            Text="Notification type"
+                            VerticalOptions="CenterAndExpand" />
+                        <Picker
+                            Title="Notification type"
+                            Grid.Column="{x:OnPlatform Android=1,
+                                                       Default=0}"
+                            Grid.ColumnSpan="{x:OnPlatform Android=1,
+                                                           Default=2}"
+                            IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                            ItemDisplayBinding="{Binding Converter={StaticResource NotificationTypeToStringConverter}}"
+                            ItemsSource="{Binding NotificationTypes, Mode=OneWay}"
+                            SelectedItem="{Binding CurrentNotificationType, Mode=TwoWay}"
+                            TextColor="White" />
+                    </Grid>
+                </ViewCell>
+                <SwitchCell
+                    IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                    On="{Binding NotifyWhenIntervalStarts, Mode=TwoWay}"
+                    OnColor="Red"
+                    Text="Start of interval" />
+                <SwitchCell
+                    IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                    On="{Binding NotifyWhenIntervalIsAboutToEnd, Mode=TwoWay}"
+                    OnColor="Red"
+                    Text="End of interval" />
+                <ViewCell>
+                    <Grid IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            HorizontalOptions="Start"
+                            Text="Seconds before interval ends"
+                            VerticalOptions="CenterAndExpand"
+                            VerticalTextAlignment="Center" />
+                        <Slider
+                            Grid.Column="1"
+                            HorizontalOptions="FillAndExpand"
+                            IsEnabled="{Binding NotifyWhenIntervalIsAboutToEnd, Mode=OneWay}"
+                            Maximum="5"
+                            Minimum="1"
+                            ThumbColor="Red" />
+                    </Grid>
+                </ViewCell>
+                <SwitchCell
+                    IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                    On="{Binding NotifyWhenARepetitionCompletes, Mode=TwoWay}"
+                    OnColor="Red"
+                    Text="End of repetition" />
+                <ViewCell>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            HorizontalOptions="Start"
+                            Text="Volume"
+                            VerticalOptions="CenterAndExpand" />
+                        <Slider
+                            Grid.Column="1"
+                            HorizontalOptions="FillAndExpand"
+                            IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                            Maximum="100"
+                            Minimum="0" />
+                    </Grid>
+                </ViewCell>
+            </TableSection>
+
+            <TableSection Title="About">
+                <ViewCell>
+                    <StackLayout>
+                        <Label
+                            FontAttributes="Bold"
+                            HorizontalOptions="Start"
+                            Text="About" />
+                        <Label HorizontalOptions="FillAndExpand" Text="I made this piece of crap just because i wanted " />
+                        <uc:LineControl LineColor="White" ScaleX="0.8" />
+                    </StackLayout>
+                </ViewCell>
+            </TableSection>
+        </TableRoot>
+    </TableView>-->
+
+    <ScrollView Orientation="Vertical">
+        <StackLayout Padding="20" Orientation="Vertical">
+            <StackLayout.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="TextColor" Value="White" />
+                    <Setter Property="FontSize" Value="{x:OnPlatform Android=18}" />
+                </Style>
+            </StackLayout.Resources>
+
+            <!--  Notifications  -->
+            <Label
+                FontAttributes="Bold"
+                HorizontalOptions="Start"
+                Text="Notifications" />
+            <uc:LineControl LineHeight="2" />
+            <Grid Margin="{x:StaticResource SettingsMargin}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Notification enabled  -->
+                <Grid
+                    Grid.Row="0"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="Enabled"
+                        VerticalTextAlignment="Center" />
+                    <Switch
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        IsToggled="{Binding AreNotificationsEnabled, Mode=TwoWay}"
+                        OnColor="Red" />
+                </Grid>
+
+                <!--  Notification type  -->
+                <Grid
+                    Grid.Row="1"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        IsVisible="{x:OnPlatform Android=True,
+                                                 Default=False}"
+                        Text="Notification type"
+                        VerticalTextAlignment="Center" />
+                    <Picker
+                        Title="Notification type"
+                        Grid.Column="{x:OnPlatform Android=1,
+                                                   Default=0}"
+                        Grid.ColumnSpan="{x:OnPlatform Android=1,
+                                                       Default=2}"
+                        HorizontalOptions="{x:OnPlatform Android=End,
+                                                         Default=Fill}"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                        ItemDisplayBinding="{Binding Converter={StaticResource NotificationTypeToStringConverter}}"
+                        ItemsSource="{Binding NotificationTypes, Mode=OneWay}"
+                        SelectedItem="{Binding CurrentNotificationType, Mode=TwoWay}"
+                        TextColor="White" />
+                </Grid>
+
+                <!--  Start of interval  -->
+                <Grid
+                    Grid.Row="2"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="Start of interval"
+                        VerticalTextAlignment="Center" />
+                    <Switch
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                        IsToggled="{Binding NotifyWhenIntervalStarts, Mode=TwoWay}"
+                        OnColor="Red" />
+                </Grid>
+
+                <!--  End of interval  -->
+                <Grid
+                    Grid.Row="3"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="End of interval"
+                        VerticalTextAlignment="Center" />
+                    <Switch
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                        IsToggled="{Binding NotifyWhenIntervalIsAboutToEnd, Mode=TwoWay}"
+                        OnColor="Red" />
+                </Grid>
+
+                <!--  Seconds before interval ends  -->
+                <Grid
+                    Grid.Row="4"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}"
+                    IsVisible="{Binding NotifyWhenIntervalIsAboutToEnd, Mode=OneWay}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="Seconds before interval ends"
+                        VerticalTextAlignment="Center" />
+                    <Label
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        Text="{Binding SecondsBeforeIntervalEnds, Mode=OneWay}"
+                        VerticalTextAlignment="Center" />
+                    <Button
+                        Grid.ColumnSpan="2"
+                        BackgroundColor="Transparent"
+                        Command="{Binding SecondsBeforeIntervalEndsCommand}"
+                        HeightRequest="48"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}" />
+                </Grid>
+
+                <!--  End of repetitions  -->
+                <Grid
+                    Grid.Row="5"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="End of repetition"
+                        VerticalTextAlignment="Center" />
+                    <Switch
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                        IsToggled="{Binding NotifyWhenARepetitionCompletes, Mode=TwoWay}"
+                        OnColor="Red" />
+                </Grid>
+
+                <!--  Volume  -->
+                <Grid
+                    Grid.Row="6"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="Notification volume"
+                        VerticalTextAlignment="Center" />
+                    <Label
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        Text="{Binding NotificationVolume, Mode=OneWay}"
+                        VerticalTextAlignment="Center" />
+                    <Button
+                        Grid.ColumnSpan="2"
+                        BackgroundColor="Transparent"
+                        Command="{Binding ChangeVolumeCommand}"
+                        HeightRequest="48"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}" />
+                </Grid>
+            </Grid>
+
+
+            <!--  About  -->
+            <Label
+                FontAttributes="Bold"
+                HorizontalOptions="Start"
+                Text="About" />
+            <uc:LineControl LineHeight="2" />
+            <Grid ColumnDefinitions="{StaticResource SettingsColumns}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackLayout
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Orientation="Vertical"
+                    VerticalOptions="Center">
+                    <Image
+                        HeightRequest="100"
+                        Source="{x:OnPlatform UWP='Assets/appIcon.png',
+                                              Default='appIcon.png'}"
+                        WidthRequest="100" />
+                    <Label HorizontalOptions="Center" Text="{Binding AppName, Mode=OneWay}" />
+                    <Label HorizontalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Version: " />
+                                <Span Text="{Binding AppVersion, Mode=OneWay}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </StackLayout>
+
+                <StackLayout
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Orientation="Vertical"
+                    VerticalOptions="Center">
+                    <Label HorizontalOptions="Fill" Text="This app allows you to create different timers with multiple intervals." />
+                    <Label HorizontalOptions="Fill" Text="If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:" />
+                    <Label
+                        HorizontalOptions="Center"
+                        Text="TimeIt Github Page"
+                        TextColor="Red"
+                        TextDecorations="Underline">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenGithubCommand}" CommandParameter="https://github.com/Wolfteam/TimeIt/issues" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Grid>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

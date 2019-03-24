@@ -7,8 +7,7 @@
     <StackLayout
         Margin="20"
         Padding="20"
-        BackgroundColor="{OnPlatform UWP=Black,
-                                     Default=White}"
+        BackgroundColor="Black"
         HorizontalOptions="Center"
         VerticalOptions="Center"
         WidthRequest="300">
@@ -16,9 +15,14 @@
             x:Name="titleLabel"
             FontAttributes="Bold"
             FontSize="{OnPlatform Android='22',
-                                  UWP='18'}" />
+                                  UWP='18'}"
+            TextColor="White" />
         <uc:LineControl />
-        <Label x:Name="messageLabel" FontSize="{OnPlatform Android='18', UWP='14'}" />
+        <Label
+            x:Name="messageLabel"
+            FontSize="{OnPlatform Android='18',
+                                  UWP='14'}"
+            TextColor="White" />
         <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -27,11 +31,13 @@
             <Button
                 x:Name="okButton"
                 Grid.Column="0"
-                Clicked="OkButton_Clicked" />
+                Clicked="OkButton_Clicked"
+                Visual="Material" />
             <Button
                 x:Name="cancelButton"
                 Grid.Column="1"
-                Clicked="CancelButton_Clicked" />
+                Clicked="CancelButton_Clicked"
+                Visual="Material" />
         </Grid>
     </StackLayout>
 </ContentView>

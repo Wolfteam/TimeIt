@@ -234,8 +234,8 @@ namespace TimeIt.UserControls
 
             //Here i create two text, one that will be drawn with a "transparent" color
             //and the other one that will be drawn over the "transparent" one
-            string ciText = TimeSpan.FromSeconds(currentInterval.TimeLeft).ToString(Constans.DefaultTimeSpanFormat);
-            string replacementText = TimeSpan.FromSeconds(currentInterval.TimeLeft + 1).ToString(Constans.DefaultTimeSpanFormat);
+            string ciText = TimeSpan.FromSeconds(currentInterval.TimeLeft).ToString(AppConstants.DefaultTimeSpanFormat);
+            string replacementText = TimeSpan.FromSeconds(currentInterval.TimeLeft + 1).ToString(AppConstants.DefaultTimeSpanFormat);
             float startAngle = 0;
             float sweepAngle = 0;
 
@@ -249,7 +249,6 @@ namespace TimeIt.UserControls
                 startAngle += sweepAngle;
             }
 
-
             using (var path = new SKPath())
             using (var intervalTimePaint = new SKPaint())
             using (var intervalTimeTransparentPaint = new SKPaint())
@@ -258,8 +257,8 @@ namespace TimeIt.UserControls
                 var pathMeasure = new SKPathMeasure(path);
 
                 intervalTimePaint.Color = SKColor.Parse(currentInterval.Color);
-                intervalTimeTransparentPaint.Color = GetTransparentColor();
-                intervalTimePaint.TextSize =
+                intervalTimeTransparentPaint.Color = GetAppBgColor();
+                intervalTimePaint.TextSize = 
                     intervalTimeTransparentPaint.TextSize = textSize;
                 intervalTimePaint.Style =
                     intervalTimeTransparentPaint.Style = SKPaintStyle.StrokeAndFill;
@@ -327,9 +326,14 @@ namespace TimeIt.UserControls
                         SKColors.White;
             }
             return ViewModel.IsDarkTheme() ?
-                SKColor.Parse("#2c2929") :
+                GetAppBgColor() :
                 SKColors.White;
+        }
 
+        private SKColor GetAppBgColor()
+        {
+            var appBgColor = (Color)Application.Current.Resources[AppConstants.AppBackgroundColorKey];
+            return appBgColor.ToSKColor();
         }
     }
 }
