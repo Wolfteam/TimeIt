@@ -92,6 +92,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Renderers\FixFrameRenderer.cs" />
+    <Compile Include="Renderers\TimerActionButtonRenderer.cs" />
     <Compile Include="Utils\ColorUtils.cs" />
     <Compile Include="Implementations\SimpleMessage.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -168,7 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CardsView">
-      <Version>2.0.3</Version>
+      <Version>2.0.4</Version>
     </PackageReference>
     <PackageReference Include="Rg.Plugins.Popup">
       <Version>1.1.5.188</Version>
@@ -182,8 +184,14 @@
     <PackageReference Include="Xam.Plugin.Iconize.FontAwesome">
       <Version>3.3.0.93</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Forms" Version="3.3.0.967583" />
+    <PackageReference Include="Xamarin.Essentials">
+      <Version>1.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Forms" Version="3.6.0.264807" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.1.5" />
+    <PackageReference Include="Xamarin.Forms.Visual.Material">
+      <Version>3.6.0.220655</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TimeIt\TimeIt.csproj">

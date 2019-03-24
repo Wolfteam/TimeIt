@@ -3,7 +3,7 @@
   <Identity Name="miraisoft.timeit-fa489d26-8c48-4ccd-9331-cb16d1f0" Publisher="CN=977a7599-23ea-48ac-aa53-673eb595bb7c" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>TimeIt.UWP</DisplayName>
+    <DisplayName>TimeIt</DisplayName>
     <PublisherDisplayName>977a7599-23ea-48ac-aa53-673eb595bb7c</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
