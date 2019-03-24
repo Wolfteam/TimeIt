@@ -14,7 +14,7 @@ using Plugin.Iconize;
 namespace TimeIt.Droid
 {
     [Activity(Label = "TimeIt", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public class MainActivity : Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -23,8 +23,10 @@ namespace TimeIt.Droid
 
             base.OnCreate(savedInstanceState);
 
+            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);
             Forms.Init(this, savedInstanceState);
+            FormsMaterial.Init(this, savedInstanceState);
             DependencyService.Register<ToastNotification>();
             ToastNotification.Init(this);
             CardsViewRenderer.Preserve();
@@ -43,6 +45,13 @@ namespace TimeIt.Droid
             {
                 // Do something if there are not any pages in the `PopupStack`
             }
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        {
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
