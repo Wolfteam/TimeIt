@@ -4,6 +4,7 @@ namespace TimeIt.Interfaces
 {
     public interface IAppSettingsService
     {
+        bool ShowElapsedInsteadOfRemainingTime { get; set; }
         NotificationType CurrentNotificationType { get; set; }
         bool AreNotificationsEnabled { get; set; }
         bool NotifyWhenIntervalStarts { get; set; }

@@ -135,6 +135,36 @@
                 </Style>
             </StackLayout.Resources>
 
+            <!--  General  -->
+            <Label
+                FontAttributes="Bold"
+                HorizontalOptions="Start"
+                Text="General" />
+            <uc:LineControl LineHeight="2" />
+            <Grid Margin="{x:StaticResource SettingsMargin}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Show elapsed instead of remaining time  -->
+                <Grid
+                    Grid.Row="0"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    <Label
+                        Grid.Column="0"
+                        HorizontalOptions="Start"
+                        Text="Show elapsed time instead of remaining"
+                        VerticalTextAlignment="Center" />
+                    <Switch
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        IsToggled="{Binding ShowElapsedInsteadOfRemainingTime, Mode=TwoWay}"
+                        OnColor="Red" />
+                </Grid>
+            </Grid>
+
+
             <!--  Notifications  -->
             <Label
                 FontAttributes="Bold"
@@ -305,7 +335,7 @@
                 HorizontalOptions="Start"
                 Text="About" />
             <uc:LineControl LineHeight="2" />
-            <Grid ColumnDefinitions="{StaticResource SettingsColumns}">
+            <Grid Margin="{x:StaticResource SettingsMargin}" ColumnDefinitions="{StaticResource SettingsColumns}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -348,7 +378,6 @@
                     </Label>
                 </StackLayout>
             </Grid>
-
         </StackLayout>
     </ScrollView>
 </ContentPage>

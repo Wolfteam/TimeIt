@@ -6,6 +6,12 @@ namespace TimeIt.Services
 {
     public class AppSettingsService : IAppSettingsService
     {
+        public bool ShowElapsedInsteadOfRemainingTime
+        {
+            get => Preferences.Get(nameof(ShowElapsedInsteadOfRemainingTime), false);
+            set => Preferences.Set(nameof(ShowElapsedInsteadOfRemainingTime), value);
+        }
+
         public NotificationType CurrentNotificationType
         {
             get => (NotificationType)Preferences.Get(nameof(CurrentNotificationType), (int)NotificationType.VOICE);

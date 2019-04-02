@@ -1,9 +1,11 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using TimeIt.Enums;
+using TimeIt.Helpers;
 using TimeIt.Interfaces;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -15,6 +17,7 @@ namespace TimeIt.ViewModels
         #region Members
         private readonly IAppSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
+        private readonly IMessenger _messenger;
         #endregion
 
         #region Properties
@@ -83,6 +86,16 @@ namespace TimeIt.ViewModels
             }
         }
 
+        public bool ShowElapsedInsteadOfRemainingTime
+        {
+            get => _appSettings.ShowElapsedInsteadOfRemainingTime;
+            set
+            {
+                _appSettings.ShowElapsedInsteadOfRemainingTime = value;
+                _messenger.Send(value, $"{MessageType.MP_SHOW_ELAPSED_TIME_SETTING_CHANGED}");
+            }
+        }
+
         public string AppName
             => AppInfo.Name;
 
@@ -94,10 +107,14 @@ namespace TimeIt.ViewModels
         public ICommand ChangeVolumeCommand { get; private set; }
         public ICommand OpenGithubCommand { get; private set; }
 
-        public SettingsPageViewModel(IAppSettingsService appSettings, ICustomDialogService dialogService)
+        public SettingsPageViewModel(
+            IAppSettingsService appSettings, 
+            ICustomDialogService dialogService,
+            IMessenger messenger)
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
+            _messenger = messenger;
             SetCommands();
         }
 
@@ -105,8 +122,11 @@ namespace TimeIt.ViewModels
         {
             SecondsBeforeIntervalEndsCommand = new RelayCommand(async () =>
             {
-                var result = await _dialogService
-                    .ShowSliderDialogAsync("Seconds before interval ends", _appSettings.SecondsBeforeIntervalEnds, 1, 5);
+                var result = await _dialogService.ShowSliderDialogAsync(
+                    "Seconds before interval ends",
+                    _appSettings.SecondsBeforeIntervalEnds,
+                    AppConstants.MinSecondsBeforeIntervalsEnd,
+                    AppConstants.MaxSecondsBeforeIntervalsEnd);
 
                 if (result is null || result == _appSettings.SecondsBeforeIntervalEnds)
                     return;
