@@ -1,9 +1,11 @@
-﻿using Plugin.Toasts;
+﻿using Amporis.Xamarin.Forms.ColorPicker;
+using Plugin.Toasts;
 using Rg.Plugins.Popup.Services;
 using System.Threading.Tasks;
 using TimeIt.Controls;
 using TimeIt.Interfaces;
 using TimeIt.Pages.Dialogs;
+using Xamarin.Forms;
 
 namespace TimeIt.Services
 {
@@ -18,14 +20,19 @@ namespace TimeIt.Services
             _simpleMessage = simpleMessage;
         }
 
-        public async Task ShowNotification(string title, string msg)
+        public void ShowNotification(string title, string msg)
         {
             var options = new NotificationOptions()
             {
                 Title = title,
                 Description = msg,
+                IsClickable = false,
+                AndroidOptions = new AndroidOptions
+                {
+                    HexColor = Color.Red.ToHex()                    
+                }
             };
-            var result = await _toastNotificator.Notify(options);
+            _toastNotificator.Notify(options);
         }
 
         public void ShowSimpleMessage(string message, bool longDelay = false)

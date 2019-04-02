@@ -18,6 +18,7 @@ namespace TimeIt.ViewModels
 {
     public class TimerPageViewModel : ViewModelBase
     {
+        private readonly IAppSettingsService _appSettings;
         private readonly INavigationService _navigationService;
         private readonly ITimeItDataService _timeItDataService;
         private readonly IMapper _mapper;
@@ -74,12 +75,14 @@ namespace TimeIt.ViewModels
         public ICommand RemoveIntervalCommand { get; private set; }
 
         public TimerPageViewModel(
+            IAppSettingsService appSettings,
             INavigationService navigationService,
             ITimeItDataService timeItDataService,
             IMapper mapper,
             IMessenger messenger,
             ICustomDialogService dialogService)
         {
+            _appSettings = appSettings;
             _navigationService = navigationService;
             _timeItDataService = timeItDataService;
             _mapper = mapper;
@@ -197,7 +200,7 @@ namespace TimeIt.ViewModels
             };
             await _timeItDataService.AddTimer(timer);
 
-            var vm = new TimerItemViewModel(_messenger);
+            var vm = new TimerItemViewModel(_appSettings, _dialogService, _messenger);
             var createdTimer = _mapper.Map(timer, vm);
             createdTimer.SetDefaultTimeLeft();
 
@@ -219,7 +222,7 @@ namespace TimeIt.ViewModels
 
             await _timeItDataService.UpdateTimer(timerToUpdate, newIntervals);
 
-            var vm = new TimerItemViewModel(_messenger);
+            var vm = new TimerItemViewModel(_appSettings, _dialogService, _messenger);
             var updatedTimer = _mapper.Map(timerToUpdate, vm);
             updatedTimer.SetDefaultTimeLeft();
 

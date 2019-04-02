@@ -54,7 +54,8 @@
                     <Entry
                         MaxLength="30"
                         Placeholder="Interval name"
-                        Text="{Binding Name, Mode=TwoWay}" />
+                        Text="{Binding Name, Mode=TwoWay}"
+                        TextColor="{x:OnPlatform Android=White}" />
                 </StackLayout>
                 <ContentView Grid.Row="1" Margin="0,0,0,10">
                     <Grid ColumnSpacing="{OnPlatform Android=20, UWP=50}">

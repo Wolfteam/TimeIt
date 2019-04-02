@@ -11,7 +11,7 @@ namespace TimeIt.Interfaces
         /// <param name="title">The title</param>
         /// <param name="message">The msg</param>
         /// <returns>Task</returns>
-        Task ShowNotification(string title, string message);
+        void ShowNotification(string title, string message);
 
         /// <summary>
         /// Shows a toast notification (android) or a

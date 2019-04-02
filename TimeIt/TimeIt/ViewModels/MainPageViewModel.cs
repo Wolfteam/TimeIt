@@ -18,7 +18,7 @@ namespace TimeIt.ViewModels
     public class MainPageViewModel : ViewModelBase
     {
         #region Members
-
+        private readonly IAppSettingsService _appSettings;
         private readonly INavigationService _navigationService;
         private readonly ITimeItDataService _timeItDataService;
         private readonly IMapper _mapper;
@@ -27,7 +27,7 @@ namespace TimeIt.ViewModels
         private string _currentTimerName;
         private int _remainingRepetitions;
         private string _totalTimeText;
-        private string _elapsedTimeText;
+        private string _elapsedOrRemainingTimeText;
         private bool _startButtonEnabled = true;
         private bool _mainButtonsAreVisible = true;
         private bool _isAddTimerButtonVisible = true;
@@ -62,10 +62,15 @@ namespace TimeIt.ViewModels
             set => Set(ref _totalTimeText, value);
         }
 
-        public string ElapsedTimeText
+        public string ElapsedOrRemainingText
+            => _appSettings.ShowElapsedInsteadOfRemainingTime
+                ? "Elapsed"
+                : "Remaining";
+
+        public string ElapsedOrRemainingTimeText
         {
-            get => _elapsedTimeText;
-            set => Set(ref _elapsedTimeText, value);
+            get => _elapsedOrRemainingTimeText;
+            set => Set(ref _elapsedOrRemainingTimeText, value);
         }
 
         public bool IsStartButtonEnabled
@@ -148,12 +153,14 @@ namespace TimeIt.ViewModels
         #endregion
 
         public MainPageViewModel(
+            IAppSettingsService appSettings,
             INavigationService navigationService,
             ITimeItDataService timeItDataService,
             IMapper mapper,
             IMessenger messenger,
             ICustomDialogService dialogService)
         {
+            _appSettings = appSettings;
             _navigationService = navigationService;
             _timeItDataService = timeItDataService;
             _mapper = mapper;
@@ -166,7 +173,7 @@ namespace TimeIt.ViewModels
 
         private void SetCommands()
         {
-            OnAppearingCommand = new RelayCommand(async() =>
+            OnAppearingCommand = new RelayCommand(async () =>
             {
                 System.Diagnostics.Debug.WriteLine("On appearing...");
                 await Init();
@@ -228,23 +235,22 @@ namespace TimeIt.ViewModels
             _messenger.Register<bool>(
                 this,
                 $"{MessageType.MP_START_BUTTON_IS_ENABLED}",
-                isEnabled =>
-                {
-                    IsStartButtonEnabled =
-                        IsAddTimerButtonVisible =
-                            IsEditTimerButtonVisible =
-                                IsDeleteTimerButtonVisible = isEnabled;
-                });
+                EnableStartAndAssociatedButtons);
+
+            _messenger.Register<bool>(
+                this,
+                $"{MessageType.MP_SHOW_ELAPSED_TIME_SETTING_CHANGED}",
+                ShowElapsedOrRemainingTimeSettingChanged);
 
             _messenger.Register<float>(
                 this,
                 $"{MessageType.MP_ELAPSED_TIME_CHANGED}",
-                seconds => ElapsedTimeText = TimeSpan.FromSeconds(seconds).ToString(AppConstants.DefaultTimeSpanFormat));
+                seconds => SetElapsedOrRemainingTimeText(seconds));
 
             _messenger.Register<float>(
                 this,
                 $"{MessageType.MP_TOTAL_TIME_CHANGED}",
-                seconds => TotalTimeText = TimeSpan.FromSeconds(seconds).ToString(AppConstants.DefaultTimeSpanFormat));
+                seconds => SetTotalTimeText(seconds));
 
             _messenger.Register<int>(
                 this,
@@ -276,7 +282,7 @@ namespace TimeIt.ViewModels
             var vms = new List<TimerItemViewModel>();
             foreach (var timer in timers)
             {
-                var vm = new TimerItemViewModel(_messenger);
+                var vm = new TimerItemViewModel(_appSettings, _dialogService, _messenger);
                 _mapper.Map(timer, vm);
                 vm.SetDefaultTimeLeft();
                 vms.Add(vm);
@@ -329,25 +335,24 @@ namespace TimeIt.ViewModels
                 MainButtonsAreVisible = false;
                 CurrentTimerName = "N/A";
                 RemainingRepetitions = 0;
-                TotalTimeText = "00:00:00";
-                ElapsedTimeText = "00:00:00";
+                SetTotalTimeText(0);
+                SetElapsedOrRemainingTimeText(0);
                 return;
             }
 
             if (CurrentPage < 0)
                 return;
 
-            IsAddTimerButtonVisible =
-                IsEditTimerButtonVisible =
-                    IsDeleteTimerButtonVisible = true;
+            EnableStartAndAssociatedButtons(true);
+            MainButtonsAreVisible = true;
 
             var currentTimer = Timers[CurrentPage];
-            MainButtonsAreVisible =
-                IsStartButtonEnabled = true;
             CurrentTimerName = currentTimer.Name;
             RemainingRepetitions = currentTimer.RemainingRepetitions;
-            TotalTimeText = TimeSpan.FromSeconds(currentTimer.TotalTime).ToString(AppConstants.DefaultTimeSpanFormat);
-            ElapsedTimeText = TimeSpan.FromSeconds(currentTimer.ElapsedTime).ToString(AppConstants.DefaultTimeSpanFormat);
+            SetTotalTimeText(currentTimer.TotalTime);
+            SetElapsedOrRemainingTimeText(_appSettings.ShowElapsedInsteadOfRemainingTime 
+                ? currentTimer.ElapsedTime 
+                : currentTimer.RemainingTime);
         }
 
         private async Task RemomveCurrentTimerAsync()
@@ -369,5 +374,26 @@ namespace TimeIt.ViewModels
             Timers.Remove(currentTimer);
             _dialogService.ShowSimpleMessage($"Timer {currentTimer.Name} was successfully removed");
         }
+
+        private void ShowElapsedOrRemainingTimeSettingChanged(bool showElapsed)
+        {
+            RaisePropertyChanged(() => ElapsedOrRemainingText);
+            if (Timers.Any(t => t.CustomTimer?.IsRunning == true))
+                return;
+            var currentTimer = Timers[CurrentPage];
+            SetElapsedOrRemainingTimeText(showElapsed ? currentTimer.ElapsedTime : currentTimer.RemainingTime);
+        }
+
+        private void SetTotalTimeText(float totalSeconds)
+            => TotalTimeText = TimeSpan.FromSeconds(totalSeconds).ToString(AppConstants.DefaultTimeSpanFormat);
+
+        private void SetElapsedOrRemainingTimeText(float seconds)
+            => ElapsedOrRemainingTimeText = TimeSpan.FromSeconds(seconds).ToString(AppConstants.DefaultTimeSpanFormat);
+
+        private void EnableStartAndAssociatedButtons(bool isEnabled)
+            => IsStartButtonEnabled =
+                    IsAddTimerButtonVisible =
+                        IsEditTimerButtonVisible =
+                            IsDeleteTimerButtonVisible = isEnabled;
     }
 }

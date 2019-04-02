@@ -7,6 +7,7 @@ using System.Windows.Input;
 using TimeIt.Delegates;
 using TimeIt.Enums;
 using TimeIt.Helpers;
+using TimeIt.Interfaces;
 
 namespace TimeIt.ViewModels
 {
@@ -14,8 +15,9 @@ namespace TimeIt.ViewModels
     {
         #region Fields
 
+        private readonly IAppSettingsService _appSettings;
+        private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
-
         private int _elapsedRepetitions;
 
         //TODO: REMOVE THIS TWO AND MOVE IT TO A CONSTANTS FILE
@@ -23,7 +25,6 @@ namespace TimeIt.ViewModels
 
         public CustomTimer CustomTimer;
         public bool RequestReDraw;
-
         #endregion
 
         #region Properties
@@ -82,8 +83,13 @@ namespace TimeIt.ViewModels
         public ICommand PositionChangedCommand { get; private set; }
 
 
-        public TimerItemViewModel(IMessenger messenger)
+        public TimerItemViewModel(
+            IAppSettingsService appSettings,
+            ICustomDialogService dialogService,
+            IMessenger messenger)
         {
+            _appSettings = appSettings;
+            _dialogService = dialogService;
             _messenger = messenger;
             SetCommands();
             RegisterMessages();
@@ -170,7 +176,11 @@ namespace TimeIt.ViewModels
             InvalidateSurfaceEvent.Invoke();
             _messenger.Send(true, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
             ElapsedRepetitions = 0;
-            _messenger.Send(0f, $"{MessageType.MP_ELAPSED_TIME_CHANGED}");
+            _messenger.Send(
+                _appSettings.ShowElapsedInsteadOfRemainingTime
+                    ? 0f
+                    : RemainingTime,
+                $"{MessageType.MP_ELAPSED_TIME_CHANGED}");
         }
 
         private void UpdateCurrentInterval()
@@ -182,12 +192,28 @@ namespace TimeIt.ViewModels
             System.Diagnostics.Debug.WriteLine(
                 $"--------------Vm - Interval = {currentInterval.Name}, time left = {currentInterval.TimeLeft}");
 
+            //if we are starting a fresh interval...
+            bool intervalStarted = currentInterval.TimeLeft == currentInterval.Duration;
+            if (intervalStarted)
+                ShowIntervalStartedNotification(currentInterval.Name);
+
+            //if the time left for this interval == seconds before interval ends
+            //we must notify it
+            if (currentInterval.TimeLeft <= AppConstants.MaxSecondsBeforeIntervalsEnd &&
+                currentInterval.TimeLeft - 1 == _appSettings.SecondsBeforeIntervalEnds)
+            {
+                ShowEndOfIntervalNotification(currentInterval.Name);
+            }
+
             if (currentInterval.TimeLeft <= 0)
             {
                 currentInterval.IsRunning = false;
                 var nextInterval = Intervals.FirstOrDefault(t => t.Position == currentInterval.Position + 1);
                 if (nextInterval is null)
                 {
+                    //if we completed a repetition...
+                    ShowEndOfRepetitionNotification(ElapsedRepetitions + 1);
+
                     if (Repetitions == ElapsedRepetitions + 1)
                     {
                         ElapsedRepetitions = 0;
@@ -209,6 +235,7 @@ namespace TimeIt.ViewModels
                 }
                 else
                 {
+                    ShowIntervalStartedNotification(nextInterval.Name);
                     nextInterval.IsRunning = true;
                     nextInterval.TimeLeft -= _fps;
                 }
@@ -217,8 +244,11 @@ namespace TimeIt.ViewModels
             {
                 currentInterval.TimeLeft -= _fps;
             }
-
-            _messenger.Send(ElapsedTime, $"{MessageType.MP_ELAPSED_TIME_CHANGED}");
+            _messenger.Send(
+                _appSettings.ShowElapsedInsteadOfRemainingTime
+                    ? ElapsedTime
+                    : RemainingTime,
+                $"{MessageType.MP_ELAPSED_TIME_CHANGED}");
             System.Diagnostics.Debug.WriteLine("Vm - Updating current interval completed");
         }
 
@@ -253,6 +283,33 @@ namespace TimeIt.ViewModels
                 return;
             RequestReDraw = true;
             InvalidateSurfaceEvent?.Invoke();
+        }
+
+        private void ShowIntervalStartedNotification(string intervalName)
+        {
+            if (_appSettings.AreNotificationsEnabled &&
+                _appSettings.NotifyWhenIntervalStarts)
+            {
+                _dialogService.ShowNotification("Interval started", $"{intervalName} has just started.");
+            }
+        }
+
+        private void ShowEndOfIntervalNotification(string intervalName)
+        {
+            if (_appSettings.AreNotificationsEnabled &&
+                _appSettings.NotifyWhenIntervalIsAboutToEnd)
+            {
+                _dialogService.ShowNotification("Interval started", $"{intervalName} is about to end.");
+            }
+        }
+
+        private void ShowEndOfRepetitionNotification(int current)
+        {
+            if (_appSettings.AreNotificationsEnabled &&
+                _appSettings.NotifyWhenARepetitionCompletes)
+            {
+                _dialogService.ShowNotification("Repetition completed", $"Repetition = {current} completed.");
+            }
         }
 
         //TODO: PROVIDE A SERVICE FOR THIS

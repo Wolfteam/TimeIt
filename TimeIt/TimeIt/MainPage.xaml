@@ -172,7 +172,7 @@
                     IsCyclical="False"
                     IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
                     IsUserInteractionEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
-                    IsViewCacheEnabled="False"
+                    IsViewCacheEnabled="True"
                     ItemsSource="{Binding Timers, Mode=OneWay}"
                     SelectedIndex="{Binding CurrentPage, Mode=TwoWay}"
                     VerticalSwipeThresholdDistance="{OnPlatform Android=1000000}">
@@ -280,7 +280,7 @@
                         FontSize="{OnPlatform Android='22',
                                               UWP='18'}"
                         HorizontalOptions="EndAndExpand"
-                        Text="{Binding ElapsedTimeText, Mode=OneWay}" />
+                        Text="{Binding ElapsedOrRemainingTimeText, Mode=OneWay}" />
 
                     <Label
                         Grid.Row="2"
@@ -288,7 +288,7 @@
                         FontSize="{OnPlatform Android='18',
                                               UWP='14'}"
                         HorizontalOptions="EndAndExpand"
-                        Text="Elapsed" />
+                        Text="{Binding ElapsedOrRemainingText, Mode=OneWay}" />
                 </Grid>
             </Grid>
         </pcControls:ParentScrollView>
