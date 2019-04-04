@@ -31,6 +31,9 @@ namespace TimeIt.ViewModels
         private ObservableCollection<IntervalListItemViewModel> _intervals =
             new ObservableCollection<IntervalListItemViewModel>();
 
+        public string PageTitle
+            => _timerID == 0 ? "Add Timer" : "Edit Timer";
+
         public string TimerName
         {
             get => _timerName;
@@ -158,6 +161,7 @@ namespace TimeIt.ViewModels
                 Repetitions = timer.Repetitions;
                 Intervals = _mapper.Map<ObservableCollection<IntervalListItemViewModel>>(timer.Intervals.OrderBy(i => i.Position));
             }
+            RaisePropertyChanged(() => PageTitle);
             RaisePropertyChanged(() => IntervalToTalTime);
         }
 
