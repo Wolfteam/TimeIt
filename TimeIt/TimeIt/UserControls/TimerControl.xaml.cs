@@ -125,7 +125,7 @@ namespace TimeIt.UserControls
                         DrawIntervalDuration(rect, canvas, interval);
 
                         //Draw the interval name
-                        DrawIntervalName(path, canvas, interval, -strokePaint.StrokeWidth);
+                        DrawIntervalName(path, canvas, interval.Name, -strokePaint.StrokeWidth);
                     }
 
                     startAngle += sweepAngle;
@@ -168,20 +168,16 @@ namespace TimeIt.UserControls
                 StrokeCap = SKStrokeCap.Butt
             })
             {
-                switch (Device.RuntimePlatform)
-                {
-                    case Device.Android:
-                        transparentStrokePaint.StrokeWidth *= 2.5f;
-                        break;
-                }
-
+                transparentStrokePaint.StrokeWidth *= Device.RuntimePlatform == Device.Android
+                    ? 2.5f
+                    : 1f;
                 path.AddArc(rect, startAngle, sweepAngle);
                 canvas.DrawPath(path, transparentStrokePaint);
             }
             DrawIntervalDuration(rect, canvas, currentInterval);
         }
 
-        private void DrawIntervalName(SKPath intervalPath, SKCanvas canvas, IntervalItemViewModel currentInterval, float vOffset)
+        private void DrawIntervalName(SKPath intervalPath, SKCanvas canvas, string currentIntName, float vOffset)
         {
             using (var intervalTextPaint = new SKPaint
             {
@@ -198,19 +194,23 @@ namespace TimeIt.UserControls
                 float initialTextSize = intervalTextPaint.TextSize;
                 SetIntervalTextSize(intervalTextPaint, pathMeasure.Length);
 
-                string intervalName;
-                if (intervalTextPaint.MeasureText(currentInterval.Name) >= pathMeasure.Length)
-                {
-                    float charWidth = intervalTextPaint.MeasureText(currentInterval.Name) / currentInterval.Name.Length;
-                    float diff = intervalTextPaint.MeasureText(currentInterval.Name) - pathMeasure.Length * 0.8f;
-                    int charsToRemove = (int)Math.Floor(diff / charWidth);
-                    intervalName = $"{currentInterval.Name.Substring(0, currentInterval.Name.Length - charsToRemove)}...";
-                }
                 //if the new text size is too small, just return
-                else if (IsIntervalTextSizeTooSmall(initialTextSize,intervalTextPaint.TextSize))
+                if (IsIntervalTextSizeTooSmall(initialTextSize, intervalTextPaint.TextSize))
                     return;
-                else
-                    intervalName = currentInterval.Name;
+
+                string intervalName = currentIntName;
+                int aditionalCharsToRemove = 0;
+                while (intervalTextPaint.MeasureText(intervalName) >= pathMeasure.Length * 0.8f)
+                {
+                    float charWidth = intervalTextPaint.MeasureText(currentIntName) / currentIntName.Length;
+                    float diff = intervalTextPaint.MeasureText(currentIntName) - pathMeasure.Length * 0.8f;
+                    int charsToRemove = (int)Math.Floor(diff / charWidth) + aditionalCharsToRemove;
+                    //just in case...
+                    if (currentIntName.Length - charsToRemove < 1)
+                        return;
+                    intervalName = $"{currentIntName.Substring(0, currentIntName.Length - charsToRemove)}...";
+                    aditionalCharsToRemove++;
+                }
 
                 float textWidth = intervalTextPaint.MeasureText(intervalName);
                 float nameHOffset = pathMeasure.Length / 2f - textWidth / 2f;
@@ -258,7 +258,7 @@ namespace TimeIt.UserControls
 
                 intervalTimePaint.Color = SKColor.Parse(currentInterval.Color);
                 intervalTimeTransparentPaint.Color = GetAppBgColor();
-                intervalTimePaint.TextSize = 
+                intervalTimePaint.TextSize =
                     intervalTimeTransparentPaint.TextSize = textSize;
                 intervalTimePaint.Style =
                     intervalTimeTransparentPaint.Style = SKPaintStyle.StrokeAndFill;
