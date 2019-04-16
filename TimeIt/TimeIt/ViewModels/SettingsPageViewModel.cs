@@ -21,7 +21,7 @@ namespace TimeIt.ViewModels
         #endregion
 
         #region Properties
-        public List<NotificationType> NotificationTypes { get; set; } = new List<NotificationType>
+        public List<NotificationType> NotificationTypes { get; } = new List<NotificationType>
         {
             NotificationType.VOICE,
             NotificationType.TOAST,
@@ -146,7 +146,7 @@ namespace TimeIt.ViewModels
             });
 
             OpenGithubCommand = new RelayCommand<string>
-                ((url) => Device.OpenUri(new Uri(url)));
+                (url => Device.OpenUri(new Uri(url)));
         }
     }
 }

@@ -110,8 +110,10 @@ namespace TimeIt.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine(
                     $"Position changed. New position = {value}. OldPosition = {_currentPage}");
+                bool positionChanged = _currentPage != value;
                 Set(ref _currentPage, value);
-                CurrentSelectedTimerChanged();
+                if (positionChanged)
+                    CurrentSelectedTimerChanged();
             }
         }
 
@@ -119,16 +121,6 @@ namespace TimeIt.ViewModels
         {
             get => _timers;
             set => Set(ref _timers, value);
-        }
-
-        public bool CanNavigate
-        {
-            get => _canNavigate;
-            set
-            {
-                Set(ref _canNavigate, value);
-                Timers[CurrentPage].InvalidateSurfaceEvent.Invoke();
-            }
         }
         #endregion
 
@@ -245,12 +237,12 @@ namespace TimeIt.ViewModels
             _messenger.Register<float>(
                 this,
                 $"{MessageType.MP_ELAPSED_TIME_CHANGED}",
-                seconds => SetElapsedOrRemainingTimeText(seconds));
+                SetElapsedOrRemainingTimeText);
 
             _messenger.Register<float>(
                 this,
                 $"{MessageType.MP_TOTAL_TIME_CHANGED}",
-                seconds => SetTotalTimeText(seconds));
+                SetTotalTimeText);
 
             _messenger.Register<int>(
                 this,
@@ -314,7 +306,7 @@ namespace TimeIt.ViewModels
                     CurrentPage = index;
                     break;
                 case OperationType.DELETED:
-                    var timerToRemove = Timers.FirstOrDefault(t => t.TimerID == timerID);
+                    var timerToRemove = Timers.First(t => t.TimerID == timerID);
                     timerToRemove.UnregisterMessages();
                     Timers.Remove(timerToRemove);
                     break;

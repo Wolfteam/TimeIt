@@ -118,14 +118,14 @@ namespace TimeIt.ViewModels
                 _messenger.Send(Intervals.Count, $"{MessageType.ADD_INTERVAL}");
             });
 
-            EditIntervalCommand = new RelayCommand<IntervalListItemViewModel>((interval) =>
+            EditIntervalCommand = new RelayCommand<IntervalListItemViewModel>(interval =>
             {
                 _navigationService.NavigateTo($"{AppPages.INTERVAL}");
                 _messenger.Send((interval, Intervals.Count), $"{MessageType.EDIT_INTERVAL}");
             });
 
             RemoveIntervalCommand = new RelayCommand<IntervalListItemViewModel>
-                (async (interval) => await DeleteIntervalAsync(interval));
+                (async interval => await DeleteIntervalAsync(interval));
         }
 
         private void RegisterMessages()
@@ -251,10 +251,10 @@ namespace TimeIt.ViewModels
             bool wasRemoved = await _timeItDataService.RemoveTimer(_timerID);
             if (!wasRemoved)
             {
-                _dialogService.ShowSimpleMessage($"An error occurred while trying to delete the timer");
+                _dialogService.ShowSimpleMessage("An error occurred while trying to delete the timer");
                 return;
             }
-            _dialogService.ShowSimpleMessage($"Timer was successfully removed");
+            _dialogService.ShowSimpleMessage("Timer was successfully removed");
             _messenger.Send(_timerID, $"{MessageType.MP_TIMER_REMOVED}");
             _navigationService.GoBack();
         }
@@ -341,12 +341,10 @@ namespace TimeIt.ViewModels
                 return false;
             }
 
-            if (string.IsNullOrEmpty(TimerName))
-            {
-                _dialogService.ShowSimpleMessage("You need to provide a timer name");
-                return false;
-            }
-            return true;
+            if (!string.IsNullOrEmpty(TimerName)) 
+                return true;
+            _dialogService.ShowSimpleMessage("You need to provide a timer name");
+            return false;
         }
     }
 }
