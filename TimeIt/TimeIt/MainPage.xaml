@@ -73,6 +73,229 @@
                 <Setter Property="OutlineColor" Value="Red" />
             </Style>
         </ResourceDictionary>
+
+        <!--  Portrait  -->
+        <RowDefinitionCollection x:Key="DefaultRowsInPortrait" x:Name="DefaultRowsInPortrait">
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </RowDefinitionCollection>
+        <ColumnDefinitionCollection x:Key="DefaultColumnsInPortrait" x:Name="DefaultColumnsInPortrait">
+            <ColumnDefinition Width="*" />
+        </ColumnDefinitionCollection>
+
+        <!--  Landscape  -->
+        <RowDefinitionCollection x:Key="DefaultRowsInLandscape" x:Name="DefaultRowsInLandscape">
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </RowDefinitionCollection>
+        <ColumnDefinitionCollection x:Key="DefaultColumnsInLandscape" x:Name="DefaultColumnsInLandscape">
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </ColumnDefinitionCollection>
+
+        <Style x:Key="MainGridStyle" TargetType="Grid">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="RowDefinitions" Value="{x:StaticResource DefaultRowsInPortrait}" />
+                                <Setter Property="ColumnDefinitions" Value="{x:StaticResource DefaultColumnsInPortrait}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="RowDefinitions" Value="{x:StaticResource DefaultRowsInLandscape}" />
+                                <Setter Property="ColumnDefinitions" Value="{x:StaticResource DefaultColumnsInLandscape}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NameAndRepetitionsStyle" TargetType="Grid">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Column" Value="0" />
+                            </VisualState.Setters>
+                        </VisualState>
+
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Column" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CanvasStyle" TargetType="pcCards:CarouselView">
+            <Setter Property="IsCyclical" Value="False" />
+            <Setter Property="IsViewCacheEnabled" Value="True" />
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="1" />
+                                <Setter Property="Grid.RowSpan" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.RowSpan" Value="3" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TimerButtonStyle" TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="2" />
+                                <Setter Property="Grid.Column" Value="0" />
+                                <Setter Property="ColumnDefinitions">
+                                    <ColumnDefinitionCollection>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </ColumnDefinitionCollection>
+                                </Setter>
+                                <Setter Property="RowDefinitions">
+                                    <RowDefinitionCollection>
+                                        <RowDefinition Height="Auto" />
+                                    </RowDefinitionCollection>
+                                </Setter>
+                            </VisualState.Setters>
+                        </VisualState>
+
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="1" />
+                                <Setter Property="Grid.Column" Value="1" />
+                                <Setter Property="RowDefinitions">
+                                    <RowDefinitionCollection>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </RowDefinitionCollection>
+                                </Setter>
+                                <Setter Property="ColumnDefinitions">
+                                    <ColumnDefinitionCollection>
+                                        <ColumnDefinition Width="*" />
+                                    </ColumnDefinitionCollection>
+                                </Setter>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TimerActionButtonStyle" TargetType="customControls:TimerActionButton">
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="BackgroundColor" Value="Accent" />
+            <Setter Property="FontAttributes" Value="{x:OnPlatform UWP=Bold}" />
+        </Style>
+
+        <Style
+            x:Key="StartButtonStyle"
+            BasedOn="{x:StaticResource TimerActionButtonStyle}"
+            TargetType="customControls:TimerActionButton">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="0" />
+        </Style>
+
+        <Style
+            x:Key="PauseButtonStyle"
+            BasedOn="{x:StaticResource TimerActionButtonStyle}"
+            TargetType="customControls:TimerActionButton">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="1" />
+                                <Setter Property="Grid.Column" Value="0" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="StopButtonStyle"
+            BasedOn="{x:StaticResource TimerActionButtonStyle}"
+            TargetType="customControls:TimerActionButton">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="0" />
+                                <Setter Property="Grid.Column" Value="2" />
+                            </VisualState.Setters>
+                        </VisualState>
+
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="2" />
+                                <Setter Property="Grid.Column" Value="0" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TotalAndElapsedTimeGridStyle" TargetType="Grid">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="3" />
+                                <Setter Property="Grid.Column" Value="0" />
+                            </VisualState.Setters>
+                        </VisualState>
+
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter Property="Grid.Row" Value="2" />
+                                <Setter Property="Grid.Column" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
     </ContentPage.Resources>
     <!--<OnPlatform x:TypeArguments="View">
         <OnPlatform.Platforms>
@@ -94,203 +317,172 @@
         </OnPlatform.Platforms>
     </OnPlatform>-->
 
-    <ContentPage.Content>
-        <pcControls:ParentScrollView Orientation="Both" VerticalOptions="FillAndExpand">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <!--  Timer name and repetitions  -->
-                <Grid
-                    Grid.Row="0"
-                    Padding="10"
-                    HorizontalOptions="Fill">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+    <Grid x:Name="MainGrid" Style="{x:StaticResource MainGridStyle}">
+        <!--  Timer name and repetitions  -->
+        <Grid x:Name="NameAndRepetitionsGrid" Style="{x:StaticResource NameAndRepetitionsStyle}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                    <Grid.Resources>
-                        <Style TargetType="Label">
-                            <Setter Property="TextColor" Value="White" />
-                        </Style>
-                    </Grid.Resources>
+            <Grid.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="TextColor" Value="White" />
+                </Style>
+            </Grid.Resources>
 
-                    <Label
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        HorizontalOptions="StartAndExpand"
-                        Text="Timer " />
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        FontAttributes="Bold"
-                        FontSize="{OnPlatform Android='22',
-                                              UWP='18'}"
-                        HorizontalOptions="StartAndExpand"
-                        Text="{Binding CurrentTimerName, Mode=OneWay}" />
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                FontSize="{OnPlatform Android='18',
+                                      UWP='14'}"
+                HorizontalOptions="StartAndExpand"
+                Text="Timer " />
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                FontAttributes="Bold"
+                FontSize="{OnPlatform Android='22',
+                                      UWP='18'}"
+                HorizontalOptions="StartAndExpand"
+                Text="{Binding CurrentTimerName, Mode=OneWay}" />
 
-                    <Label
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        HorizontalOptions="EndAndExpand"
-                        Text="Repetitions " />
+            <Label
+                Grid.Row="0"
+                Grid.Column="1"
+                FontSize="{OnPlatform Android='18',
+                                      UWP='14'}"
+                HorizontalOptions="EndAndExpand"
+                Text="Repetitions " />
 
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        FontAttributes="Bold"
-                        FontSize="{OnPlatform Android='22',
-                                              UWP='18'}"
-                        HorizontalOptions="EndAndExpand"
-                        Text="{Binding RemainingRepetitions, Mode=OneWay}" />
+            <Label
+                Grid.Row="1"
+                Grid.Column="1"
+                FontAttributes="Bold"
+                FontSize="{OnPlatform Android='22',
+                                      UWP='18'}"
+                HorizontalOptions="EndAndExpand"
+                Text="{Binding RemainingRepetitions, Mode=OneWay}" />
 
-                    <uc:LineControl
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2" />
-                </Grid>
+            <uc:LineControl
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+        </Grid>
 
-                <!--  Canvas  -->
-                <pcCards:CarouselView
-                    x:Name="CarouselView"
-                    Grid.Row="1"
-                    HeightRequest="400"
-                    IsCyclical="False"
-                    IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
-                    IsUserInteractionEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
-                    IsViewCacheEnabled="True"
-                    ItemsSource="{Binding Timers, Mode=OneWay}"
-                    SelectedIndex="{Binding CurrentPage, Mode=TwoWay}"
-                    VerticalSwipeThresholdDistance="{OnPlatform Android=1000000}">
-                    <pcCards:CarouselView.ItemTemplate>
-                        <DataTemplate>
-                            <uc:TimerControl BindingContext="{Binding}" />
-                        </DataTemplate>
-                    </pcCards:CarouselView.ItemTemplate>
+        <!--  Canvas  -->
+        <pcCards:CarouselView
+            x:Name="CarouselView"
+            IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
+            IsUserInteractionEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
+            ItemsSource="{Binding Timers, Mode=OneWay}"
+            SelectedIndex="{Binding CurrentPage, Mode=TwoWay}"
+            Style="{x:StaticResource CanvasStyle}"
+            VerticalSwipeThresholdDistance="{OnPlatform Android=1000000}">
+            <pcCards:CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <uc:TimerControl BindingContext="{Binding}" />
+                </DataTemplate>
+            </pcCards:CarouselView.ItemTemplate>
 
-                    <pcControls:IndicatorsControl
-                        SelectedIndicatorStyle="{x:StaticResource ActiveIndicator}"
-                        ToFadeDuration="2500"
-                        UnselectedIndicatorStyle="{x:StaticResource InactiveIndicator}" />
+            <pcControls:IndicatorsControl
+                SelectedIndicatorStyle="{x:StaticResource ActiveIndicator}"
+                ToFadeDuration="2500"
+                UnselectedIndicatorStyle="{x:StaticResource InactiveIndicator}" />
 
-                    <pcControls:LeftArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
-                    <pcControls:RightArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
-                </pcCards:CarouselView>
-                <!--  Buttons  -->
-                <Grid
-                    Grid.Row="2"
-                    Padding="10"
-                    HorizontalOptions="Fill">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <customControls:TimerActionButton
-                        Grid.Column="0"
-                        BackgroundColor="Accent"
-                        Command="{Binding StartTimerCommand}"
-                        FontAttributes="{x:OnPlatform UWP=Bold}"
-                        IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
-                        IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
-                        Text="Start"
-                        TextColor="White" />
+            <pcControls:LeftArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
+            <pcControls:RightArrowControl ToFadeDuration="{OnPlatform Android=2500}" />
+        </pcCards:CarouselView>
 
-                    <customControls:TimerActionButton
-                        Grid.Column="1"
-                        BackgroundColor="Accent"
-                        Command="{Binding PauseTimerCommand}"
-                        FontAttributes="{x:OnPlatform UWP=Bold}"
-                        IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                        IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
-                        Text="Pause"
-                        TextColor="White" />
+        <!--  Buttons  -->
+        <Grid x:Name="TimerButtonsGrid" Style="{x:StaticResource TimerButtonStyle}">
+            <customControls:TimerActionButton
+                x:Name="StartButton"
+                Command="{Binding StartTimerCommand}"
+                IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay}"
+                IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
+                Style="{x:StaticResource StartButtonStyle}"
+                Text="Start" />
 
-                    <customControls:TimerActionButton
-                        Grid.Column="2"
-                        BackgroundColor="Accent"
-                        Command="{Binding StopTimerCommand}"
-                        FontAttributes="{x:OnPlatform UWP=Bold}"
-                        IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                        IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
-                        Text="Stop"
-                        TextColor="White" />
-                </Grid>
-                <!--  Total time and elapsed  -->
-                <Grid
-                    Grid.Row="3"
-                    Padding="10"
-                    HorizontalOptions="Fill">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+            <customControls:TimerActionButton
+                x:Name="PauseButton"
+                Command="{Binding PauseTimerCommand}"
+                IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
+                Style="{x:StaticResource PauseButtonStyle}"
+                Text="Pause" />
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <customControls:TimerActionButton
+                x:Name="StopButton"
+                Command="{Binding StopTimerCommand}"
+                IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
+                Style="{x:StaticResource StopButtonStyle}"
+                Text="Stop" />
+        </Grid>
 
-                    <Grid.Resources>
-                        <Style TargetType="Label">
-                            <Setter Property="TextColor" Value="White" />
-                        </Style>
-                    </Grid.Resources>
+        <!--  Total time and elapsed  -->
+        <Grid x:Name="TotalAndElapsedTimeGrid" Style="{x:StaticResource TotalAndElapsedTimeGridStyle}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                    <uc:LineControl
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        FontAttributes="Bold"
-                        FontSize="{OnPlatform Android='22',
-                                              UWP='18'}"
-                        HorizontalOptions="StartAndExpand"
-                        Text="{Binding TotalTimeText, Mode=OneWay}" />
-                    <Label
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        HorizontalOptions="StartAndExpand"
-                        Text="Total" />
+            <Grid.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="TextColor" Value="White" />
+                </Style>
+            </Grid.Resources>
 
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        FontAttributes="Bold"
-                        FontSize="{OnPlatform Android='22',
-                                              UWP='18'}"
-                        HorizontalOptions="EndAndExpand"
-                        Text="{Binding ElapsedOrRemainingTimeText, Mode=OneWay}" />
+            <uc:LineControl
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
 
-                    <Label
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        HorizontalOptions="EndAndExpand"
-                        Text="{Binding ElapsedOrRemainingText, Mode=OneWay}" />
-                </Grid>
-            </Grid>
-        </pcControls:ParentScrollView>
-    </ContentPage.Content>
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                FontAttributes="Bold"
+                FontSize="{OnPlatform Android='22',
+                                      UWP='18'}"
+                HorizontalOptions="StartAndExpand"
+                Text="{Binding TotalTimeText, Mode=OneWay}" />
+            <Label
+                Grid.Row="2"
+                Grid.Column="0"
+                FontSize="{OnPlatform Android='18',
+                                      UWP='14'}"
+                HorizontalOptions="StartAndExpand"
+                Text="Total" />
+
+            <Label
+                Grid.Row="1"
+                Grid.Column="1"
+                FontAttributes="Bold"
+                FontSize="{OnPlatform Android='22',
+                                      UWP='18'}"
+                HorizontalOptions="EndAndExpand"
+                Text="{Binding ElapsedOrRemainingTimeText, Mode=OneWay}" />
+
+            <Label
+                Grid.Row="2"
+                Grid.Column="1"
+                FontSize="{OnPlatform Android='18',
+                                      UWP='14'}"
+                HorizontalOptions="EndAndExpand"
+                Text="{Binding ElapsedOrRemainingText, Mode=OneWay}" />
+        </Grid>
+    </Grid>
 </ContentPage>

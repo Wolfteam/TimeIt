@@ -1,16 +1,38 @@
-﻿using TimeIt.ViewModels;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 
 namespace TimeIt
 {
     public partial class MainPage : ContentPage
     {
-        private MainPageViewModel ViewModel
-            => (MainPageViewModel)BindingContext;
+        private double _width;
+        private double _height;
 
         public MainPage()
         {
             InitializeComponent();
+        }
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
+            if (_width == width && _height == height)
+            {
+                return;
+            }
+            _width = width;
+            _height = height;
+            bool isInLandscape = width > height;
+
+            string state = isInLandscape ? "Landscape" : "Portrait";
+
+            VisualStateManager.GoToState(MainGrid, state);
+            VisualStateManager.GoToState(NameAndRepetitionsGrid, state);
+            VisualStateManager.GoToState(CarouselView, state);
+            VisualStateManager.GoToState(TimerButtonsGrid, state);
+            VisualStateManager.GoToState(StartButton, state);
+            VisualStateManager.GoToState(PauseButton, state);
+            VisualStateManager.GoToState(StopButton, state);
+            VisualStateManager.GoToState(TotalAndElapsedTimeGrid, state);
         }
 
         #region Old
