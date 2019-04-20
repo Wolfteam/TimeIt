@@ -68,81 +68,10 @@ namespace TimeIt.UserControls
             var center = new SKPoint(info.Width / 2f, yPoint);
             var rect = new SKRect(center.X - radius, center.Y - radius,
                                      center.X + radius, center.Y + radius);
-            float startAngle = 0;
-            float sweepAngle;
-
             try
             {
-                float totalTime = ViewModel.GetTimerCycleTotalTime();
-
-                if (ViewModel.CustomTimer?.IsRunning == true &&
-                    !ViewModel.RequestReDraw)
-                {
-                    System.Diagnostics.Debug.WriteLine($"--------------Timer = {ViewModel.Name} is running and a redraw was not requested");
-                    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
-                    startAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime) - 90f;
-                    //sometimes i need a *-1 in the sweepAngle o.o
-                    sweepAngle = ViewModel.CalculateAngle(1, totalTime) * -1;
-                    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
-                    return;
-                }
-
                 System.Diagnostics.Debug.WriteLine($"--------------Rendering the timer started. Timer = {ViewModel.Name}");
-                _rendering = true;
-                canvas.Clear();
-
-                foreach (var interval in ViewModel.Intervals.OrderBy(t => t.Position))
-                {
-                    //System.Diagnostics.Debug.WriteLine($"----Rendering Interval = {interval.Name} started");
-                    sweepAngle = ViewModel.CalculateAngle(interval.Duration, totalTime);
-                    //System.Diagnostics.Debug.WriteLine($"Duration = {interval.Duration}, Start angle = {startAngle}, final angle = {sweepAngle}");
-                    using (var path = new SKPath())
-                    using (var strokePaint = new SKPaint
-                    {
-                        Color = SKColor.Parse(interval.Color),
-                        Style = SKPaintStyle.Stroke,
-                        StrokeCap = SKStrokeCap.Butt
-                    })
-                    using (var contourPaint = new SKPaint
-                    {
-                        Color = SKColors.Black,
-                        Style = SKPaintStyle.Stroke,
-                        StrokeCap = SKStrokeCap.Butt
-                    })
-                    {
-                        strokePaint.StrokeWidth = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry));
-                        contourPaint.StrokeWidth = (float)(1.25 * strokePaint.StrokeWidth);
-                        strokePaint.StrokeWidth *= Device.RuntimePlatform == Device.Android
-                            ? 2.5f
-                            : 1f;
-
-                        //draw the arc
-                        path.AddArc(rect, startAngle - 90f, sweepAngle);
-                        canvas.DrawPath(path, contourPaint);
-                        canvas.DrawPath(path, strokePaint);
-
-                        //Draw the interval duration text
-                        DrawIntervalDuration(rect, canvas, interval);
-
-                        //Draw the interval name
-                        DrawIntervalName(path, canvas, interval.Name, -strokePaint.StrokeWidth);
-                    }
-
-                    startAngle += sweepAngle;
-                    //System.Diagnostics.Debug.WriteLine($"----Rendering Interval = {interval.Name} completed");
-                }
-
-                if (ViewModel.CustomTimer?.IsRunning == true && ViewModel.RequestReDraw ||
-                    ViewModel.CustomTimer?.IsPaused == true && ViewModel.RequestReDraw)
-                {
-                    System.Diagnostics.Debug.WriteLine($"--------------Timer = {ViewModel.Name} is running/paused and a redraw was requested");
-                    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
-                    startAngle = -90f;
-                    sweepAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime);
-                    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
-                    ViewModel.RequestReDraw = false;
-                }
-                _rendering = false;
+                DrawIntervals(canvas, rect);
                 System.Diagnostics.Debug.WriteLine($"--------------Rendering the timer completed. Timer = {ViewModel.Name}");
             }
             catch (Exception e)
@@ -150,6 +79,80 @@ namespace TimeIt.UserControls
                 System.Diagnostics.Debug.WriteLine(e.Message);
                 throw;
             }
+        }
+
+        private void DrawIntervals(SKCanvas canvas, SKRect rect)
+        {
+            float totalTime = ViewModel.GetTimerCycleTotalTime();
+            float startAngle = 0;
+            float sweepAngle;
+            //this avoids redrawing all the intervals but with big intervals
+            //it shows white dots...
+            //if (ViewModel.CustomTimer?.IsRunning == true &&
+            //    !ViewModel.RequestReDraw)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"--------------Timer = {ViewModel.Name} is running and a redraw was not requested");
+            //    float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
+            //    startAngle = ViewModel.CalculateAngle(totalElapsedTime, totalTime) - 90f;
+            //    //sometimes i need a *-1 in the sweepAngle o.o
+            //    sweepAngle = ViewModel.CalculateAngle(1, totalTime) * -1;
+            //    UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
+            //    return;
+            //}
+            _rendering = true;
+            var orderedIntervals = ViewModel.Intervals.OrderBy(t => t.Position);
+            canvas.Clear();
+            //We draw all the intervals...
+            foreach (var interval in orderedIntervals)
+            {
+                sweepAngle = CalculateAngle(interval.Duration, totalTime);
+                using (var path = new SKPath())
+                using (var strokePaint = new SKPaint
+                {
+                    Color = SKColor.Parse(interval.Color),
+                    Style = SKPaintStyle.Stroke,
+                    StrokeCap = SKStrokeCap.Butt
+                })
+                using (var contourPaint = new SKPaint
+                {
+                    Color = SKColors.Black,
+                    Style = SKPaintStyle.Stroke,
+                    StrokeCap = SKStrokeCap.Butt
+                })
+                {
+                    strokePaint.StrokeWidth = (float)Device.GetNamedSize(NamedSize.Medium, typeof(Entry));
+                    contourPaint.StrokeWidth = (float)(1.25 * strokePaint.StrokeWidth);
+                    strokePaint.StrokeWidth *= Device.RuntimePlatform == Device.Android
+                        ? 2.5f
+                        : 1f;
+
+                    //draw the arc
+                    path.AddArc(rect, startAngle - 90f, sweepAngle);
+                    canvas.DrawPath(path, contourPaint);
+                    canvas.DrawPath(path, strokePaint);
+
+                    //Draw the interval duration text
+                    DrawIntervalDuration(rect, canvas, interval);
+
+                    //Draw the interval name
+                    DrawIntervalName(path, canvas, interval.Name, -strokePaint.StrokeWidth);
+                }
+
+                startAngle += sweepAngle;
+            }
+
+            //then we draw a 'transparent' arc based on the elapsed time
+            if (ViewModel.CustomTimer?.IsRunning == true ||
+                ViewModel.CustomTimer?.IsPaused == true)
+            {
+                System.Diagnostics.Debug.WriteLine($"--------------Timer = {ViewModel.Name} is running/paused and a redraw was requested");
+                float totalElapsedTime = ViewModel.GetTimerCycleTotalElapsedTime();
+                startAngle = -90f;
+                sweepAngle = CalculateAngle(totalElapsedTime, totalTime);
+                UpdateCurrentInterval(rect, canvas, startAngle, sweepAngle);
+                ViewModel.RequestReDraw = false;
+            }
+            _rendering = false;
         }
 
         private void UpdateCurrentInterval(SKRect rect, SKCanvas canvas, float startAngle, float sweepAngle)
@@ -241,7 +244,7 @@ namespace TimeIt.UserControls
 
             foreach (var interval in ViewModel.Intervals.OrderBy(i => i.Position))
             {
-                sweepAngle = ViewModel.CalculateAngle(interval.Duration, ViewModel.GetTimerCycleTotalTime());
+                sweepAngle = CalculateAngle(interval.Duration, ViewModel.GetTimerCycleTotalTime());
                 if (interval.Position == currentInterval.Position)
                 {
                     break;
@@ -334,6 +337,12 @@ namespace TimeIt.UserControls
         {
             var appBgColor = (Color)Application.Current.Resources[AppConstants.AppBackgroundColorKey];
             return appBgColor.ToSKColor();
+        }
+
+        private float CalculateAngle(float time, float totalTime)
+        {
+            float intervalAngle = time * 360f / totalTime;
+            return intervalAngle;
         }
     }
 }
