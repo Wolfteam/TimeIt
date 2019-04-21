@@ -65,18 +65,19 @@
         </ColumnDefinitionCollection>
 
         <Style x:Key="MainGridStyle" TargetType="Grid">
-            <Setter Property="Margin" Value="20" />
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CommonStates">
                         <VisualState x:Name="Portrait">
                             <VisualState.Setters>
+                                <Setter Property="Margin" Value="{x:OnPlatform Android=20, Default='20,0,20,20'}" />
                                 <Setter Property="RowDefinitions" Value="{x:StaticResource DefaultRowsInPortrait}" />
                                 <Setter Property="ColumnDefinitions" Value="{x:StaticResource DefaultColumnsInPortrait}" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Landscape">
                             <VisualState.Setters>
+                                <Setter Property="Margin" Value="20" />
                                 <Setter Property="RowDefinitions" Value="{x:StaticResource DefaultRowsInLandscape}" />
                                 <Setter Property="ColumnDefinitions" Value="{x:StaticResource DefaultColumnsInLandscape}" />
                             </VisualState.Setters>

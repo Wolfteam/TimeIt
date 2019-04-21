@@ -34,7 +34,6 @@ namespace TimeIt.ViewModels
         private bool _isEditTimerButtonVisible;
         private bool _isDeleteTimerButtonVisible;
         private int _currentPage = 0;
-        private bool _canNavigate = true;
         private ObservableCollection<TimerItemViewModel> _timers = new ObservableCollection<TimerItemViewModel>();
 
         public bool Navigated;
@@ -66,6 +65,11 @@ namespace TimeIt.ViewModels
             => _appSettings.ShowElapsedInsteadOfRemainingTime
                 ? "Elapsed"
                 : "Remaining";
+
+        public string PauseButtonText
+            => Timers.Any(t => t.CustomTimer?.IsPaused == true)
+                ? "Resume"
+                : "Pause";
 
         public string ElapsedOrRemainingTimeText
         {
@@ -203,21 +207,22 @@ namespace TimeIt.ViewModels
             {
                 //CanNavigate = false;
                 if (Timers.Count > 0)
-                {
                     Timers[CurrentPage].StartTimer();
-                }
+                RaisePropertyChanged(() => PauseButtonText);
             });
 
             PauseTimerCommand = new RelayCommand(() =>
             {
                 if (Timers.Count > 0)
                     Timers[CurrentPage].PauseTimer();
+                RaisePropertyChanged(() => PauseButtonText);
             });
 
             StopTimerCommand = new RelayCommand(() =>
             {
                 if (Timers.Count > 0)
                     Timers[CurrentPage].StopTimer();
+                RaisePropertyChanged(() => PauseButtonText);
                 //CanNavigate = true;
             });
         }

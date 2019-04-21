@@ -416,7 +416,7 @@
                 IsEnabled="{Binding IsStartButtonEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                 IsVisible="{Binding MainButtonsAreVisible, Mode=OneWay}"
                 Style="{x:StaticResource PauseButtonStyle}"
-                Text="Pause" />
+                Text="{Binding PauseButtonText, Mode=OneWay}" />
 
             <customControls:TimerActionButton
                 x:Name="StopButton"
