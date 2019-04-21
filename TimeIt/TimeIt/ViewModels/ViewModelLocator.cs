@@ -28,6 +28,9 @@ namespace TimeIt.ViewModels
         public SettingsPageViewModel Settings
             => SimpleIoc.Default.GetInstance<SettingsPageViewModel>();
 
+        public static MainPageViewModel MainStatic
+            => SimpleIoc.Default.GetInstance<MainPageViewModel>();
+
         public ViewModelLocator()
         {
             if (SimpleIoc.Default.IsRegistered<INavigationService>())
@@ -55,12 +58,10 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
             SimpleIoc.Default.Register(() => new TimeItDbContext());
 
-
             SimpleIoc.Default.Register<MainPageViewModel>();
             SimpleIoc.Default.Register<TimerPageViewModel>();
             SimpleIoc.Default.Register<IntervalPageViewModel>();
             SimpleIoc.Default.Register<SettingsPageViewModel>();
         }
-
     }
 }

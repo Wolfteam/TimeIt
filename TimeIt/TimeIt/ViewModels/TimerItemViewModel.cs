@@ -1,9 +1,7 @@
-﻿using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+﻿using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 using TimeIt.Delegates;
 using TimeIt.Enums;
 using TimeIt.Helpers;
@@ -14,7 +12,6 @@ namespace TimeIt.ViewModels
     public class TimerItemViewModel
     {
         #region Fields
-
         private readonly IAppSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
@@ -80,9 +77,6 @@ namespace TimeIt.ViewModels
 
         #endregion
 
-        public ICommand PositionChangedCommand { get; private set; }
-
-
         public TimerItemViewModel(
             IAppSettingsService appSettings,
             ICustomDialogService dialogService,
@@ -95,10 +89,9 @@ namespace TimeIt.ViewModels
             RegisterMessages();
         }
 
+        #region Methods
         private void SetCommands()
         {
-            PositionChangedCommand = new RelayCommand<int>
-                (newPage => System.Diagnostics.Debug.WriteLine($"Position changed. New position = {newPage}"));
         }
 
         private void RegisterMessages()
@@ -122,13 +115,8 @@ namespace TimeIt.ViewModels
             //just a sanity check
             if (CustomTimer?.IsRunning == true || CustomTimer?.IsPaused == true)
                 return;
-            foreach (var interval in Intervals)
-            {
-                if (interval.TimeLeft <= 0)
-                    interval.TimeLeft = interval.Duration;
-                if (interval.Position == 1)
-                    interval.IsRunning = true;
-            }
+
+            ResetIntervals(true);
 
             _messenger.Send(TotalTime, $"{MessageType.MP_TOTAL_TIME_CHANGED}");
             _messenger.Send(false, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
@@ -167,11 +155,7 @@ namespace TimeIt.ViewModels
             CustomTimer.Stop();
             CustomTimer.IsPaused = false;
 
-            foreach (var interval in Intervals)
-            {
-                interval.IsRunning = false;
-                interval.TimeLeft = interval.Duration;
-            }
+            ResetIntervals();
 
             InvalidateSurfaceEvent.Invoke();
             _messenger.Send(true, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
@@ -222,13 +206,7 @@ namespace TimeIt.ViewModels
                     else
                     {
                         ElapsedRepetitions++;
-                        foreach (var interval in Intervals)
-                        {
-                            interval.IsRunning = false;
-                            interval.TimeLeft = interval.Duration;
-                            if (interval.Position == 1)
-                                interval.IsRunning = true;
-                        }
+                        ResetIntervals(true);
 
                         RequestReDraw = true;
                     }
@@ -263,17 +241,78 @@ namespace TimeIt.ViewModels
             return totalElapsedTime;
         }
 
-        public float CalculateAngle(float time, float totalTime)
-        {
-            float intervalAngle = time * 360f / totalTime;
-            return intervalAngle;
-        }
-
         public void SetDefaultTimeLeft()
         {
             foreach (var interval in Intervals)
             {
                 interval.TimeLeft = interval.Duration;
+            }
+        }
+
+        public void UpdateElapsedTime(float elapsedSeconds)
+        {
+            var currentInterval = Intervals.FirstOrDefault(i => i.IsRunning);
+            var intervalsToUpdate = Intervals
+                .Where(i => i.Position >= currentInterval.Position)
+                .OrderBy(i => i.Position);
+
+            if (elapsedSeconds >= TotalTime - ElapsedTime)
+            {
+                return;
+            }
+
+            for (int i = 0; i <= RemainingRepetitions; i++)
+            {
+                if (elapsedSeconds <= 0)
+                    break;
+
+                foreach (var interval in intervalsToUpdate)
+                {
+                    float diff = interval.TimeLeft - elapsedSeconds;
+                    if (diff < 0)
+                    {
+                        elapsedSeconds -= interval.TimeLeft;
+                        interval.IsRunning = false;
+                        interval.TimeLeft = 0;
+                    }
+                    else if (diff == 0)
+                    {
+                        interval.IsRunning = false;
+                        interval.TimeLeft = 0;
+                        var nextInterval = Intervals.FirstOrDefault(t => t.Position == interval.Position + 1);
+                        if (nextInterval != null)
+                        {
+                            nextInterval.IsRunning = true;
+                            nextInterval.TimeLeft -= _fps;
+                        }
+                        elapsedSeconds = 0;
+                        break;
+                    }
+                    else
+                    {
+                        interval.IsRunning = true;
+                        interval.TimeLeft -= elapsedSeconds;
+                        elapsedSeconds = 0;
+                        break;
+                    }
+                }
+
+                if (elapsedSeconds > 0)
+                {
+                    ElapsedRepetitions++;
+                    ResetIntervals();
+                }
+            }
+        }
+
+        private void ResetIntervals(bool enableFirstOne = false)
+        {
+            foreach (var interval in Intervals)
+            {
+                interval.IsRunning = false;
+                interval.TimeLeft = interval.Duration;
+                if (enableFirstOne && interval.Position == 1)
+                    interval.IsRunning = true;
             }
         }
 
@@ -314,5 +353,7 @@ namespace TimeIt.ViewModels
 
         //TODO: PROVIDE A SERVICE FOR THIS
         public bool IsDarkTheme() => true;
+
+        #endregion
     }
 }
