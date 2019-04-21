@@ -46,6 +46,16 @@ namespace TimeIt.ViewModels
             var mapperConfig = new MapperConfiguration(config =>
             {
                 config.AddProfiles(GetType().Assembly);
+                config.ConstructServicesUsing(t =>
+                {
+                    //ConstructServicesUsing gets called if you used it in the
+                    //mapping profile
+                    if (t == typeof(TimerItemViewModel))
+                    {
+                        return SimpleIoc.Default.GetInstanceWithoutCaching(t);
+                    }
+                    return SimpleIoc.Default.GetInstance(t);
+                });
             });
             SimpleIoc.Default.Register(() => mapperConfig.CreateMapper());
 
@@ -54,6 +64,7 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register<ICustomDialogService, DialogService>();
             SimpleIoc.Default.Register<IAppSettingsService, AppSettingsService>();
 
+            SimpleIoc.Default.Register(() => DependencyService.Get<INotificationService>());
             SimpleIoc.Default.Register(() => DependencyService.Get<IToastNotificator>());
             SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
             SimpleIoc.Default.Register(() => new TimeItDbContext());
@@ -62,6 +73,8 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register<TimerPageViewModel>();
             SimpleIoc.Default.Register<IntervalPageViewModel>();
             SimpleIoc.Default.Register<SettingsPageViewModel>();
+
+            SimpleIoc.Default.Register<TimerItemViewModel>();
         }
     }
 }

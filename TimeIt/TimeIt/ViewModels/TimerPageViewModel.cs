@@ -204,11 +204,10 @@ namespace TimeIt.ViewModels
             };
             await _timeItDataService.AddTimer(timer);
 
-            var vm = new TimerItemViewModel(_appSettings, _dialogService, _messenger);
-            var createdTimer = _mapper.Map(timer, vm);
-            createdTimer.SetDefaultTimeLeft();
+            var vm = _mapper.Map<TimerItemViewModel>(timer);
+            vm.SetDefaultTimeLeft();
 
-            _messenger.Send(createdTimer, $"{MessageType.MP_TIMER_CREATED}");
+            _messenger.Send(vm, $"{MessageType.MP_TIMER_CREATED}");
             _navigationService.GoBack();
         }
 
@@ -226,11 +225,10 @@ namespace TimeIt.ViewModels
 
             await _timeItDataService.UpdateTimer(timerToUpdate, newIntervals);
 
-            var vm = new TimerItemViewModel(_appSettings, _dialogService, _messenger);
-            var updatedTimer = _mapper.Map(timerToUpdate, vm);
-            updatedTimer.SetDefaultTimeLeft();
+            var vm = _mapper.Map<TimerItemViewModel>(timerToUpdate);
+            vm.SetDefaultTimeLeft();
 
-            _messenger.Send(updatedTimer, $"{MessageType.MP_TIMER_UPDATED}");
+            _messenger.Send(vm, $"{MessageType.MP_TIMER_UPDATED}");
             _navigationService.GoBack();
         }
 

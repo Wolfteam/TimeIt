@@ -279,8 +279,7 @@ namespace TimeIt.ViewModels
             var vms = new List<TimerItemViewModel>();
             foreach (var timer in timers)
             {
-                var vm = new TimerItemViewModel(_appSettings, _dialogService, _messenger);
-                _mapper.Map(timer, vm);
+                var vm = _mapper.Map<TimerItemViewModel>(timer);
                 vm.SetDefaultTimeLeft();
                 vms.Add(vm);
             }

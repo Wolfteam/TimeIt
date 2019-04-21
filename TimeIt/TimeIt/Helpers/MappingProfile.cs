@@ -19,7 +19,10 @@ namespace TimeIt.Helpers
                 .ForMember(d => d.Color, opt => opt.MapFrom(s => s.Color.ToHexString(true)))
                 .ReverseMap()
                 .ForMember(d => d.Color, opt => opt.MapFrom(s => Color.FromHex(s.Color)));
-            CreateMap<Timer, TimerItemViewModel>().ReverseMap();
+
+            CreateMap<Timer, TimerItemViewModel>()
+                .ConstructUsingServiceLocator()
+                .ReverseMap();
 
             CreateMap<IntervalListItemViewModel, Interval>()
                 .ForMember(d => d.Color, opt => opt.MapFrom(s => Color.FromHex(s.Color)))
