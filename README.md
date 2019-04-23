@@ -3,18 +3,17 @@
 
 Create multiple timers with n intervals and get notifications for each one and more.
 
-<img src="images/appIcon.png">
+<img height="150" width="150" src="images/appIcon.png">
 
 ## Images
 
 ### UWP
-<img src="images/android_landscape.png">
-<img src="images/android_portrait.png">
+<img height="300" src="images/uwp_landscape.png">
+<img height="300" src="images/uwp_portrait.PNG">
 
 ### Android
-<img src="images/uwp_landscape.png">
-<img src="images/uwp_portrait.png">
-
+<img height="300" src="images/android_landscape.png">
+<img height="300" src="images/android_portrait.png">
 
 ## Instalation
 
