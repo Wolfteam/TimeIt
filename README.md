@@ -17,7 +17,7 @@ Landscape             |  Portrait
 :-------------------------:|:-------------------------:
 ![](./images/android_landscape.png)  |  ![](./images/android_portrait.png)
 
-## Instalation
+## Installation
 
 ### UWP
 I currently don't have a developer account to publish this app in the Microsoft Store (WIP).... so to install this app:
