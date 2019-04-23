@@ -8,12 +8,14 @@ Create multiple timers with n intervals and get notifications for each one and m
 ## Images
 
 ### UWP
-<img height="300" src="images/uwp_landscape.png">
-<img height="300" src="images/uwp_portrait.PNG">
+Landscape             |  Portrait
+:-------------------------:|:-------------------------:
+![](./images/uwp_landscape.png)  |  ![](./images/uwp_portrait.PNG)
 
 ### Android
-<img height="300" src="images/android_landscape.png">
-<img height="300" src="images/android_portrait.png">
+Landscape             |  Portrait
+:-------------------------:|:-------------------------:
+![](./images/android_landscape.png)  |  ![](./images/android_portrait.png)
 
 ## Instalation
 
