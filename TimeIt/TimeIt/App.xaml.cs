@@ -1,7 +1,9 @@
-﻿using Plugin.Iconize;
+﻿using Newtonsoft.Json;
+using Plugin.Iconize;
 using System;
 using System.Linq;
 using TimeIt.Helpers;
+using TimeIt.Models;
 using TimeIt.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.WindowsSpecific;
@@ -12,7 +14,7 @@ namespace TimeIt
 {
     public partial class App : Application
     {
-        private const string SleepOccurredOn = "SleepOccurredOn";
+        private const string TimerOnSleep = "TimerOnSleep";
 
         public App()
         {
@@ -39,7 +41,7 @@ namespace TimeIt
         {
             // Handle when your app starts
             System.Diagnostics.Debug.WriteLine("OnStart");
-            if (Current.Properties.ContainsKey(SleepOccurredOn))
+            if (TimerWasRunning())
             {
                 OnResume();
             }
@@ -57,9 +59,16 @@ namespace TimeIt
 
             currentTimer.PauseTimer();
 
-            var now = DateTimeOffset.UtcNow;
-            Current.Properties.Remove(SleepOccurredOn);
-            Current.Properties.Add(SleepOccurredOn, now.ToString());
+            CleanProperties();
+
+            var interval = currentTimer.Intervals.First(i => i.IsRunning);
+            SetProperties(
+                currentTimer.TimerID, 
+                currentTimer.ElapsedRepetitions, 
+                currentTimer.RemainingRepetitions, 
+                currentTimer.ElapsedTime, 
+                interval.IntervalID, 
+                interval.TimeLeft);
 
             ViewModelLocator.WasAppInForeground = true;
         }
@@ -68,42 +77,60 @@ namespace TimeIt
         {
             System.Diagnostics.Debug.WriteLine("OnResume");
             // Handle when your app resumes
-            if (!Current.Properties.ContainsKey(SleepOccurredOn))
+            if (!TimerWasRunning())
             {
                 return;
             }
-            var now = DateTimeOffset.UtcNow;
-            var sleepOn = DateTimeOffset.Parse(Current.Properties[SleepOccurredOn] as string);
-            var diff = (int)now.Subtract(sleepOn).TotalSeconds;
+            var serialized = Current.Properties[TimerOnSleep] as string;
+            var timer = JsonConvert.DeserializeObject<TimerOnSleep>(serialized);
 
-            Current.Properties.Remove(SleepOccurredOn);
+            CleanProperties();
 
             var currentTimer = ViewModelLocator.MainStatic.Timers
-                .FirstOrDefault(t => t.CustomTimer?.IsPaused == true);
+                .FirstOrDefault(t => t.CustomTimer?.IsPaused == true || t.TimerID == timer.TimerID);
 
+            //this heppens when the app was close / killed
             if (currentTimer is null)
             {
+                ViewModelLocator.TimerOnSleep = timer;
                 return;
             }
 
-            //we slept too much...
-            if (diff >= currentTimer.RemainingTime)
-            {
-                currentTimer.StopTimer();
-                return;
-            }
+            currentTimer.OnResume(timer);
+        }
 
-            currentTimer.UpdateElapsedTime(diff);
-            //if we can resume a timer...
-            if (currentTimer.Intervals.Any(i => i.IsRunning))
+        private void SetProperties(
+            int timerID,
+            int elapsedRepetitions,
+            int remainingRepetitions,
+            float elapsedTime,
+            int intervalID,
+            float intervalTimeLeft)
+        {
+            var timer = new TimerOnSleep
             {
-                currentTimer.PauseTimer();
-            }
-            //we cant resume a timer, so lets stop it
-            else
-            {
-                currentTimer.StopTimer();
-            }
+                TimerID = timerID,
+                RemainingRepetitions = remainingRepetitions,
+                ElapsedRepetitions = elapsedRepetitions,
+                ElapsedTime = elapsedTime,
+                IntervalID = intervalID,
+                IntervalTimeLeft = intervalTimeLeft,
+                SleepOccurredOn = DateTimeOffset.UtcNow
+            };
+
+            var serialized = JsonConvert.SerializeObject(timer);
+
+            Current.Properties.Add(TimerOnSleep, serialized);
+        }
+
+        private void CleanProperties()
+        {
+            Current.Properties.Remove(TimerOnSleep);
+        }
+
+        private bool TimerWasRunning()
+        {
+            return Current.Properties.ContainsKey(TimerOnSleep);
         }
     }
 }

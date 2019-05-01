@@ -31,6 +31,8 @@ namespace TimeIt.ViewModels
         public static MainPageViewModel MainStatic
             => SimpleIoc.Default.GetInstance<MainPageViewModel>();
 
+        public static TimerOnSleep TimerOnSleep { get; set; }
+
         public ViewModelLocator()
         {
             if (SimpleIoc.Default.IsRegistered<INavigationService>())

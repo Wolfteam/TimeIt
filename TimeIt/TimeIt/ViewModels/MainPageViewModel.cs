@@ -288,6 +288,17 @@ namespace TimeIt.ViewModels
 
             CurrentSelectedTimerChanged();
 
+            //if a timer was running before the app was killed..
+            if (ViewModelLocator.TimerOnSleep != null)
+            {
+                var timer = Timers.FirstOrDefault(t => t.TimerID == ViewModelLocator.TimerOnSleep.TimerID);
+                //this is required to let the cards view do its things..
+                await Task.Delay(1);
+                CurrentPage = Timers.IndexOf(timer);
+                timer.OnResume(ViewModelLocator.TimerOnSleep);
+                ViewModelLocator.TimerOnSleep = null;
+            }
+
             _initialized = true;
         }
 
@@ -346,8 +357,8 @@ namespace TimeIt.ViewModels
             CurrentTimerName = currentTimer.Name;
             RemainingRepetitions = currentTimer.RemainingRepetitions;
             SetTotalTimeText(currentTimer.TotalTime);
-            SetElapsedOrRemainingTimeText(_appSettings.ShowElapsedInsteadOfRemainingTime 
-                ? currentTimer.ElapsedTime 
+            SetElapsedOrRemainingTimeText(_appSettings.ShowElapsedInsteadOfRemainingTime
+                ? currentTimer.ElapsedTime
                 : currentTimer.RemainingTime);
         }
 

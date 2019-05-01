@@ -6,6 +6,7 @@ using TimeIt.Delegates;
 using TimeIt.Enums;
 using TimeIt.Helpers;
 using TimeIt.Interfaces;
+using TimeIt.Models;
 
 namespace TimeIt.ViewModels
 {
@@ -121,13 +122,14 @@ namespace TimeIt.ViewModels
             _messenger.Send(TotalTime, $"{MessageType.MP_TOTAL_TIME_CHANGED}");
             _messenger.Send(false, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
 
-            CustomTimer = new CustomTimer(TimeSpan.FromSeconds(_fps), () =>
-            {
-                UpdateCurrentInterval();
-                InvalidateSurfaceEvent.Invoke();
-            });
+            InitCustomTimer();
 
             CustomTimer.Start();
+            //i need to be able to schedule all the notifications
+            //this notifications may be of type text - text + voice
+            //if i pause the timer, i need to cancel all the scheduled notifications but only
+            //when the app is not slept, you could add a parameter to the pause method
+            //when the timer calls the stop method, you should cancel all the notifications
         }
 
         public void PauseTimer()
@@ -157,7 +159,7 @@ namespace TimeIt.ViewModels
 
             ResetIntervals();
 
-            InvalidateSurfaceEvent.Invoke();
+            InvalidateSurfaceEvent?.Invoke();
             _messenger.Send(true, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
             ElapsedRepetitions = 0;
             _messenger.Send(
@@ -165,6 +167,47 @@ namespace TimeIt.ViewModels
                     ? 0f
                     : RemainingTime,
                 $"{MessageType.MP_ELAPSED_TIME_CHANGED}");
+        }
+
+        public void OnResume(TimerOnSleep timer)
+        {
+            //TODO: THIS CRAP IS BUGGED, SOMETIMES IT SHOWS A NEGATIVE
+            //INTERVAL LOL AND REMAINING KEEPS SUMING INSTEAD OF RESTING
+            var now = DateTimeOffset.UtcNow;
+            var diff = (int)now.Subtract(timer.SleepOccurredOn).TotalSeconds;
+
+            if (diff >= RemainingTime)
+            {
+                StopTimer();
+                return;
+            }
+
+            UpdateElapsedTime(timer, diff);
+
+            //if its null, its because the app was killed
+            if (CustomTimer is null)
+                InitCustomTimer();
+
+            //if we can resume the timer...
+            if (Intervals.Any(i => i.IsRunning))
+            {
+                _messenger.Send(false, $"{MessageType.MP_START_BUTTON_IS_ENABLED}");
+                PauseTimer();
+            }
+            //we cant resume it, so lets stop it
+            else
+            {
+                StopTimer();
+            }
+        }
+
+        private void InitCustomTimer()
+        {
+            CustomTimer = new CustomTimer(TimeSpan.FromSeconds(_fps), () =>
+            {
+                UpdateCurrentInterval();
+                InvalidateSurfaceEvent?.Invoke();
+            });
         }
 
         private void UpdateCurrentInterval()
@@ -249,19 +292,21 @@ namespace TimeIt.ViewModels
             }
         }
 
-        public void UpdateElapsedTime(float elapsedSeconds)
+        public void UpdateElapsedTime(TimerOnSleep timer, float elapsedSeconds)
         {
-            var currentInterval = Intervals.FirstOrDefault(i => i.IsRunning);
+            var currentInterval = Intervals.FirstOrDefault(i => i.IsRunning || i.IntervalID == timer.IntervalID);
+            currentInterval.TimeLeft = timer.IntervalTimeLeft;
             var intervalsToUpdate = Intervals
                 .Where(i => i.Position >= currentInterval.Position)
                 .OrderBy(i => i.Position);
 
-            if (elapsedSeconds >= TotalTime - ElapsedTime)
+            if (elapsedSeconds >= TotalTime - timer.ElapsedTime)
             {
+                ElapsedRepetitions = timer.ElapsedRepetitions;
                 return;
             }
 
-            for (int i = 0; i <= RemainingRepetitions; i++)
+            for (int i = 0; i <= timer.RemainingRepetitions; i++)
             {
                 if (elapsedSeconds <= 0)
                     break;
@@ -299,10 +344,12 @@ namespace TimeIt.ViewModels
 
                 if (elapsedSeconds > 0)
                 {
-                    ElapsedRepetitions++;
+                    timer.ElapsedRepetitions++;
                     ResetIntervals();
                 }
             }
+
+            ElapsedRepetitions = timer.ElapsedRepetitions;
         }
 
         private void ResetIntervals(bool enableFirstOne = false)
