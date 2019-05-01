@@ -40,6 +40,22 @@ namespace TimeIt.UWP
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            if (e.PrelaunchActivated)
+                return;
+            OnLaunchedOrActivated(e);
+        }
+
+        /// <summary>
+        /// Invoked when the application is activated by some means other than normal launching.
+        /// </summary>
+        /// <param name="e">Event data for the event.</param>
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            OnLaunchedOrActivated(args);
+        }
+
+        private void OnLaunchedOrActivated(IActivatedEventArgs args)
+        {
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -52,10 +68,10 @@ namespace TimeIt.UWP
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 Rg.Plugins.Popup.Popup.Init();
-                Xamarin.Forms.Forms.Init(e);
+                Xamarin.Forms.Forms.Init(args);
                 Xamarin.Forms.DependencyService.Register<ToastNotification>(); // Register your dependency
                 ToastNotification.Init();
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: Load state from previously suspended application
                 }
@@ -69,7 +85,7 @@ namespace TimeIt.UWP
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                rootFrame.Navigate(typeof(MainPage));
             }
             // Ensure the current window is active
             Window.Current.Activate();
