@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using TimeIt.Delegates;
@@ -16,7 +17,11 @@ namespace TimeIt.ViewModels
         private readonly IAppSettingsService _appSettings;
         private readonly ICustomDialogService _dialogService;
         private readonly IMessenger _messenger;
+        private readonly INotificationService _notificationService;
+        private readonly INotificationSoundProvider _notificationSoundProvider;
+        private readonly IBackgroundTaskService _backgroundTaskService;
         private int _elapsedRepetitions;
+        private readonly List<int> _notificationIds = new List<int>();
 
         //TODO: REMOVE THIS TWO AND MOVE IT TO A CONSTANTS FILE
         private const float _fps = 1f;
@@ -81,11 +86,17 @@ namespace TimeIt.ViewModels
         public TimerItemViewModel(
             IAppSettingsService appSettings,
             ICustomDialogService dialogService,
-            IMessenger messenger)
+            IMessenger messenger,
+            INotificationService notificationService,
+            INotificationSoundProvider notificationSoundProvider,
+            IBackgroundTaskService backgroundTaskService)
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
             _messenger = messenger;
+            _notificationService = notificationService;
+            _notificationSoundProvider = notificationSoundProvider;
+            _backgroundTaskService = backgroundTaskService;
             SetCommands();
             RegisterMessages();
         }
@@ -124,12 +135,14 @@ namespace TimeIt.ViewModels
 
             InitCustomTimer();
 
-            CustomTimer.Start();
             //i need to be able to schedule all the notifications
             //this notifications may be of type text - text + voice
             //if i pause the timer, i need to cancel all the scheduled notifications but only
             //when the app is not slept, you could add a parameter to the pause method
             //when the timer calls the stop method, you should cancel all the notifications
+            ScheduleNotifications();
+
+            CustomTimer.Start();
         }
 
         public void PauseTimer()
@@ -139,11 +152,17 @@ namespace TimeIt.ViewModels
 
             if (CustomTimer.IsRunning)
             {
+                //We only need to cancel / reschedule notific. when the app is running
+                if (!ViewModelLocator.WasAppInForeground)
+                    CancelScheduledNotifications();
                 CustomTimer.Stop();
                 CustomTimer.IsPaused = true;
             }
             else
             {
+                //We only need to cancel / reschedule notific. when the app is running
+                if (!ViewModelLocator.WasAppInForeground)
+                    ScheduleNotifications(true);
                 CustomTimer.Start();
                 CustomTimer.IsPaused = false;
             }
@@ -151,6 +170,7 @@ namespace TimeIt.ViewModels
 
         public void StopTimer()
         {
+            CancelScheduledNotifications();
             if (CustomTimer is null)
                 return;
 
@@ -171,6 +191,9 @@ namespace TimeIt.ViewModels
 
         public void OnResume(TimerOnSleep timer)
         {
+            //TODO: LET 2 INTERVALS PASS, CLOSE THE APP, OPEN IT AGAIN AFTER THE THIRD INTERVAL
+            //JUST STARTED AND YOU WILL SEE A WEIRD BUG WHERE THE VISUAL IS NOT CORRECTLY UPDATED
+
             //TODO: THIS CRAP IS BUGGED, SOMETIMES IT SHOWS A NEGATIVE
             //INTERVAL LOL AND REMAINING KEEPS SUMING INSTEAD OF RESTING
             var now = DateTimeOffset.UtcNow;
@@ -201,6 +224,123 @@ namespace TimeIt.ViewModels
             }
         }
 
+        //TODO: THIS IS NOT GETTING TRIGGERED AT THE CORRECT TIME
+        public void ScheduleNotifications(bool reschedule = false)
+        {
+            if (!_appSettings.AreNotificationsEnabled)
+                return;
+            int secondsBefore = _appSettings.SecondsBeforeIntervalEnds;
+            bool whenStarts = _appSettings.NotifyWhenIntervalStarts;
+            bool whenIsAboutToEnd = _appSettings.NotifyWhenIntervalIsAboutToEnd;
+            bool whenRepetitionCompletes = _appSettings.NotifyWhenARepetitionCompletes;
+
+            if (!whenStarts && !whenIsAboutToEnd && !whenRepetitionCompletes)
+                return;
+
+            string soundPath = _notificationSoundProvider
+                .GetSoundPath((CountdownSoundType)secondsBefore);
+
+            float secondsToAdd = 0;
+            int rep = reschedule ? RemainingRepetitions : Repetitions;
+
+            System.Diagnostics.Debug.WriteLine($"---Scheduling notifications in {(reschedule ? "Reschedule" : "Normal")} mode...");
+            System.Diagnostics.Debug.WriteLine($"---Repetitions = {rep}");
+
+            for (int i = 1; i <= rep; i++)
+            {
+                var now = DateTime.Now;
+                var intervals = reschedule
+                    ? Intervals
+                        .Where(x => x.Position >= Intervals.First(y => y.IsRunning).Position)
+                        .OrderBy(x => x.Position)
+                    : Intervals.OrderBy(p => p.Position);
+
+                System.Diagnostics.Debug.WriteLine($"---Current repetition = {i}");
+
+                foreach (var interval in intervals)
+                {
+                    var secondsToUse = reschedule ? interval.TimeLeft : interval.Duration;
+
+                    if (whenStarts &&
+                        ((reschedule && !interval.IsRunning) || !reschedule))
+                    {
+                        var id = (int)secondsToAdd;
+                        System.Diagnostics.Debug.WriteLine($"---Scheduled whenStarts for = {interval.Name} in = {id} seconds");
+                        _notificationService.Show(
+                            $"{Name} - {interval.Name} started",
+                            $"Time left = {TimeSpan.FromSeconds(interval.Duration).ToString(AppConstants.DefaultTimeSpanFormat)}",
+                            id,
+                            now.AddSeconds(id));
+
+                        _notificationIds.Add(id);
+                    }
+
+                    bool allowed = reschedule
+                        ? secondsToUse - secondsBefore > 0
+                        : secondsToUse - secondsBefore >= 0;
+
+                    if (whenIsAboutToEnd && allowed)
+                    {
+                        var diff = (int)(secondsToAdd + secondsToUse - secondsBefore);
+                        System.Diagnostics.Debug.WriteLine($"---Scheduled whenIsAboutToEnd for = {interval.Name} in = {diff} seconds");
+                        _notificationService.Show(
+                            $"{Name} - {interval.Name} is about to end",
+                            $"{secondsBefore} second(s) left",
+                            diff,
+                            now.AddSeconds(diff),
+                            soundPath);
+
+                        _notificationIds.Add(diff);
+                    }
+
+                    secondsToAdd += secondsToUse;
+                }
+
+                if (whenRepetitionCompletes)
+                {
+                    System.Diagnostics.Debug.WriteLine($"---Scheduled whenRepetitionCompletes in = {secondsToAdd} seconds");
+                    _notificationService.Show(
+                        $"Repetition completed",
+                        $"Repetition number = {i} completed for timer = {Name}",
+                        (int)secondsToAdd,
+                        now.AddSeconds(secondsToAdd));
+                    _notificationIds.Add((int)secondsToAdd);
+                }
+
+                //the things that depends on this variable are only needed once
+                reschedule = false;
+            }
+        }
+
+        public void CancelScheduledNotifications()
+        {
+            _backgroundTaskService.CancelAllSoundNotification();
+
+            foreach (int id in _notificationIds)
+            {
+                _notificationService.Cancel(id);
+            }
+            _notificationIds.Clear();
+
+            //Here we try to cancel every possible case,
+            //note that this is for the case when the app was killed
+            float secondsToAdd = 0;
+            float duration = Intervals.Sum(i => i.Duration);
+
+            for (int i = 1; i <= Repetitions; i++)
+            {
+                foreach (var interval in Intervals)
+                {
+                    float secondsBefore = secondsToAdd + interval.Duration - _appSettings.SecondsBeforeIntervalEnds;
+
+                    _notificationService.Cancel((int)secondsToAdd);
+                    _notificationService.Cancel((int)secondsBefore);
+                    secondsToAdd += interval.Duration;
+                }
+                _notificationService.Cancel((int)(duration * i));
+            }
+        }
+
         private void InitCustomTimer()
         {
             CustomTimer = new CustomTimer(TimeSpan.FromSeconds(_fps), () =>
@@ -219,28 +359,12 @@ namespace TimeIt.ViewModels
             System.Diagnostics.Debug.WriteLine(
                 $"--------------Vm - Interval = {currentInterval.Name}, time left = {currentInterval.TimeLeft}");
 
-            //if we are starting a fresh interval...
-            bool intervalStarted = currentInterval.TimeLeft == currentInterval.Duration;
-            if (intervalStarted)
-                ShowIntervalStartedNotification(currentInterval.Name);
-
-            //if the time left for this interval == seconds before interval ends
-            //we must notify it
-            if (currentInterval.TimeLeft <= AppConstants.MaxSecondsBeforeIntervalsEnd &&
-                currentInterval.TimeLeft - 1 == _appSettings.SecondsBeforeIntervalEnds)
-            {
-                ShowEndOfIntervalNotification(currentInterval.Name);
-            }
-
             if (currentInterval.TimeLeft <= 0)
             {
                 currentInterval.IsRunning = false;
                 var nextInterval = Intervals.FirstOrDefault(t => t.Position == currentInterval.Position + 1);
                 if (nextInterval is null)
                 {
-                    //if we completed a repetition...
-                    ShowEndOfRepetitionNotification(ElapsedRepetitions + 1);
-
                     if (Repetitions == ElapsedRepetitions + 1)
                     {
                         ElapsedRepetitions = 0;
@@ -256,7 +380,6 @@ namespace TimeIt.ViewModels
                 }
                 else
                 {
-                    ShowIntervalStartedNotification(nextInterval.Name);
                     nextInterval.IsRunning = true;
                     nextInterval.TimeLeft -= _fps;
                 }
@@ -294,17 +417,17 @@ namespace TimeIt.ViewModels
 
         public void UpdateElapsedTime(TimerOnSleep timer, float elapsedSeconds)
         {
-            var currentInterval = Intervals.FirstOrDefault(i => i.IsRunning || i.IntervalID == timer.IntervalID);
-            currentInterval.TimeLeft = timer.IntervalTimeLeft;
-            var intervalsToUpdate = Intervals
-                .Where(i => i.Position >= currentInterval.Position)
-                .OrderBy(i => i.Position);
-
             if (elapsedSeconds >= TotalTime - timer.ElapsedTime)
             {
                 ElapsedRepetitions = timer.ElapsedRepetitions;
                 return;
             }
+
+            var currentInterval = Intervals.FirstOrDefault(i => i.IsRunning || i.IntervalID == timer.IntervalID);
+            currentInterval.TimeLeft = timer.IntervalTimeLeft;
+            var intervalsToUpdate = Intervals
+                .Where(i => i.Position >= currentInterval.Position)
+                .OrderBy(i => i.Position);
 
             for (int i = 0; i <= timer.RemainingRepetitions; i++)
             {
@@ -369,33 +492,6 @@ namespace TimeIt.ViewModels
                 return;
             RequestReDraw = true;
             InvalidateSurfaceEvent?.Invoke();
-        }
-
-        private void ShowIntervalStartedNotification(string intervalName)
-        {
-            if (_appSettings.AreNotificationsEnabled &&
-                _appSettings.NotifyWhenIntervalStarts)
-            {
-                _dialogService.ShowNotification("Interval started", $"{intervalName} has just started.");
-            }
-        }
-
-        private void ShowEndOfIntervalNotification(string intervalName)
-        {
-            if (_appSettings.AreNotificationsEnabled &&
-                _appSettings.NotifyWhenIntervalIsAboutToEnd)
-            {
-                _dialogService.ShowNotification("Interval started", $"{intervalName} is about to end.");
-            }
-        }
-
-        private void ShowEndOfRepetitionNotification(int current)
-        {
-            if (_appSettings.AreNotificationsEnabled &&
-                _appSettings.NotifyWhenARepetitionCompletes)
-            {
-                _dialogService.ShowNotification("Repetition completed", $"Repetition = {current} completed.");
-            }
         }
 
         //TODO: PROVIDE A SERVICE FOR THIS

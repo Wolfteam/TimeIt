@@ -14,7 +14,15 @@ namespace TimeIt
 {
     public partial class App : Application
     {
+        /// <summary>
+        /// Key to save / retrieve the timer object that was running
+        /// </summary>
         private const string TimerOnSleep = "TimerOnSleep";
+
+        /// <summary>
+        /// Used to indicate if a android intent launched the app
+        /// </summary>
+        public static bool WasLaunchedFromIntent;
 
         public App()
         {
@@ -40,7 +48,13 @@ namespace TimeIt
         protected override void OnStart()
         {
             // Handle when your app starts
-            System.Diagnostics.Debug.WriteLine("OnStart");
+            System.Diagnostics.Debug.WriteLine("------OnStart");
+
+            if (WasLaunchedFromIntent)
+            {
+                return;
+            }
+
             if (TimerWasRunning())
             {
                 OnResume();
@@ -49,11 +63,17 @@ namespace TimeIt
 
         protected override void OnSleep()
         {
-            System.Diagnostics.Debug.WriteLine("OnSleep");
-            // Handle when your app sleeps
-            var currentTimer = ViewModelLocator.MainStatic.Timers
-                .FirstOrDefault(t => t.CustomTimer?.IsRunning == true);
+            System.Diagnostics.Debug.WriteLine("------OnSleep");
+            if (WasLaunchedFromIntent)
+            {
+                WasLaunchedFromIntent = false;
+                return;
+            }
 
+            ViewModelLocator.WasAppInForeground = true;
+
+            // Handle when your app sleeps
+            var currentTimer = ViewModelLocator.MainStatic.CurrentRunningTimer;
             if (currentTimer is null)
                 return;
 
@@ -69,13 +89,11 @@ namespace TimeIt
                 currentTimer.ElapsedTime, 
                 interval.IntervalID, 
                 interval.TimeLeft);
-
-            ViewModelLocator.WasAppInForeground = true;
         }
 
         protected override void OnResume()
         {
-            System.Diagnostics.Debug.WriteLine("OnResume");
+            System.Diagnostics.Debug.WriteLine("------OnResume");
             // Handle when your app resumes
             if (!TimerWasRunning())
             {
@@ -93,6 +111,7 @@ namespace TimeIt
             if (currentTimer is null)
             {
                 ViewModelLocator.TimerOnSleep = timer;
+                ViewModelLocator.WasAppInForeground = true;
                 return;
             }
 

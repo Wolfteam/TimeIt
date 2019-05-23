@@ -126,6 +126,12 @@ namespace TimeIt.ViewModels
             get => _timers;
             set => Set(ref _timers, value);
         }
+
+        public bool IsTimerRunning
+            => Timers.Any(t => t.CustomTimer?.IsRunning == true);
+
+        public TimerItemViewModel CurrentRunningTimer 
+            => Timers.FirstOrDefault(t => t.CustomTimer?.IsRunning == true);
         #endregion
 
         #region Commands
@@ -297,6 +303,7 @@ namespace TimeIt.ViewModels
                 CurrentPage = Timers.IndexOf(timer);
                 timer.OnResume(ViewModelLocator.TimerOnSleep);
                 ViewModelLocator.TimerOnSleep = null;
+                ViewModelLocator.WasAppInForeground = false;
             }
 
             _initialized = true;
