@@ -6,7 +6,7 @@ namespace TimeIt.Helpers
         public const string AppBackgroundColorKey = "AppBackgroundColor";
         public const string AppBarBackgroundColorKey = "AppBarBackgroundColor";
 
-        public const int MinSecondsBeforeIntervalsEnd = 1;
-        public const int MaxSecondsBeforeIntervalsEnd = 5;
+        public const int MinSecondsBeforeIntervalsEnd = 3;
+        public const int MaxSecondsBeforeIntervalsEnd = 10;
     }
 }
