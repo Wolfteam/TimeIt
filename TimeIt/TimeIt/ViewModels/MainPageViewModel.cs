@@ -297,7 +297,7 @@ namespace TimeIt.ViewModels
             //if a timer was running before the app was killed..
             if (ViewModelLocator.TimerOnSleep != null)
             {
-                var timer = Timers.FirstOrDefault(t => t.TimerID == ViewModelLocator.TimerOnSleep.TimerID);
+                var timer = Timers.First(t => t.TimerID == ViewModelLocator.TimerOnSleep.TimerID);
                 //this is required to let the cards view do its things..
                 await Task.Delay(1);
                 CurrentPage = Timers.IndexOf(timer);
@@ -405,9 +405,12 @@ namespace TimeIt.ViewModels
             => ElapsedOrRemainingTimeText = TimeSpan.FromSeconds(seconds).ToString(AppConstants.DefaultTimeSpanFormat);
 
         private void EnableStartAndAssociatedButtons(bool isEnabled)
-            => IsStartButtonEnabled =
-                    IsAddTimerButtonVisible =
-                        IsEditTimerButtonVisible =
-                            IsDeleteTimerButtonVisible = isEnabled;
+        {
+            IsStartButtonEnabled =
+                IsAddTimerButtonVisible =
+                    IsEditTimerButtonVisible =
+                        IsDeleteTimerButtonVisible = isEnabled;
+            RaisePropertyChanged(() => PauseButtonText);
+        }
     }
 }

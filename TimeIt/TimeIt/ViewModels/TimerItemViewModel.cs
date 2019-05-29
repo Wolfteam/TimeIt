@@ -191,11 +191,6 @@ namespace TimeIt.ViewModels
 
         public void OnResume(TimerOnSleep timer)
         {
-            //TODO: LET 2 INTERVALS PASS, CLOSE THE APP, OPEN IT AGAIN AFTER THE THIRD INTERVAL
-            //JUST STARTED AND YOU WILL SEE A WEIRD BUG WHERE THE VISUAL IS NOT CORRECTLY UPDATED
-
-            //TODO: THIS CRAP IS BUGGED, SOMETIMES IT SHOWS A NEGATIVE
-            //INTERVAL LOL AND REMAINING KEEPS SUMING INSTEAD OF RESTING
             var now = DateTimeOffset.UtcNow;
             var diff = (int)now.Subtract(timer.SleepOccurredOn).TotalSeconds;
 
@@ -224,7 +219,6 @@ namespace TimeIt.ViewModels
             }
         }
 
-        //TODO: THIS IS NOT GETTING TRIGGERED AT THE CORRECT TIME
         public void ScheduleNotifications(bool reschedule = false)
         {
             if (!_appSettings.AreNotificationsEnabled)
@@ -423,16 +417,27 @@ namespace TimeIt.ViewModels
                 return;
             }
 
-            var currentInterval = Intervals.FirstOrDefault(i => i.IsRunning || i.IntervalID == timer.IntervalID);
+            var currentInterval = Intervals.First(i => i.IntervalID == timer.IntervalID);
             currentInterval.TimeLeft = timer.IntervalTimeLeft;
-            var intervalsToUpdate = Intervals
-                .Where(i => i.Position >= currentInterval.Position)
-                .OrderBy(i => i.Position);
+            bool firstTime = true;
 
             for (int i = 0; i <= timer.RemainingRepetitions; i++)
             {
                 if (elapsedSeconds <= 0)
                     break;
+
+                var intervalsToUpdate = firstTime
+                    ? Intervals.Where(x => x.Position >= currentInterval.Position).OrderBy(x => x.Position)
+                    : Intervals.OrderBy(x => x.Position);
+
+                if (firstTime)
+                {
+                    foreach (var interval in Intervals.Where(x => x.Position < currentInterval.Position))
+                    {
+                        interval.IsRunning = false;
+                        interval.TimeLeft = 0;
+                    }
+                }
 
                 foreach (var interval in intervalsToUpdate)
                 {
@@ -470,6 +475,8 @@ namespace TimeIt.ViewModels
                     timer.ElapsedRepetitions++;
                     ResetIntervals();
                 }
+
+                firstTime = false;
             }
 
             ElapsedRepetitions = timer.ElapsedRepetitions;
