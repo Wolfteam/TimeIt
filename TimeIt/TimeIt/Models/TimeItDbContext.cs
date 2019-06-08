@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using TimeIt.Extensions;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace TimeIt.Models
@@ -9,6 +10,7 @@ namespace TimeIt.Models
     public class TimeItDbContext : DbContext
     {
         private const string databaseName = "timeIt.db";
+        private const string currentMigration = "Migration_v1";
 
         public DbSet<Timer> Timers { get; set; }
         public DbSet<Interval> Intervals { get; set; }
@@ -33,12 +35,19 @@ namespace TimeIt.Models
                 .WithMany(t => t.Intervals)
                 .HasForeignKey(i => i.TimerID);
 
-            modelBuilder.Entity<Timer>().HasData(new Timer
-            {
-                TimerID = 1,
-                Name = "Default",
-                Repetitions = 2
-            });
+            modelBuilder.Entity<Timer>().HasData(
+                new Timer
+                {
+                    TimerID = 1,
+                    Name = "Default",
+                    Repetitions = 2
+                }, new Timer
+                {
+                    TimerID = 2,
+                    Name = "Estados sin luz",
+                    Repetitions = 2
+                }
+            );
 
             modelBuilder.Entity<Interval>().HasData(
                 new Interval
@@ -67,6 +76,105 @@ namespace TimeIt.Models
                     Name = "Run",
                     Position = 3,
                     TimerID = 1
+                },
+                new Interval
+                {
+                    IntervalID = 4,
+                    Color = Color.Red,
+                    Duration = 180,
+                    Name = "Distrito Capital",
+                    Position = 1,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 5,
+                    Color = Color.White,
+                    Duration = 340,
+                    Name = "Zulia",
+                    Position = 2,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 6,
+                    Color = Color.Yellow,
+                    Duration = 300,
+                    Name = "Anzoategui",
+                    Position = 3,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 7,
+                    Color = Color.Violet,
+                    Duration = 240,
+                    Name = "Nueva Esparta",
+                    Position = 4,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 8,
+                    Color = Color.MintCream,
+                    Duration = 290,
+                    Name = "Guarico",
+                    Position = 5,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 9,
+                    Color = Color.AliceBlue,
+                    Duration = 280,
+                    Name = "Trujillo",
+                    Position = 6,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 10,
+                    Color = Color.IndianRed,
+                    Duration = 220,
+                    Name = "Tachira",
+                    Position = 7,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 11,
+                    Color = Color.Green,
+                    Duration = 180,
+                    Name = "Aragua",
+                    Position = 8,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 12,
+                    Color = Color.GreenYellow,
+                    Duration = 150,
+                    Name = "Bolivar",
+                    Position = 9,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 13,
+                    Color = Color.LawnGreen,
+                    Duration = 345,
+                    Name = "Aragua",
+                    Position = 10,
+                    TimerID = 2
+                },
+                new Interval
+                {
+                    IntervalID = 14,
+                    Color = Color.Khaki,
+                    Duration = 235,
+                    Name = "Delta Amacuro",
+                    Position = 11,
+                    TimerID = 2
                 }
            );
         }
@@ -96,9 +204,13 @@ namespace TimeIt.Models
 
         public static void Init()
         {
+            bool migrated = Preferences.ContainsKey(currentMigration);
+            if (migrated)
+                return;
             using (var context = new TimeItDbContext())
             {
                 context.Database.Migrate();
+                Preferences.Set(currentMigration, true);
             }
         }
     }
