@@ -14,7 +14,7 @@ namespace TimeIt.Services
 
         public NotificationType CurrentNotificationType
         {
-            get => (NotificationType)Preferences.Get(nameof(CurrentNotificationType), (int)NotificationType.VOICE);
+            get => (NotificationType)Preferences.Get(nameof(CurrentNotificationType), (int)NotificationType.TOAST);
             set => Preferences.Set(nameof(CurrentNotificationType), (int)value);
         }
 
@@ -48,10 +48,16 @@ namespace TimeIt.Services
             set => Preferences.Set(nameof(NotifyWhenARepetitionCompletes), value);
         }
 
-        public int Volumne
+        public int Volume
         {
-            get => Preferences.Get(nameof(Volumne), 70);
-            set => Preferences.Set(nameof(Volumne), value);
+            get => Preferences.Get(nameof(Volume), 70);
+            set => Preferences.Set(nameof(Volume), value);
+        }
+
+        public bool ToastWithSound
+        {
+            get => Preferences.Get(nameof(ToastWithSound), false);
+            set => Preferences.Set(nameof(ToastWithSound), value);
         }
     }
 }

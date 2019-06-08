@@ -11,6 +11,7 @@ namespace TimeIt.Interfaces
         int SecondsBeforeIntervalEnds { get; set; }
         bool NotifyWhenIntervalIsAboutToEnd { get; set; }
         bool NotifyWhenARepetitionCompletes { get; set; }
-        int Volumne { get; set; }
+        int Volume { get; set; }
+        bool ToastWithSound { get; set; }
     }
 }

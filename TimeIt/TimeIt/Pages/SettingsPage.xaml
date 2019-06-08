@@ -11,7 +11,7 @@
 
     <ContentPage.Resources>
         <ColumnDefinitionCollection x:Key="SettingsColumns">
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="*" />
         </ColumnDefinitionCollection>
         <Thickness x:Key="SettingsMargin">
@@ -180,6 +180,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <!--  Notification enabled  -->
@@ -226,9 +227,40 @@
                         TextColor="White" />
                 </Grid>
 
-                <!--  Start of interval  -->
+                <!--  Toast with sound  -->
                 <Grid
                     Grid.Row="2"
+                    Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}"
+                    IsVisible="{Binding IsToastWithSoundVisible, Mode=OneWay}"
+                    RowSpacing="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackLayout
+                        Grid.Column="0"
+                        Orientation="Vertical"
+                        VerticalOptions="Center">
+                        <Label Text="Toast with custom sound" />
+                        <Label
+                            Margin="10,0,0,0"
+                            FontSize="{x:OnPlatform Android=Small,
+                                                    Default=Default}"
+                            Text="Plays a countdown sound"
+                            TextColor="Red" />
+                    </StackLayout>
+                    <Switch
+                        Grid.Column="1"
+                        HorizontalOptions="End"
+                        IsEnabled="{Binding AreNotificationsEnabled, Mode=OneWay}"
+                        IsToggled="{Binding ToastWithSound, Mode=TwoWay}"
+                        OnColor="Red" />
+                </Grid>
+
+                <!--  Start of interval  -->
+                <Grid
+                    Grid.Row="3"
                     Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
                     ColumnDefinitions="{x:StaticResource SettingsColumns}">
                     <Label
@@ -246,7 +278,7 @@
 
                 <!--  End of interval  -->
                 <Grid
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
                     ColumnDefinitions="{x:StaticResource SettingsColumns}">
                     <Label
@@ -264,7 +296,7 @@
 
                 <!--  Seconds before interval ends  -->
                 <Grid
-                    Grid.Row="4"
+                    Grid.Row="5"
                     Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
                     ColumnDefinitions="{x:StaticResource SettingsColumns}"
                     IsVisible="{Binding NotifyWhenIntervalIsAboutToEnd, Mode=OneWay}">
@@ -288,7 +320,7 @@
 
                 <!--  End of repetitions  -->
                 <Grid
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
                     ColumnDefinitions="{x:StaticResource SettingsColumns}">
                     <Label
@@ -306,9 +338,10 @@
 
                 <!--  Volume  -->
                 <Grid
-                    Grid.Row="6"
+                    Grid.Row="7"
                     Margin="{x:OnPlatform Android={StaticResource SettingsMargin}}"
-                    ColumnDefinitions="{x:StaticResource SettingsColumns}">
+                    ColumnDefinitions="{x:StaticResource SettingsColumns}"
+                    IsVisible="{Binding IsNotificationVolumeVisible, Mode=OneWay}">
                     <Label
                         Grid.Column="0"
                         HorizontalOptions="Start"
@@ -335,10 +368,14 @@
                 HorizontalOptions="Start"
                 Text="About" />
             <uc:LineControl LineHeight="2" />
-            <Grid Margin="{x:StaticResource SettingsMargin}" ColumnDefinitions="{StaticResource SettingsColumns}">
+            <Grid Margin="{x:StaticResource SettingsMargin}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
                 <StackLayout
                     Grid.Row="0"
                     Grid.Column="0"

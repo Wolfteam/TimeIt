@@ -21,17 +21,18 @@ namespace TimeIt.ViewModels
         #endregion
 
         #region Properties
-        public List<NotificationType> NotificationTypes { get; } = new List<NotificationType>
-        {
-            NotificationType.VOICE,
-            NotificationType.TOAST,
-            NotificationType.BOTH
-        };
+        public List<NotificationType> NotificationTypes { get; private set; }
+            = new List<NotificationType>();
 
         public NotificationType CurrentNotificationType
         {
             get => _appSettings.CurrentNotificationType;
-            set => _appSettings.CurrentNotificationType = value;
+            set
+            {
+                _appSettings.CurrentNotificationType = value;
+                RaisePropertyChanged(() => IsNotificationVolumeVisible);
+                RaisePropertyChanged(() => IsToastWithSoundVisible);
+            }
         }
 
         public bool AreNotificationsEnabled
@@ -78,10 +79,10 @@ namespace TimeIt.ViewModels
 
         public int NotificationVolume
         {
-            get => _appSettings.Volumne;
+            get => _appSettings.Volume;
             set
             {
-                _appSettings.Volumne = value;
+                _appSettings.Volume = value;
                 RaisePropertyChanged(() => NotificationVolume);
             }
         }
@@ -96,6 +97,18 @@ namespace TimeIt.ViewModels
             }
         }
 
+        public bool IsNotificationVolumeVisible
+            => CurrentNotificationType == NotificationType.VOICE;
+
+        public bool IsToastWithSoundVisible
+            => CurrentNotificationType == NotificationType.TOAST;
+
+        public bool ToastWithSound
+        {
+            get => _appSettings.ToastWithSound;
+            set => _appSettings.ToastWithSound = value;
+        }
+
         public string AppName
             => AppInfo.Name;
 
@@ -103,18 +116,27 @@ namespace TimeIt.ViewModels
             => AppInfo.VersionString;
         #endregion
 
+        #region Commands
         public ICommand SecondsBeforeIntervalEndsCommand { get; private set; }
         public ICommand ChangeVolumeCommand { get; private set; }
         public ICommand OpenGithubCommand { get; private set; }
+        #endregion
 
         public SettingsPageViewModel(
-            IAppSettingsService appSettings, 
+            IAppSettingsService appSettings,
             ICustomDialogService dialogService,
             IMessenger messenger)
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
             _messenger = messenger;
+
+            NotificationTypes.Add(NotificationType.TOAST);
+            //if (Device.RuntimePlatform != Device.UWP)
+            //{
+            //    NotificationTypes.Add(NotificationType.VOICE);
+            //}
+
             SetCommands();
         }
 
@@ -137,9 +159,9 @@ namespace TimeIt.ViewModels
             ChangeVolumeCommand = new RelayCommand(async () =>
             {
                 var result = await _dialogService
-                    .ShowSliderDialogAsync("Notification volume", _appSettings.Volumne);
+                    .ShowSliderDialogAsync("Notification volume", _appSettings.Volume);
 
-                if (result is null || result == _appSettings.Volumne)
+                if (result is null || result == _appSettings.Volume)
                     return;
 
                 NotificationVolume = (int)result.Value;

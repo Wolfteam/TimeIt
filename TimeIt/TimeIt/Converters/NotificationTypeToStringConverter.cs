@@ -16,8 +16,6 @@ namespace TimeIt.Converters
                     return "Voice";
                 case NotificationType.TOAST:
                     return "Toast";
-                case NotificationType.BOTH:
-                    return "Both";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(notificationType), notificationType, $"The provided notificaion type is not valid");
             }
