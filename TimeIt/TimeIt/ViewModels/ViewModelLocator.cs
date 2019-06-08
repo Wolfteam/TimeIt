@@ -47,7 +47,7 @@ namespace TimeIt.ViewModels
 
             var mapperConfig = new MapperConfiguration(config =>
             {
-                config.AddProfiles(GetType().Assembly);
+                config.AddProfiles(typeof(Helpers.MappingProfile));
                 config.ConstructServicesUsing(t =>
                 {
                     //ConstructServicesUsing gets called if you used it in the
@@ -67,8 +67,10 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register<IAppSettingsService, AppSettingsService>();
 
             SimpleIoc.Default.Register(() => DependencyService.Get<INotificationService>());
+            SimpleIoc.Default.Register(() => DependencyService.Get<INotificationSoundProvider>());
             SimpleIoc.Default.Register(() => DependencyService.Get<IToastNotificator>());
             SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
+            SimpleIoc.Default.Register(() => DependencyService.Get<IBackgroundTaskService>());
             SimpleIoc.Default.Register(() => new TimeItDbContext());
 
             SimpleIoc.Default.Register<MainPageViewModel>();

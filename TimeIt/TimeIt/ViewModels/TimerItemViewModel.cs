@@ -227,12 +227,16 @@ namespace TimeIt.ViewModels
             bool whenStarts = _appSettings.NotifyWhenIntervalStarts;
             bool whenIsAboutToEnd = _appSettings.NotifyWhenIntervalIsAboutToEnd;
             bool whenRepetitionCompletes = _appSettings.NotifyWhenARepetitionCompletes;
+            NotificationType currentNotifType = _appSettings.CurrentNotificationType;
 
             if (!whenStarts && !whenIsAboutToEnd && !whenRepetitionCompletes)
                 return;
 
-            string soundPath = _notificationSoundProvider
-                .GetSoundPath((CountdownSoundType)secondsBefore);
+            string notifSoundPath = currentNotifType == NotificationType.TOAST && _appSettings.ToastWithSound
+                ? _notificationSoundProvider.GetSoundPath((CountdownSoundType)secondsBefore)
+                : null;
+
+            int volume = _appSettings.Volume;
 
             float secondsToAdd = 0;
             int rep = reschedule ? RemainingRepetitions : Repetitions;
@@ -260,13 +264,17 @@ namespace TimeIt.ViewModels
                     {
                         var id = (int)secondsToAdd;
                         System.Diagnostics.Debug.WriteLine($"---Scheduled whenStarts for = {interval.Name} in = {id} seconds");
-                        _notificationService.Show(
-                            $"{Name} - {interval.Name} started",
-                            $"Time left = {TimeSpan.FromSeconds(interval.Duration).ToString(AppConstants.DefaultTimeSpanFormat)}",
-                            id,
-                            now.AddSeconds(id));
 
-                        _notificationIds.Add(id);
+                        if (currentNotifType == NotificationType.TOAST)
+                        {
+                            _notificationService.Show(
+                                $"{Name} - {interval.Name} started",
+                                $"Time left = {TimeSpan.FromSeconds(interval.Duration).ToString(AppConstants.DefaultTimeSpanFormat)}",
+                                id,
+                                now.AddSeconds(id));
+
+                            _notificationIds.Add(id);
+                        }
                     }
 
                     bool allowed = reschedule
@@ -277,14 +285,17 @@ namespace TimeIt.ViewModels
                     {
                         var diff = (int)(secondsToAdd + secondsToUse - secondsBefore);
                         System.Diagnostics.Debug.WriteLine($"---Scheduled whenIsAboutToEnd for = {interval.Name} in = {diff} seconds");
-                        _notificationService.Show(
-                            $"{Name} - {interval.Name} is about to end",
-                            $"{secondsBefore} second(s) left",
-                            diff,
-                            now.AddSeconds(diff),
-                            soundPath);
+                        if (currentNotifType == NotificationType.TOAST)
+                        {
+                            _notificationService.Show(
+                                $"{Name} - {interval.Name} is about to end",
+                                $"{secondsBefore} second(s) left",
+                                diff,
+                                now.AddSeconds(diff),
+                                notifSoundPath);
 
-                        _notificationIds.Add(diff);
+                            _notificationIds.Add(diff);
+                        }
                     }
 
                     secondsToAdd += secondsToUse;
@@ -293,12 +304,15 @@ namespace TimeIt.ViewModels
                 if (whenRepetitionCompletes)
                 {
                     System.Diagnostics.Debug.WriteLine($"---Scheduled whenRepetitionCompletes in = {secondsToAdd} seconds");
-                    _notificationService.Show(
-                        $"Repetition completed",
-                        $"Repetition number = {i} completed for timer = {Name}",
-                        (int)secondsToAdd,
-                        now.AddSeconds(secondsToAdd));
-                    _notificationIds.Add((int)secondsToAdd);
+                    if (currentNotifType == NotificationType.TOAST)
+                    {
+                        _notificationService.Show(
+                            $"Repetition completed",
+                            $"Repetition number = {i} completed for timer = {Name}",
+                            (int)secondsToAdd,
+                            now.AddSeconds(secondsToAdd));
+                        _notificationIds.Add((int)secondsToAdd);
+                    }
                 }
 
                 //the things that depends on this variable are only needed once

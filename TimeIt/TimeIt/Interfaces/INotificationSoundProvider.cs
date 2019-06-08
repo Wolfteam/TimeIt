@@ -7,6 +7,6 @@ namespace TimeIt.Interfaces
     {
         string GetSoundPath(CountdownSoundType soundType);
         Stream GetSoundStream(CountdownSoundType soundType);
-        void Play(CountdownSoundType soundType);
+        void Play(CountdownSoundType soundType, int volume = 100);
     }
 }
