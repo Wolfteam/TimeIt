@@ -10,10 +10,11 @@ using Xamarin.Forms;
 using Plugin.Toasts;
 using PanCardView.Droid;
 using Plugin.Iconize;
+using Android.Content;
 
 namespace TimeIt.Droid
 {
-    [Activity(Label = "TimeIt", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ResizeableActivity = true)]
+    [Activity(Label = "TimeIt", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ResizeableActivity = true, LaunchMode = LaunchMode.SingleTask)]
     public class MainActivity : Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -52,6 +53,11 @@ namespace TimeIt.Droid
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        protected override void OnNewIntent(Intent intent)
+        {
+            App.WasLaunchedFromIntent = true;
         }
     }
 }
