@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<linker>
+  <!--
+    Linking example file, this app does not use user assembly linking (with that the diff. in size is just 5 mb~), 
+    so this file is not needed. 
+    I will leave it here just in case i want to complete it
+  -->
+  <assembly fullname="mscorlib">
+    <!--Sqlite-->
+    <type fullname="System.DateTime" preserve="methods" />
+    <!--Automapper-->
+    <type fullname="System.Convert" preserve="All" />
+  </assembly>
+
+  <assembly fullname="AutoMapper">
+    <type fullname="AutoMapper.Mappers.ConvertMapper" preserve="All" />
+    <type fullname="AutoMapper.Mappers.CollectionMapper" preserve="All" />
+    <type fullname="AutoMapper.Mappers.EnumerableMapper" preserve="All" />
+    <type fullname="AutoMapper.Mappers.CollectionMapper+EnumerableMapper" preserve="All" />
+    <type fullname="AutoMapper*" preserve="All" />
+    <type fullname="AutoMapper.*" preserve="All" />
+  </assembly>
+
+  <assembly fullname="GalaSoft.MvvmLight">
+    <type fullname="GalaSoft.MvvmLight.Ioc.*" preserve="All" />
+    <type fullname="GalaSoft.MvvmLight.Messaging.*" preserve="All" />
+    <type fullname="GalaSoft.MvvmLight.Views.*" preserve="All" />
+    <type fullname="GalaSoft.MvvmLight.*" preserve="All" />
+  </assembly>
+</linker>

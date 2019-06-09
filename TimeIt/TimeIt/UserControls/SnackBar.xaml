@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<TemplatedView
+    x:Class="TimeIt.UserControls.SnackBar"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <TemplatedView.ControlTemplate>
+        <ControlTemplate>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Margin="20,5,5,5"
+                    FontSize="{TemplateBinding FontSize}"
+                    HorizontalOptions="FillAndExpand"
+                    LineBreakMode="WordWrap"
+                    Text="{TemplateBinding Message}"
+                    TextColor="{TemplateBinding TextColor}"
+                    VerticalOptions="Center" />
+
+                <Button
+                    x:Name="okButton"
+                    Grid.Column="1"
+                    Margin="5"
+                    Clicked="OkButton_Clicked"
+                    FontSize="{TemplateBinding FontSisze}"
+                    HorizontalOptions="End"
+                    IsVisible="{TemplateBinding ShowOkButton}"
+                    Text="{TemplateBinding OkButtonText}"
+                    TextColor="{TemplateBinding OkButtonTextColor}"
+                    VerticalOptions="Center" />
+
+
+                <Button
+                    x:Name="closeButton"
+                    Grid.Column="2"
+                    Margin="5"
+                    Clicked="CloseButton_Clicked"
+                    FontSize="{TemplateBinding FontSisze}"
+                    HorizontalOptions="End"
+                    Text="{TemplateBinding CloseButtonText}"
+                    TextColor="{TemplateBinding CloseButtonTextColor}"
+                    VerticalOptions="Center" />
+            </Grid>
+        </ControlTemplate>
+    </TemplatedView.ControlTemplate>
+</TemplatedView>
