@@ -29,7 +29,7 @@ namespace TimeIt.Services
                 IsClickable = false,
                 AndroidOptions = new AndroidOptions
                 {
-                    HexColor = Color.Red.ToHex()                    
+                    HexColor = Color.Red.ToHex()
                 }
             };
             _toastNotificator.Notify(options);

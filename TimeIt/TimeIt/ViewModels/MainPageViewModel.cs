@@ -130,7 +130,7 @@ namespace TimeIt.ViewModels
         public bool IsTimerRunning
             => Timers.Any(t => t.CustomTimer?.IsRunning == true);
 
-        public TimerItemViewModel CurrentRunningTimer 
+        public TimerItemViewModel CurrentRunningTimer
             => Timers.FirstOrDefault(t => t.CustomTimer?.IsRunning == true);
         #endregion
 

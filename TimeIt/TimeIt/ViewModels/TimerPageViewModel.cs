@@ -339,7 +339,7 @@ namespace TimeIt.ViewModels
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(TimerName)) 
+            if (!string.IsNullOrEmpty(TimerName))
                 return true;
             _dialogService.ShowSimpleMessage("You need to provide a timer name");
             return false;

@@ -47,7 +47,7 @@ namespace TimeIt.ViewModels
 
             var mapperConfig = new MapperConfiguration(config =>
             {
-                config.AddProfiles(typeof(Helpers.MappingProfile));
+                config.AddMaps(typeof(Helpers.MappingProfile).Assembly);
                 config.ConstructServicesUsing(t =>
                 {
                     //ConstructServicesUsing gets called if you used it in the
