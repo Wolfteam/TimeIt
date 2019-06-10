@@ -17,7 +17,7 @@ namespace TimeIt.Droid.Background
             string extra = intent.GetStringExtra(LocalNotificationKey);
             var notif = JsonConvert.DeserializeObject<LocalNotification>(extra);
             var notifService = DependencyService.Get<INotificationService>() as NotificationService;
-            notifService.Show(notif.Id, notif.Title, notif.Body);
+            notifService.Show(notif.Id, notif.Title, notif.Body, notif.SoundPath);
         }
     }
 }
