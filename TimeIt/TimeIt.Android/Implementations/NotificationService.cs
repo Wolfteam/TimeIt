@@ -4,13 +4,12 @@ using Android.Graphics;
 using Android.Media;
 using Android.OS;
 using Android.Support.V4.App;
-using Java.Util;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
 using TimeIt.Droid.Background;
 using TimeIt.Droid.Implementations;
 using TimeIt.Droid.Models;
+using TimeIt.Enums;
 using TimeIt.Interfaces;
 
 [assembly: Xamarin.Forms.Dependency(typeof(NotificationService))]
@@ -18,10 +17,15 @@ namespace TimeIt.Droid.Implementations
 {
     public class NotificationService : INotificationService
     {
-        private string PackageName
+        private static string PackageName
             => Application.Context.PackageName;
-        private string ChannelId
+
+        public static string GeneralChannelId
             => $"{PackageName}.general";
+
+        public static string LowChannelId
+            => $"{PackageName}.low";
+
         private NotificationManager NotifManager
             => (NotificationManager)Application.Context.GetSystemService(Context.NotificationService);
 
@@ -41,21 +45,50 @@ namespace TimeIt.Droid.Implementations
             notificationManager.Cancel(id);
         }
 
-        public void Show(string title, string body, string soundNotificationPath = null)
+        public void Show(string title, string body, SoundType? soundType)
         {
-            Show(0, title, body, soundNotificationPath);
+            Show(0, title, body, soundType);
         }
 
-        public void Show(int id, string title, string body, string soundNotificationPath = null)
+        public void Show(int id, string title, string body, SoundType? soundType)
         {
             var appIcon = BitmapFactory.DecodeResource(Application.Context.Resources, Resource.Drawable.appIcon);
             Bitmap bm = Bitmap.CreateScaledBitmap(appIcon,
-               48,
-               48,
-               true);
+                48,
+                48,
+                true);
+            bool hasSound = soundType.HasValue;
+            var soundProvider = Xamarin.Forms.DependencyService.Get<INotificationSoundProvider>();
 
-            var soundUri = !string.IsNullOrEmpty(soundNotificationPath)
-                ? Android.Net.Uri.Parse(soundNotificationPath)
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                var generalChannel = new NotificationChannel(GeneralChannelId, "Notifications", NotificationImportance.Default)
+                {
+                    LightColor = Resource.Color.colorAccent,
+                    Description = "App notifications with sound"
+                };
+                var lowChannel = new NotificationChannel(LowChannelId, "General", NotificationImportance.Low)
+                {
+                    LightColor = Resource.Color.colorAccent,
+                    Description = "App notifications without sound",
+                };
+
+                generalChannel.EnableLights(true);
+                lowChannel.EnableLights(true);
+                lowChannel.SetSound(null, null);
+
+                NotifManager.CreateNotificationChannel(generalChannel);
+                NotifManager.CreateNotificationChannel(lowChannel);
+
+                // play sound
+                if (hasSound)
+                {
+                    soundProvider.Play(soundType.Value);
+                }
+            }
+
+            var soundUri = hasSound
+                ? Android.Net.Uri.Parse(soundProvider.GetSoundPath(soundType.Value))
                 : RingtoneManager.GetDefaultUri(RingtoneType.Notification);
 
             var audioAttributes = new AudioAttributes.Builder()
@@ -64,43 +97,9 @@ namespace TimeIt.Droid.Implementations
                 .SetLegacyStreamType(Stream.Alarm)
                 .Build();
 
-            string channelId = ChannelId;
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                bool createNewChannel = true;
-                var existingChannel = NotifManager.NotificationChannels.FirstOrDefault();
-                if (existingChannel != null)
-                {
-                    bool hasDiffSounud = existingChannel.Sound.EncodedSchemeSpecificPart != soundUri.EncodedSchemeSpecificPart;
-                    if (hasDiffSounud)
-                    {
-                        NotifManager.DeleteNotificationChannel(existingChannel.Id);
-                    }
-                    else
-                    {
-                        channelId = existingChannel.Id;
-                        createNewChannel = false;
-                    }
-                }
-                //Once a notif. channel is created, you cannot edid it via code...
-                //so you have to create a new one in order to set a diff sound
-                //the problem with this approach is that in the app notif., it will
-                //appear a msg that says that a category was deleted
-                if (createNewChannel)
-                {
-                    channelId = ChannelId + UUID.RandomUUID().ToString();
-                    var channel = new NotificationChannel(channelId, "General", NotificationImportance.Default);
-                    channel.SetSound(soundUri, audioAttributes);
-                    channel.EnableLights(true);
-                    channel.LightColor = Resource.Color.colorAccent;
-                    NotifManager.CreateNotificationChannel(channel);
-                }
-            }
-
-            var bundle = new Bundle();
-            bundle.PutString(nameof(NotificationService), $"{id}");
-
-            var resultIntent = GetLauncherActivity();
+            //we use the main because we dont want to show the splash again..
+            //and because the splash produces a bug where the timer gets paused xd
+            var resultIntent = new Intent(Application.Context, typeof(MainActivity));
             //resultIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTop | ActivityFlags.SingleTop);
             //resultIntent.SetAction(Intent.ActionMain);
             //resultIntent.AddCategory(Intent.CategoryLauncher);
@@ -108,10 +107,13 @@ namespace TimeIt.Droid.Implementations
             //resultIntent.SetFlags(ActivityFlags.NewTask);
 
             //var pendingIntent = PendingIntent.GetActivity(Application.Context, 1, resultIntent, PendingIntentFlags.UpdateCurrent);
+            var bundle = new Bundle();
+            bundle.PutString(nameof(NotificationService), $"{id}");
             var pendingIntent = Android.Support.V4.App.TaskStackBuilder.Create(Application.Context)
                 .AddNextIntent(resultIntent)
                 .GetPendingIntent(1, (int)PendingIntentFlags.UpdateCurrent, bundle);
 
+            string channelId = hasSound ? LowChannelId : GeneralChannelId;
             var builder = new Notification.Builder(Application.Context, channelId)
                 .SetContentTitle(title)
                 .SetContentText(body)
@@ -121,7 +123,7 @@ namespace TimeIt.Droid.Implementations
                 .SetLargeIcon(bm)
                 .SetContentIntent(pendingIntent);
 
-            if (!string.IsNullOrEmpty(soundNotificationPath) &&
+            if (hasSound &&
                 Build.VERSION.SdkInt < BuildVersionCodes.O)
             {
                 //This are deprecated for android O +
@@ -130,7 +132,6 @@ namespace TimeIt.Droid.Implementations
                 builder.SetPriority(NotificationCompat.PriorityDefault);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
-
             var notification = builder.Build();
 
             NotifManager.Notify(id, notification);
@@ -141,14 +142,14 @@ namespace TimeIt.Droid.Implementations
             string body,
             int id,
             DateTime deliveryOn,
-            string soundNotificationPath = null)
+            SoundType? soundType)
         {
             var now = DateTime.Now;
             bool showNow = deliveryOn <= now;
 
             if (showNow)
             {
-                Show(id, title, body, soundNotificationPath);
+                Show(id, title, body, soundType);
                 return;
             }
 
@@ -159,12 +160,13 @@ namespace TimeIt.Droid.Implementations
                 Body = body,
                 Id = id,
                 IconId = Resource.Drawable.appIcon,
-                SoundPath = soundNotificationPath
+                SoundType = soundType
             };
             var serializedNotification = JsonConvert.SerializeObject(localNotification);
             intent.PutExtra(SchedulerReceiver.LocalNotificationKey, serializedNotification);
 
-            var pendingIntent = PendingIntent.GetBroadcast(Application.Context, 0, intent, PendingIntentFlags.CancelCurrent);
+            var pendingIntent =
+                PendingIntent.GetBroadcast(Application.Context, 0, intent, PendingIntentFlags.CancelCurrent);
             var future = (long)(deliveryOn - now).TotalMilliseconds;
             var milis = Java.Lang.JavaSystem.CurrentTimeMillis() + future;
             var alarmManager = GetAlarmManager();
@@ -176,11 +178,6 @@ namespace TimeIt.Droid.Implementations
                 alarmManager.SetExact(AlarmType.RtcWakeup, milis, pendingIntent);
             else
                 alarmManager.Set(AlarmType.RtcWakeup, milis, pendingIntent);
-        }
-
-        public Intent GetLauncherActivity()
-        {
-            return Application.Context.PackageManager.GetLaunchIntentForPackage(PackageName);
         }
 
         private Intent CreateSchedulerIntent(int id)

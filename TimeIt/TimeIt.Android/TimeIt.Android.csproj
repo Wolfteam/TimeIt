@@ -117,13 +117,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Implementations\BackgroundTaskService.cs" />
+    <Compile Include="Background\SoundService.cs" />
     <Compile Include="Models\LocalNotification.cs" />
     <Compile Include="Implementations\NotificationService.cs" />
     <Compile Include="Implementations\NotificationSoundProvider.cs" />
     <Compile Include="Background\SchedulerReceiver.cs" />
     <Compile Include="Implementations\SimpleMessage.cs" />
-    <Compile Include="Background\SoundWorker.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Remderers\IntervalListViewRenderer.cs" />
     <Compile Include="Remderers\TimerActionButtonRenderer.cs" />

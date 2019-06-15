@@ -1,6 +1,6 @@
 ﻿using Android.Content;
 using Newtonsoft.Json;
-using TimeIt.Droid.Implementations;
+using System;
 using TimeIt.Droid.Models;
 using TimeIt.Interfaces;
 using Xamarin.Forms;
@@ -16,8 +16,8 @@ namespace TimeIt.Droid.Background
         {
             string extra = intent.GetStringExtra(LocalNotificationKey);
             var notif = JsonConvert.DeserializeObject<LocalNotification>(extra);
-            var notifService = DependencyService.Get<INotificationService>() as NotificationService;
-            notifService.Show(notif.Id, notif.Title, notif.Body, notif.SoundPath);
+            var notifService = DependencyService.Get<INotificationService>();
+            notifService.Show(notif.Title, notif.Body, notif.Id, DateTime.Now, notif.SoundType);
         }
     }
 }
