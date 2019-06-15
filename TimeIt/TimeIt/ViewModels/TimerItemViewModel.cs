@@ -19,7 +19,6 @@ namespace TimeIt.ViewModels
         private readonly IMessenger _messenger;
         private readonly INotificationService _notificationService;
         private readonly INotificationSoundProvider _notificationSoundProvider;
-        private readonly IBackgroundTaskService _backgroundTaskService;
         private int _elapsedRepetitions;
         private readonly List<int> _notificationIds = new List<int>();
 
@@ -88,15 +87,13 @@ namespace TimeIt.ViewModels
             ICustomDialogService dialogService,
             IMessenger messenger,
             INotificationService notificationService,
-            INotificationSoundProvider notificationSoundProvider,
-            IBackgroundTaskService backgroundTaskService)
+            INotificationSoundProvider notificationSoundProvider)
         {
             _appSettings = appSettings;
             _dialogService = dialogService;
             _messenger = messenger;
             _notificationService = notificationService;
             _notificationSoundProvider = notificationSoundProvider;
-            _backgroundTaskService = backgroundTaskService;
             SetCommands();
             RegisterMessages();
         }
@@ -232,11 +229,9 @@ namespace TimeIt.ViewModels
             if (!whenStarts && !whenIsAboutToEnd && !whenRepetitionCompletes)
                 return;
 
-            string notifSoundPath = currentNotifType == NotificationType.TOAST && _appSettings.ToastWithSound
-                ? _notificationSoundProvider.GetSoundPath((CountdownSoundType)secondsBefore)
-                : null;
-
-            int volume = _appSettings.Volume;
+            var soundType = currentNotifType == NotificationType.TOAST && _appSettings.ToastWithSound
+                ? (SoundType)secondsBefore
+                : (SoundType?)null;
 
             float secondsToAdd = 0;
             int rep = reschedule ? RemainingRepetitions : Repetitions;
@@ -292,7 +287,7 @@ namespace TimeIt.ViewModels
                                 $"{secondsBefore} second(s) left",
                                 diff,
                                 now.AddSeconds(diff),
-                                notifSoundPath);
+                                soundType);
 
                             _notificationIds.Add(diff);
                         }
@@ -322,8 +317,6 @@ namespace TimeIt.ViewModels
 
         public void CancelScheduledNotifications()
         {
-            _backgroundTaskService.CancelAllSoundNotification();
-
             foreach (int id in _notificationIds)
             {
                 _notificationService.Cancel(id);

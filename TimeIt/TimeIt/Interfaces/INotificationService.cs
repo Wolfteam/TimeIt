@@ -1,4 +1,5 @@
 ﻿using System;
+using TimeIt.Enums;
 
 namespace TimeIt.Interfaces
 {
@@ -12,8 +13,8 @@ namespace TimeIt.Interfaces
         /// <param name="title">Title of the notification</param>
         /// <param name="body">Body or description of the notification</param>
         /// <param name="id">Id of the notification</param>
-        /// <param name="soundNotificationPath">The path to the audio that will be played</param>
-        void Show(string title, string body, string soundNotificationPath = null);
+        /// <param name="soundType">The sound that will be played</param>
+        void Show(string title, string body, SoundType? soundType = null);
 
         /// <summary>
         /// Show a local notification at a specified time
@@ -22,8 +23,8 @@ namespace TimeIt.Interfaces
         /// <param name="body">Body or description of the notification</param>
         /// <param name="id">Id of the notification</param>
         /// <param name="notifyTime">Time to show notification</param>
-        /// <param name="soundNotificationPath">The path to the audio that will be played</param>
-        void Show(string title, string body, int id, DateTime deliveryOn, string soundNotificationPath = null);
+        /// <param name="soundType">The sound that will be played</param>
+        void Show(string title, string body, int id, DateTime deliveryOn, SoundType? soundType = null);
 
         /// <summary>
         /// Cancel a local notification

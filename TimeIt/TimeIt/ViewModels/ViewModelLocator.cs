@@ -70,7 +70,6 @@ namespace TimeIt.ViewModels
             SimpleIoc.Default.Register(() => DependencyService.Get<INotificationSoundProvider>());
             SimpleIoc.Default.Register(() => DependencyService.Get<IToastNotificator>());
             SimpleIoc.Default.Register(() => DependencyService.Get<ISimpleMessage>());
-            SimpleIoc.Default.Register(() => DependencyService.Get<IBackgroundTaskService>());
             SimpleIoc.Default.Register(() => new TimeItDbContext());
 
             SimpleIoc.Default.Register<MainPageViewModel>();
