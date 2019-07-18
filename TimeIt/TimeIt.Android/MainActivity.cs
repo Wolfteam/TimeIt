@@ -14,7 +14,7 @@ using Android.Content;
 
 namespace TimeIt.Droid
 {
-    [Activity(Label = "TimeIt", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ResizeableActivity = true, LaunchMode = LaunchMode.SingleTask)]
+    [Activity(Label = "TimeIt", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = false, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ResizeableActivity = true, LaunchMode = LaunchMode.SingleTask)]
     public class MainActivity : Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Linq;
+using TimeIt.Enums;
 using TimeIt.Interfaces;
 using TimeIt.UWP.Implementations;
 using Windows.UI.Notifications;
@@ -33,9 +34,9 @@ namespace TimeIt.UWP.Implementations
             }
         }
 
-        public void Show(string title, string body, string soundNotificationPath = null)
+        public void Show(string title, string body, SoundType? soundType)
         {
-            var content = GenerateSimpleToastContent(title, body, soundNotificationPath);
+            var content = GenerateSimpleToastContent(title, body, GetSoundPath(soundType));
             var toastNotifcation = new ToastNotification(content.GetXml());
             ShowToastNotification(toastNotifcation);
         }
@@ -44,18 +45,18 @@ namespace TimeIt.UWP.Implementations
             string title, 
             string body, 
             int id, 
-            DateTime deliveryOn, 
-            string soundNotificationPath = null)
+            DateTime deliveryOn,
+            SoundType? soundType)
         {
             bool showNow = deliveryOn <= DateTime.Now;
 
             if (showNow)
             {
-                Show(title, body, soundNotificationPath);
+                Show(title, body, soundType);
                 return;
             }
 
-            var content = GenerateSimpleToastContent(title, body, soundNotificationPath);
+            var content = GenerateSimpleToastContent(title, body, GetSoundPath(soundType));
             var toastNotification = new ScheduledToastNotification(content.GetXml(), deliveryOn)
             {
                 Id = $"{id}",
@@ -117,5 +118,15 @@ namespace TimeIt.UWP.Implementations
 
         private void ScheduleToastNotification(ScheduledToastNotification scheduledToast)
             => ToastNotificationManager.CreateToastNotifier().AddToSchedule(scheduledToast);
+
+        private string GetSoundPath(SoundType? soundType)
+        {
+            var soundProvider = Xamarin.Forms.DependencyService.Get<INotificationSoundProvider>();
+            string soundNotificationPath = soundType.HasValue
+                ? soundProvider.GetSoundPath(soundType.Value)
+                : null;
+
+            return soundNotificationPath;
+        }
     }
 }

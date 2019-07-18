@@ -117,18 +117,18 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Implementations\BackgroundTaskService.cs" />
+    <Compile Include="Background\SoundService.cs" />
     <Compile Include="Models\LocalNotification.cs" />
     <Compile Include="Implementations\NotificationService.cs" />
     <Compile Include="Implementations\NotificationSoundProvider.cs" />
     <Compile Include="Background\SchedulerReceiver.cs" />
     <Compile Include="Implementations\SimpleMessage.cs" />
-    <Compile Include="Background\SoundWorker.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Remderers\IntervalListViewRenderer.cs" />
     <Compile Include="Remderers\TimerActionButtonRenderer.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SplashActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\fonts\fa-Brands-Regular-400.otf" />
@@ -194,6 +194,9 @@
   </ItemGroup>
   <ItemGroup>
     <LinkDescription Include="LinkDescription.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\splash_centered.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

@@ -1,6 +1,6 @@
 ﻿namespace TimeIt.Enums
 {
-    public enum CountdownSoundType
+    public enum SoundType
     {
         TEN_SECONDS = 10,
         NINE_SECONDS = 9,

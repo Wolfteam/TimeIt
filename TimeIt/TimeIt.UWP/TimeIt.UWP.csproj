@@ -92,7 +92,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Implementations\BackgroundTaskService.cs" />
     <Compile Include="Implementations\NotificationService.cs" />
     <Compile Include="Implementations\NotificationSoundProvider.cs" />
     <Compile Include="Renderers\FixFrameRenderer.cs" />
