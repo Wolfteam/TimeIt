@@ -131,7 +131,7 @@
             <StackLayout.Resources>
                 <Style TargetType="Label">
                     <Setter Property="TextColor" Value="White" />
-                    <Setter Property="FontSize" Value="{x:OnPlatform Android=18}" />
+                    <Setter Property="FontSize" Value="{x:OnPlatform Android=18, Default=Default}" />
                 </Style>
             </StackLayout.Resources>
 

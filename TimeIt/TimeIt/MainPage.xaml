@@ -8,8 +8,8 @@
     xmlns:customControls="clr-namespace:TimeIt.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:TimeIt.Helpers"
-    xmlns:iconize="clr-namespace:Plugin.Iconize;assembly=Plugin.Iconize"
     xmlns:local="clr-namespace:TimeIt"
+    xmlns:localModels="clr-namespace:TimeIt.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pcCards="clr-namespace:PanCardView;assembly=PanCardView"
     xmlns:pcControls="clr-namespace:PanCardView.Controls;assembly=PanCardView"
@@ -25,37 +25,61 @@
     </ContentPage.Behaviors>
 
     <ContentPage.ToolbarItems>
-        <iconize:IconToolbarItem
+        <customControls:BindableToolbarItem
             Command="{Binding AddTimerCommand}"
-            Icon="fas-plus"
-            IconColor="White"
             IsVisible="{Binding IsAddTimerButtonVisible, Mode=OneWay}"
             Order="Default"
             Priority="0"
-            Text="Add Timer" />
-        <iconize:IconToolbarItem
+            Text="Add Timer">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Plus}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </customControls:BindableToolbarItem>
+        <customControls:BindableToolbarItem
             Command="{Binding EditTimerCommand}"
-            Icon="fas-pen"
-            IconColor="White"
             IsVisible="{Binding IsEditTimerButtonVisible, Mode=OneWay}"
             Order="Default"
-            Priority="0"
-            Text="Edit Timer" />
-        <iconize:IconToolbarItem
+            Priority="1"
+            Text="Edit Timer">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Pen}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </customControls:BindableToolbarItem>
+        <customControls:BindableToolbarItem
             Command="{Binding RemoveTimerCommand}"
-            Icon="fas-trash-alt"
-            IconColor="White"
             IsVisible="{Binding IsDeleteTimerButtonVisible, Mode=OneWay}"
             Order="Primary"
-            Priority="0"
-            Text="Delete" />
-        <iconize:IconToolbarItem
+            Priority="2"
+            Text="Delete">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.TrashAlt}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </customControls:BindableToolbarItem>
+        <customControls:BindableToolbarItem
             Command="{Binding OpenSettingsCommand}"
-            Icon="fas-cog"
-            IconColor="White"
             Order="Secondary"
-            Priority="1"
-            Text="Settings" />
+            Priority="3"
+            Text="Settings">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Cog}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </customControls:BindableToolbarItem>
     </ContentPage.ToolbarItems>
 
     <ContentPage.Resources>
@@ -142,7 +166,7 @@
 
         <Style x:Key="CanvasStyle" TargetType="pcCards:CarouselView">
             <Setter Property="IsCyclical" Value="False" />
-            <Setter Property="IsViewCacheEnabled" Value="True" />
+            <Setter Property="IsViewReusingEnabled" Value="False" />
             <Setter Property="Grid.Column" Value="0" />
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>

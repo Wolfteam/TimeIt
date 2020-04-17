@@ -12,5 +12,29 @@
         <Style x:Key="PageStyle" TargetType="ContentPage">
             <Setter Property="BackgroundColor" Value="{StaticResource AppBackgroundColor}" />
         </Style>
+
+        <OnPlatform x:Key="FontAwesomeIconSize" x:TypeArguments="x:Double">
+            <On Platform="Android" Value="20" />
+            <On Platform="iOS" Value="20" />
+            <On Platform="UWP" Value="40" />
+        </OnPlatform>
+
+        <OnPlatform x:Key="FontAwesomeBrands" x:TypeArguments="x:String">
+            <On Platform="Android" Value="Fonts/FontAwesome5Brands-Regular.otf#Regular" />
+            <On Platform="iOS" Value="FontAwesome5Brands-Regular" />
+            <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Brands-Regular.otf#Font Awesome 5 Brands" />
+        </OnPlatform>
+
+        <OnPlatform x:Key="FontAwesomeSolid" x:TypeArguments="x:String">
+            <On Platform="Android" Value="Fonts/FontAwesome5Free-Solid.otf#Regular" />
+            <On Platform="iOS" Value="FontAwesome5Free-Solid" />
+            <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Free-Solid.otf#Font Awesome 5 Free" />
+        </OnPlatform>
+
+        <OnPlatform x:Key="FontAwesomeRegular" x:TypeArguments="x:String">
+            <On Platform="Android" Value="Fonts/FontAwesome5Free-Regular.otf#Regular" />
+            <On Platform="iOS" Value="FontAwesome5Free-Regular" />
+            <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Free-Regular.otf#Font Awesome 5 Free" />
+        </OnPlatform>
     </Application.Resources>
 </Application>

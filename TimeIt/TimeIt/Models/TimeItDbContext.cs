@@ -193,7 +193,7 @@ namespace TimeIt.Models
                     databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), databaseName);
                     break;
                 case Device.UWP:
-                    databasePath = databaseName;
+                    databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), databaseName);
                     break;
                 default:
                     throw new NotImplementedException("Platform not supported");

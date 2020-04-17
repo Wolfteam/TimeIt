@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Plugin.Iconize;
 using System;
 using System.Linq;
 using TimeIt.Helpers;
@@ -12,7 +11,7 @@ using Xamarin.Forms.Xaml;
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace TimeIt
 {
-    public partial class App : Application
+    public partial class App : Xamarin.Forms.Application
     {
         /// <summary>
         /// Key to save / retrieve the timer object that was running
@@ -28,7 +27,7 @@ namespace TimeIt
         {
             InitializeComponent();
             //TODO: I SHOULD REMOVE THE HARDCODED FONT SIZES FROM THE MAIN PAGE
-            var page = new IconNavigationPage(new MainPage())
+            var page = new NavigationPage(new MainPage())
             {
                 BarBackgroundColor = (Color)Current.Resources[AppConstants.AppBarBackgroundColorKey],
                 BarTextColor = Color.White
@@ -38,11 +37,6 @@ namespace TimeIt
 
             //this is to place the toolbar to the bottom on uwp
             MainPage.On<Xamarin.Forms.PlatformConfiguration.Windows>().SetToolbarPlacement(ToolbarPlacement.Bottom);
-
-            Iconize
-                .With(new Plugin.Iconize.Fonts.FontAwesomeRegularModule())
-                .With(new Plugin.Iconize.Fonts.FontAwesomeBrandsModule())
-                .With(new Plugin.Iconize.Fonts.FontAwesomeSolidModule());
         }
 
         protected override void OnStart()
@@ -83,11 +77,11 @@ namespace TimeIt
 
             var interval = currentTimer.Intervals.First(i => i.IsRunning);
             SetProperties(
-                currentTimer.TimerID, 
-                currentTimer.ElapsedRepetitions, 
-                currentTimer.RemainingRepetitions, 
-                currentTimer.ElapsedTime, 
-                interval.IntervalID, 
+                currentTimer.TimerID,
+                currentTimer.ElapsedRepetitions,
+                currentTimer.RemainingRepetitions,
+                currentTimer.ElapsedTime,
+                interval.IntervalID,
                 interval.TimeLeft);
         }
 

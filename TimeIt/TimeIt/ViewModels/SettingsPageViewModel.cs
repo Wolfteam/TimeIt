@@ -168,7 +168,7 @@ namespace TimeIt.ViewModels
             });
 
             OpenGithubCommand = new RelayCommand<string>
-                (url => Device.OpenUri(new Uri(url)));
+                (async url => await Launcher.TryOpenAsync(new Uri(url)));
         }
     }
 }

@@ -11,7 +11,7 @@ namespace TimeIt.Helpers
             var mce = new MapperConfigurationExpression();
             mce.ConstructServicesUsing(SimpleIoc.Default.GetInstance);
 
-            mce.AddProfiles(typeof(MappingProfile).Assembly);
+            mce.AddProfile<MappingProfile>();
 
             var mc = new MapperConfiguration(mce);
             mc.AssertConfigurationIsValid();

@@ -6,7 +6,7 @@
     xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
     xmlns:c="clr-namespace:TimeIt.Controls"
     xmlns:cp="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
-    xmlns:iconize="clr-namespace:Plugin.Iconize;assembly=Plugin.Iconize"
+    xmlns:localModels="clr-namespace:TimeIt.Models"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
     x:Name="editIntervalPage"
     Title="Add / Edit Interval"
@@ -14,21 +14,33 @@
     Style="{StaticResource PageStyle}">
 
     <ContentPage.ToolbarItems>
-        <iconize:IconToolbarItem
+        <c:BindableToolbarItem
             Command="{Binding SaveCommand}"
-            Icon="fas-save"
-            IconColor="White"
             Order="Primary"
             Priority="0"
-            Text="Save" />
+            Text="Save">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Save}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </c:BindableToolbarItem>
 
-        <iconize:IconToolbarItem
+        <c:BindableToolbarItem
             Command="{Binding DiscardChangesCommand}"
-            Icon="fas-times"
-            IconColor="White"
             Order="Primary"
             Priority="1"
-            Text="Discard" />
+            Text="Discard">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Times}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </c:BindableToolbarItem>
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>

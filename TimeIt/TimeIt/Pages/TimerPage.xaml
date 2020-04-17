@@ -6,8 +6,7 @@
     xmlns:behaviors="clr-namespace:Xamarin.Forms.BehaviorsPack;assembly=Xamarin.Forms.BehaviorsPack"
     xmlns:c="clr-namespace:TimeIt.Controls"
     xmlns:converters="clr-namespace:TimeIt.Converters"
-    xmlns:iconize="clr-namespace:Plugin.Iconize;assembly=Plugin.Iconize"
-    xmlns:models="clr-namespace:TimeIt.Models"
+    xmlns:localModels="clr-namespace:TimeIt.Models"
     xmlns:uc="clr-namespace:TimeIt.UserControls"
     x:Name="timerPage"
     Title="{Binding PageTitle, Mode=OneWay}"
@@ -15,29 +14,46 @@
     NavigationPage.BackButtonTitle="Go back hdp"
     Style="{StaticResource PageStyle}">
     <ContentPage.ToolbarItems>
-        <iconize:IconToolbarItem
+        <c:BindableToolbarItem
             Command="{Binding SaveTimerCommand}"
-            Icon="fas-save"
-            IconColor="White"
             Order="Primary"
             Priority="0"
-            Text="Save" />
+            Text="Save">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Save}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </c:BindableToolbarItem>
 
-        <iconize:IconToolbarItem
+        <c:BindableToolbarItem
             Command="{Binding DiscardChangesCommand}"
-            Icon="fas-times"
-            IconColor="White"
             Order="Primary"
             Priority="1"
-            Text="Discard" />
+            Text="Discard">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.Times}"
+                    Size="{StaticResource FontAwesomeIconSize}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </c:BindableToolbarItem>
 
-        <iconize:IconToolbarItem
+        <c:BindableToolbarItem
             Command="{Binding RemoveTimerCommand}"
-            Icon="fas-trash-alt"
-            IconColor="White"
             Order="Secondary"
             Priority="2"
-            Text="Delete" />
+            Text="Delete">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    Glyph="{x:Static localModels:FontAwesome5SolidIcons.TrashAlt}"
+                    Color="White" />
+            </ToolbarItem.IconImageSource>
+        </c:BindableToolbarItem>
     </ContentPage.ToolbarItems>
 
     <ContentPage.Resources>
@@ -215,43 +231,35 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <uc:LineControl LineHeight="2" />
-            <Grid Grid.Row="1" HorizontalOptions="Fill">
+            <Grid Grid.Row="1" HorizontalOptions="FillAndExpand">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
                 <Label
                     Grid.Column="0"
                     FontAttributes="Bold"
                     FontSize="{OnPlatform Android='18',
                                           UWP='14'}"
-                    HorizontalOptions="StartAndExpand"
+                    HorizontalOptions="Start"
                     Text="Intervals:"
                     TextColor="White"
                     VerticalOptions="Center" />
-                <StackLayout
+                <Button
                     Grid.Column="1"
-                    Margin="0,0,20,0"
-                    Padding="0"
-                    HorizontalOptions="EndAndExpand"
-                    Orientation="Horizontal"
+                    BackgroundColor="Transparent"
+                    Command="{Binding AddIntervalCommand}"
+                    FontSize="14"
+                    Text="Add a new interval"
+                    TextColor="White"
                     VerticalOptions="Center">
-                    <StackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding AddIntervalCommand}" />
-                    </StackLayout.GestureRecognizers>
-                    <Label
-                        FontSize="{OnPlatform Android='18',
-                                              UWP='14'}"
-                        Text="Add a new interval"
-                        TextColor="White"
-                        VerticalOptions="Center" />
-                    <iconize:IconLabel
-                        FontSize="{OnPlatform Android='22',
-                                              UWP='18'}"
-                        Text="fas-plus-circle"
-                        TextColor="White"
-                        VerticalTextAlignment="Center" />
-                </StackLayout>
+                    <Button.ImageSource>
+                        <FontImageSource
+                            FontFamily="{StaticResource FontAwesomeSolid}"
+                            Glyph="{x:Static localModels:FontAwesome5SolidIcons.PlusCircle}"
+                            Color="White" />
+                    </Button.ImageSource>
+                </Button>
             </Grid>
             <c:IntervalListView
                 x:Name="IntervalsListView"
@@ -269,7 +277,11 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid Margin="0,0,0,10" Padding="{OnPlatform UWP='10'}">
+                            <Grid
+                                Margin="0,0,0,10"
+                                Padding="{OnPlatform UWP='10',
+                                                     Default='0'}"
+                                HorizontalOptions="FillAndExpand">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
@@ -288,21 +300,23 @@
                                     Text="{Binding Name, Mode=OneWay}"
                                     TextColor="{Binding Color, Mode=OneWay, Converter={StaticResource StringToColorConverter}}"
                                     VerticalOptions="End" />
-                                <FlexLayout
+                                <Button
                                     Grid.Row="0"
                                     Grid.RowSpan="2"
                                     Grid.Column="1"
-                                    Direction="Row"
-                                    JustifyContent="End">
-                                    <iconize:IconButton
-                                        BackgroundColor="Transparent"
-                                        Command="{Binding Path=BindingContext.RemoveIntervalCommand, Source={x:Reference timerPage}}"
-                                        CommandParameter="{Binding}"
-                                        FontSize="Medium"
-                                        HorizontalOptions="Center"
-                                        Text="fas-trash-alt"
-                                        TextColor="White" />
-                                </FlexLayout>
+                                    Margin="{x:OnPlatform Android='0,10,0,0'}"
+                                    BackgroundColor="Transparent"
+                                    Command="{Binding Path=BindingContext.RemoveIntervalCommand, Source={x:Reference timerPage}}"
+                                    CommandParameter="{Binding}"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Center">
+                                    <Button.ImageSource>
+                                        <FontImageSource
+                                            FontFamily="{StaticResource FontAwesomeSolid}"
+                                            Glyph="{x:Static localModels:FontAwesome5SolidIcons.TrashAlt}"
+                                            Color="Red" />
+                                    </Button.ImageSource>
+                                </Button>
                                 <Label
                                     Grid.Row="1"
                                     Grid.Column="0"

@@ -1,5 +1,5 @@
-﻿using Plugin.Iconize;
-using System;
+﻿using System;
+using TimeIt.Models;
 using Xamarin.Forms;
 
 namespace TimeIt.Controls
@@ -90,27 +90,39 @@ namespace TimeIt.Controls
         public CustomStepper()
         {
             double fontSize = Device.GetNamedSize(
-                    Device.RuntimePlatform == Device.Android 
+                    Device.RuntimePlatform == Device.Android
                     ? NamedSize.Large
-                    : NamedSize.Medium, 
+                    : NamedSize.Medium,
                 typeof(Button));
 
-            PlusBtn = new IconButton
+            var iconSize = (OnPlatform<double>)Application.Current.Resources["FontAwesomeIconSize"];
+            var fontResource = (OnPlatform<string>)Application.Current.Resources["FontAwesomeSolid"];
+            PlusBtn = new Button
             {
                 BackgroundColor = Color.Transparent,
                 FontSize = fontSize,
-                Text = "fas-plus-circle",
-                TextColor = Color.Red,
                 FontAttributes = FontAttributes.Bold,
+                ImageSource = new FontImageSource()
+                {
+                    FontFamily = fontResource,
+                    Glyph = FontAwesome5SolidIcons.PlusCircle,
+                    Color = Color.Red,
+                    Size = Device.RuntimePlatform == Device.Android ? iconSize : iconSize / 2
+                }
             };
 
-            MinusBtn = new IconButton
+            MinusBtn = new Button
             {
                 BackgroundColor = Color.Transparent,
                 FontSize = fontSize,
-                Text = "fas-minus-circle",
-                TextColor = Color.Red,
                 FontAttributes = FontAttributes.Bold,
+                ImageSource = new FontImageSource()
+                {
+                    FontFamily = fontResource,
+                    Glyph = FontAwesome5SolidIcons.MinusCircle,
+                    Color = Color.Red,
+                    Size = Device.RuntimePlatform == Device.Android ? iconSize : iconSize / 2
+                }
             };
 
             PlusBtn.Clicked += PlusBtnClicked;
@@ -118,11 +130,11 @@ namespace TimeIt.Controls
             Entry = new Label
             {
                 BackgroundColor = Color.Transparent,
+                TextColor = Color.White,
                 FontSize = fontSize,
                 FontAttributes = FontAttributes.Bold,
                 HorizontalTextAlignment = TextAlignment.Center,
                 VerticalTextAlignment = TextAlignment.Center,
-                TextColor = Color.Red,
                 IsEnabled = false
             };
 
