@@ -1,16 +1,11 @@
-﻿using System;
-
-using Android.App;
-using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using Android.OS;
-using Xamarin.Forms;
-using Plugin.Toasts;
-using PanCardView.Droid;
-using Plugin.Iconize;
+﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
+using Android.OS;
+using Android.Runtime;
+using PanCardView.Droid;
+using Plugin.Toasts;
+using Xamarin.Forms;
 
 namespace TimeIt.Droid
 {
@@ -31,7 +26,6 @@ namespace TimeIt.Droid
             DependencyService.Register<ToastNotification>();
             ToastNotification.Init(this);
             CardsViewRenderer.Preserve();
-            Iconize.Init(Resource.Id.toolbar, Resource.Id.sliding_tabs);
             LoadApplication(new App());
         }
 
