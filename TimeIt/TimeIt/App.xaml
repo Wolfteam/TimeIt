@@ -13,28 +13,41 @@
             <Setter Property="BackgroundColor" Value="{StaticResource AppBackgroundColor}" />
         </Style>
 
-        <OnPlatform x:Key="FontAwesomeIconSize" x:TypeArguments="x:Double">
-            <On Platform="Android" Value="20" />
-            <On Platform="iOS" Value="20" />
+        <OnPlatform
+            x:Key="FontAwesomeIconSize"
+            x:TypeArguments="x:Double"
+            Default="20">
             <On Platform="UWP" Value="40" />
         </OnPlatform>
 
-        <OnPlatform x:Key="FontAwesomeBrands" x:TypeArguments="x:String">
-            <On Platform="Android" Value="Fonts/FontAwesome5Brands-Regular.otf#Regular" />
-            <On Platform="iOS" Value="FontAwesome5Brands-Regular" />
+        <!--
+            Export font is not properly working on uwp https://github.com/xamarin/Xamarin.Forms/issues/10307
+            Once it gets fixed, we can remove the fonts from the uwp project
+        -->
+        <OnPlatform
+            x:Key="FontAwesomeBrands"
+            x:TypeArguments="x:String"
+            Default="FABrands">
             <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Brands-Regular.otf#Font Awesome 5 Brands" />
+            <!--<On Platform="UWP" Value="FABrands#Font Awesome 5 Brands Regular" />-->
         </OnPlatform>
 
-        <OnPlatform x:Key="FontAwesomeSolid" x:TypeArguments="x:String">
-            <On Platform="Android" Value="Fonts/FontAwesome5Free-Solid.otf#Regular" />
-            <On Platform="iOS" Value="FontAwesome5Free-Solid" />
+        <OnPlatform
+            x:Key="FontAwesomeSolid"
+            x:TypeArguments="x:String"
+            Default="FASolid">
             <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Free-Solid.otf#Font Awesome 5 Free" />
+
+            <!--<On Platform="UWP" Value="FASolid#Font Awesome 5 Free Regular" />-->
         </OnPlatform>
 
-        <OnPlatform x:Key="FontAwesomeRegular" x:TypeArguments="x:String">
-            <On Platform="Android" Value="Fonts/FontAwesome5Free-Regular.otf#Regular" />
-            <On Platform="iOS" Value="FontAwesome5Free-Regular" />
+        <OnPlatform
+            x:Key="FontAwesomeRegular"
+            x:TypeArguments="x:String"
+            Default="FARegular">
             <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Free-Regular.otf#Font Awesome 5 Free" />
+
+            <!--<On Platform="UWP" Value="FARegular#Font Awesome 5 Free Solid" />-->
         </OnPlatform>
     </Application.Resources>
 </Application>

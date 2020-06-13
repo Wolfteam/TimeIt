@@ -1,4 +1,7 @@
-﻿namespace TimeIt.Models
+﻿using Xamarin.Forms;
+
+[assembly: ExportFont("FontAwesome5Free-Regular.otf", Alias = "FARegular")]
+namespace TimeIt.Models
 {
 	public static class FontAwesome5RegularIcons
 	{
