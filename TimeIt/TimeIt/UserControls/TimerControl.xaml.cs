@@ -216,7 +216,7 @@ namespace TimeIt.UserControls
                 }
 
                 float textWidth = intervalTextPaint.MeasureText(intervalName);
-                float nameHOffset = pathMeasure.Length / 2f - textWidth / 2f;
+                float nameHOffset = pathMeasure.Length / 4f - textWidth / 4f;
 
                 canvas.DrawTextOnPath(intervalName, intervalPath, nameHOffset, vOffset, intervalTextPaint);
             }
@@ -278,7 +278,7 @@ namespace TimeIt.UserControls
                 //    intervalTimeTransparentPaint.TextScaleX = pathMeasure.Length / pathMeasure.Length * 0.6f;
 
                 float durationWidth = intervalTimePaint.MeasureText(ciText);
-                float durationHOffset = pathMeasure.Length / 2f - durationWidth / 2f;
+                float durationHOffset = pathMeasure.Length / 4f - durationWidth / 4f;
                 //float durationHOffset = (float)(Math.PI * sweepAngle * radius / 360) - durationWidth / 2f;
                 //TODO: there is a small glitch with the colors here
                 //first we draw the "transparent" one

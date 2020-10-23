@@ -20,34 +20,19 @@
             <On Platform="UWP" Value="40" />
         </OnPlatform>
 
-        <!--
-            Export font is not properly working on uwp https://github.com/xamarin/Xamarin.Forms/issues/10307
-            Once it gets fixed, we can remove the fonts from the uwp project
-        -->
         <OnPlatform
             x:Key="FontAwesomeBrands"
             x:TypeArguments="x:String"
-            Default="FABrands">
-            <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Brands-Regular.otf#Font Awesome 5 Brands" />
-            <!--<On Platform="UWP" Value="FABrands#Font Awesome 5 Brands Regular" />-->
-        </OnPlatform>
+            Default="FABrands" />
 
         <OnPlatform
             x:Key="FontAwesomeSolid"
             x:TypeArguments="x:String"
-            Default="FASolid">
-            <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Free-Solid.otf#Font Awesome 5 Free" />
-
-            <!--<On Platform="UWP" Value="FASolid#Font Awesome 5 Free Regular" />-->
-        </OnPlatform>
+            Default="FASolid" />
 
         <OnPlatform
             x:Key="FontAwesomeRegular"
             x:TypeArguments="x:String"
-            Default="FARegular">
-            <On Platform="UWP" Value="/Assets/Fonts/FontAwesome5Free-Regular.otf#Font Awesome 5 Free" />
-
-            <!--<On Platform="UWP" Value="FARegular#Font Awesome 5 Free Solid" />-->
-        </OnPlatform>
+            Default="FARegular" />
     </Application.Resources>
 </Application>

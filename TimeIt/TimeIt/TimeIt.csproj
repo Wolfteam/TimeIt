@@ -45,9 +45,9 @@
     <PackageReference Include="Toasts.Forms.Plugin" Version="3.3.2" />
     <PackageReference Include="Xam.Plugin.SimpleAudioPlayer" Version="1.4.0" />
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
-    <PackageReference Include="Xamarin.Forms" Version="4.6.0.847" />
+    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1560" />
     <PackageReference Include="Xamarin.Forms.BehaviorsPack" Version="2.1.1" />
-    <PackageReference Include="Xamarin.Forms.Visual.Material" Version="4.6.0.847" />
+    <PackageReference Include="Xamarin.Forms.Visual.Material" Version="4.8.0.1560" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,13 +93,6 @@
     <EmbeddedResource Update="UserControls\TimerControl.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Windows.Foundation.UniversalApiContract">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\References\10.0.17134.0\Windows.Foundation.UniversalApiContract\6.0.0.0\Windows.Foundation.UniversalApiContract.winmd</HintPath>
-      <IsWinMDFile>true</IsWinMDFile>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
